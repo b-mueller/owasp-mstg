@@ -99,25 +99,31 @@ Programmatic defenses aim to hinder various processes used by reverse engineers,
 
 --[ TODO ] --
 
-For a protection scheme to be considered effective, it must incorporate defenses against all five processes. Furthermore, to achieve overall robustness, the defenses in each category must be comprised of multiple mechanisms (e.g. multiple functionally independent means of anti-debugging on different API layers). *Resiliency testing* is the process of verifying the effectiveness of those mechanisms.
+For a protection scheme to be considered effective, it must incorporate various kinds of anti-reversing tricks. To make things sound more respectable, we're calling those those tricks *programmatic defenses*. "Programmatic" refers to the fact that these kinds of defenses *do something* - they are functions that prevent, or react to, actions of the reverse engineer. This is in contract to obfuscating transformations, which change the way the program looks. Note that these two categories sometimes overlap - for example, self-compiling or self-modifiying code, while usually being refered to as a means of obfuscation, can also be said to "do something". In general however, you'll see that it is a useful distincton.
 
-### Types of Defenses
-
-Software protection schemes incorporate a variety of functions that prevent, or react to, actions of the reverse engineer. For example, an app could terminate when it suspects being run on a rooted device or on an emulator. These *programmatic defenses* can be further categorized into two modi operandi:
+*Programmatic defenses* can be further categorized into two modi operandi:
 
 1. Preventive: Functions that aim to *prevent* anticipated actions of the reverse engineer. As an example, an app may use an operating system API to prevent debuggers from attaching.
 
 2. Reactive: Features that aim to detect, and respond to, tools or actions of the reverse engineer. For example, an app could terminate when it suspects being run in an emulator, or change its behavior in some way if a debugger is detected.
 
-<img src="Images/Chapters/0x07b/reversing-processes.png" width="600px" />
+You usually find a mix of those two employed in any given software protection scheme.
 
 ### Criteria for Overall Effectiveness
 
-*The adversary finds that the binary code is encrypted and doesn’t load in their favorite disassembler. Multiple layers of debugging defenses prevent them from easily dumping the decrypted code. Patching the binary code is difficult due to its encrypted nature, and because it triggers additional integrity checks. On top of that, the app crashes in incomprehensible ways at the slightest hint of tampering. A day and a half later, they turn away in disgust and frustration.*
+*She found that the binary code is encrypted and doesn’t load in their favorite disassembler. Multiple layers of debugging defenses prevented her from easily dumping the decrypted code. Patching the binary code was difficult due to its encrypted nature, and because it triggered additional integrity checks. On top of that, the app crashed in incomprehensible ways at the slightest hint of tampering. Hours later, you she turned away in disgust, doubting the life choices that led her to this moment.*
 
-The main motto in anti-reversing is **the sum is greater than its parts.** We want to make it as difficult as possible for the adversary to get a first foothold for their analysis. We want them to throw the towel before they even get started! Because if they *do* get started, it's usually only a matter of time before the whole protection scheme collapses.
+-- The desired effect of software protections
+
+The main motto in anti-reversing is **the sum is greater than its parts.** The defender wants to make it as difficult as possible to get a first foothold for an analysis. They want the adversary to throw the towel before they even get started! Because once the adversary does get started, it's usually only a matter of time before the house of card collapses.
 
 To achieve this, one needs to combine a multitude of defenses, preferably including some original ones. The defenses need to be scattered throughout the app, but also work together in unison to create a greater whole. In the following sections, we'll describe the main criteria that contribute to the effectiveness of programmatic defenses.
+
+#### Coverage of Reversing Processes and Artefacts
+
+--[ TODO ] --
+
+<img src="Images/Chapters/0x07b/reversing-processes.png" width="600px" />
 
 #### Number of Defenses
 
