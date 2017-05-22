@@ -1071,9 +1071,9 @@ Controls in this category verify the integrity of the app's own memory space. Th
 
 In principle, this is done by comparing the contents of memory, or a checksum over the contents, with known "good" values. There are many ways of implementing such checks. Examples include:
 
-** Detecting PLT hooks **
+**Detecting PLT hooks**
 
-** Detecting inline hooks **
+**Detecting inline hooks**
 
 Inline hooking takes control of a function by overwriting its first few bytes with a jump to injected code. 
 
