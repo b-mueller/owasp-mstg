@@ -1067,7 +1067,15 @@ N/A
 
 #### Overview
 
--- TODO [Provide a general description of the issue "Testing Memory Integrity Checks".] --
+Controls in this category verify the integrity of the app's own memory space. The goal is to protect against modifications applied both to the app's files, as well against as memory patches applied during runtime. This includes unwanted changes to binary code or bytecode, functions pointer tables, and important data structures. 
+
+In principle, this is done by comparing the contents of memory, or a checksum over the contents, with known "good" values. There are many ways of implementing such checks. Examples include:
+
+** Detecting PLT hooks **
+
+** Detecting inline hooks **
+
+Inline hooking takes control of a function by overwriting its first few bytes with a jump to injected code. 
 
 #### Static Analysis
 

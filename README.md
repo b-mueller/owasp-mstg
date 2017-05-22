@@ -6,11 +6,11 @@ This is the official Github Repository of the OWASP Mobile Security Testing Guid
 
 ## Join the MSTG Working Session at the OWASP Summit 2017
 
-Rhe [OWASP summit 2017](http://owaspsummit.org) will have a whole 5-days track dedicated the the Mobile Testing Guide! This will be a great opportunity to meet other mobile appsec experts and participate in the creation of the industry standard. Our ambitious goal for the summit to complete the MSTG. The summit will take place in Woburn Forest Center Parcs, Bedfordshire (50 minutes from London) from June 12th to June 16th. [Sign up here](http://owaspsummit.org/Working-Sessions/Mobile-Security/MSTG.html).
+The [OWASP summit 2017](http://owaspsummit.org) will have a whole 5-days track dedicated to the the Mobile Testing Guide! This will be a great opportunity to meet other mobile appsec experts and participate in the creation of the industry standard. Our ambitious goal for the summit to complete the MSTG. The summit will take place in Woburn Forest Center Parcs, Bedfordshir, 50 minutes from London, from June 12th to June 16th. [Sign up here](http://owaspsummit.org/Working-Sessions/Mobile-Security/MSTG.html).
 
 ## Table-of-Contents
 
-### Introductionary
+### Introduction
 
 - [Header](Document/0x00-Header.md)
 - [Foreword](Document/Foreword.md)
@@ -58,7 +58,7 @@ Rhe [OWASP summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 
 The MSTG hasn't been officially released yet. There are several options for converting it into an easily readable format:
 
-1. Read it on [Gitbook](https://b-mueller.gitbooks.io/owasp-mobile-security-testing-guide/content/). The book is auto-synced with the main repo. You can use the gitbook command line tool to generate PDF, epub, and other e-book formats. Please note that we have disabled the ebook export features on gitbook.com for the time being - they will be enabled once the project reaches beta status.
+1. Read it on [Gitbook](https://b-mueller.gitbooks.io/owasp-mobile-security-testing-guide/content/). The book is automatically synchronized with the main repo. You can use the gitbook command line tool to generate PDF, epub, and other e-book formats. Please note that we have disabled the ebook export features on gitbook.com for the time being - they will be enabled once the project reaches beta status.
 
 2. Clone the repository and run the [document generator](https://github.com/OWASP/owasp-mstg/blob/master/Tools/generate_document.sh) (requires [pandoc](http://pandoc.org)). This produces docx and html files in the "Generated" subdirectory.
 
@@ -70,7 +70,7 @@ $ ./generate_document.sh
 
 You can also use the [document index](https://rawgit.com/OWASP/owasp-mstg/master/Generated/OWASP-MSTG-Table-of-Contents.html) to navigate the master branch of the MSTG.
 
-## Contributions, Feature Requests and Feedback
+## Contributions, feature requests and feedback
 
 **We are searching for additional authors, reviewers and editors.** The best way to get started is to browse the [existing content](https://b-mueller.gitbooks.io/owasp-mobile-security-testing-guide/content/). Also, check the [project dashboard](https://github.com/OWASP/owasp-mstg/projects/1) for a list of open tasks.
 
