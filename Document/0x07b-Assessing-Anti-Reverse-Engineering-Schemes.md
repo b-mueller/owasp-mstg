@@ -113,29 +113,41 @@ Software protection schemes incorporate a variety of functions that prevent, or 
 
 ### Criteria for Overall Effectiveness
 
---[ TODO ] --
+*The adversary finds that the binary code is encrypted and doesn’t load in their favorite disassembler. Multiple layers of debugging defenses prevent them from easily dumping the decrypted code. Patching the binary code is difficult due to its encrypted nature, and because it triggers additional integrity checks. On top of that, the app crashes in incomprehensible ways at the slightest hint of tampering. A day and a half later, they turn away in disgust and frustration.*
+
+The main motto in anti-reversing is **the sum is greater than its parts.** We want to make it as difficult as possible for the adversary to get a first foothold for their analysis. We want them to throw the towel before they even get started! Because if they *do* get started, it's usually only a matter of time before the whole protection scheme collapses.
+
+To achieve this, one needs to combine a multitude of defenses, preferably including some original ones. The defenses need to be scattered throughout the app, but also work together in unison to create a greater whole. In the following sections, we'll describe the main criteria that contribute to the effectiveness of programmatic defenses.
 
 #### Number of Defenses
 
-"More is better" is not always a great motto in real life but it does apply to software protections. Employing multiple defenses simultaneously makes it difficult for the adversary to get a foothold for starting the analysis. They may find that the binary code is encrypted and doesn’t load in their favorite disassembler. Multiple layers of debugging defenses prevent her from easily dumping the decrypted code. Patching the binary code is difficult due to its encrypted nature, and because it triggers additional integrity checks.
+--[ TODO ] --
 
 #### Implementation Diversity
 
 --[ TODO ] --
 
+See also "parallelism" and "API layer" below.
+
 #### Response Diversity
 
-Less is better in terms of information given to the adversary. The most effective defensive features are designed to respond in stealth mode: The attacker is left completely unaware that a defensive mechanism has been triggered. 
+Less is better in terms of information given to the adversary. This principle also applies to anti-tampering controls: A control that reacts to tampering immediately in a visible way is more easily discovered than a control that triggers some kind of hidden response with no apparent immediate consequences. For example, imagine a debugger detection mechanism that displays a message box saying "DEBUGGER DETECTED!" in big, red, all-caps letters. This gives away exactly what has happened, plus it gives the reverse engineer something to look for (the code displaying the messagebox). Now imagine a mechanism that quietly changes modifies function pointer when it detects a debugger, triggering a sequence of events that leads to a crash later on. This makes the reverse engineering process much more painful.
+
+The most effective defensive features are designed to respond in stealth mode: The attacker is left completely unaware that a defensive mechanism has been triggered. For maximum effectiveness, we recommend mixing different types of responses including the following:
 
 - Feedback: When the anti-tampering response is triggered, an error message is displayed to the user or written to a log file. The adversary can immediately discern the nature of the defensive feature as well as the time at which the mechanism was triggered.
 - Indiscernible: The defense mechanism terminates the app without providing any error details and without logging the reason for the termination. The adversary does not learn information about the nature of the defensive feature, but can discern the approximate time at which the feature was triggered.
-- Stealth: The anti-tampering feature either does not visibly respond at all to the detected tampering, or the response happens with a significant delay. For example, the mechanism could corrupt a pointer which leads to a malfunction at a much later point in time.
+- Stealth: The anti-tampering feature either does not visibly respond at all to the detected tampering, or the response happens with a significant delay. 
 
-"The app implements multiple different responses to tampering, debugging and emulation, including stealthy responses that don't simply terminate the app."
+See also MASVS V8.8: "The app implements multiple different responses to tampering, debugging and emulation, including stealthy responses that don't simply terminate the pap."
+
+#### Scattering
+
+--[ TODO ] --
 
 #### Integration
 
-"Obfuscating transformations and functional defenses are interdependent and well-integrated throughout the app."
+--[ TODO ] --
 
 ### Effectiveness Criteria for a Single Control
 
@@ -149,7 +161,7 @@ Adversaries are more likely to be familiar with unqiquituous techniques that are
 - Widely known: A well-documented and commonly used technique is used. It can be bypassed by using widely available tools with a moderate amount of customization.
 - Proprietary: The feature is not commonly found in published anti-reverse-engineering resources for the target operating system, or a known technique has been sufficiently extended / customized to cause significant effort for the reverse engineer.
 
-#### Dependence on System APIs
+#### API Layer
 
 Lower-level calls are more difficult to defeat than higher level calls. 
 
