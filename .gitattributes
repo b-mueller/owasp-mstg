@@ -1,3 +1,0 @@
-*.apk filter=lfs diff=lfs merge=lfs -text
-*.ipa filter=lfs diff=lfs merge=lfs -text
-*.tgz filter=lfs diff=lfs merge=lfs -text
