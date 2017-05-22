@@ -49,6 +49,7 @@ To perform security testing different tools are available in order to be able to
 * AndBug - https://github.com/swdunlop/AndBug-  AndBug is a debugger targeting the Android platform's Dalvik virtual machine intended for reverse engineers and developers.
 * Cydia Substrate: Introspy-Android - https://github.com/iSECPartners/Introspy-Android - Blackbox tool to help understand what an Android application is doing at runtime and assist in the identification of potential security issues.
 * Drozer - https://www.mwrinfosecurity.com/products/drozer/ - Drozer allows you to search for security vulnerabilities in apps and devices by assuming the role of an app and interacting with the Dalvik VM, other apps' IPC endpoints and the underlying OS.
+* VirtualHook - https://github.com/rk700/VirtualHook - VirtualHook is a hooking tool for applications on Android ART(>=5.0). It's based on VirtualApp and therefore does not require root permission to inject hooks.
 
 #### Bypassing Root Detection and SSL Pinning
 * Xposed Module: Just Trust Me - https://github.com/Fuzion24/JustTrustMe - Xposed Module to bypass SSL certificate pinning.
