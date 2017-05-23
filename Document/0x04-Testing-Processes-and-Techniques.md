@@ -3,8 +3,6 @@
 ## Mobile App Security Testing Methodology
 
 -- TODO [Describe Mobile Security Testing methodology] --
--- ToDo: Explain different kind of Apps (Native, Hybrid etc) and that hte MSTG focuses for now on native implementations.
-
 
 The context of mobile security testing is a conjunction of multiple different tier of components: **app**, **communication** and **back-end server**. These three high-level components will be the main attack surface for a mobile security test.   
 
@@ -12,7 +10,54 @@ The context of mobile security testing is a conjunction of multiple different ti
 * **Communication:** Usage of insecure or unencrypted communication channel, missing SSL certificate pinning etc.
 * **Back-end Servers:** Flawed authentication and session management, vulnerable server side functions etc.
 
+### Different Types of Mobile Apps
 
+The following section is a brief introduction to the 3 different types of mobile applications, namely the (1) Native App, (2) Hybrid App and (3) Web App. Before we dive into them, it is essential to first understand what is Mobile App.
+
+#### Mobile App
+
+In the past, people uses Personal Computers (PCs) to perform daily tasks at work and at leisure, such as creating a PowerPoint presentation slide or writing a report. Then, when computation power increases and web technologies become more popular, some of these capabilities that used to be only able to perform on PCs, they can be performed on the Web Browser. Today, a smart phone in one's pocket has more processor and RAM than a full-fledge PC back in those days! These mobile devices are capable to perform daily tasks and they has special processor designed for high performance and capabilities to support multitasking and high productivity daily tasks. As such, it has formed its own ecosystem where there are high demand for various types of mobile apps, be it designed for enhancing one's productivity, lifestyle or social connectivity. 
+
+In short, mobile applications (hereby referred to as simply 'Mobile App'), are essentially self-contained programs that were designed to enhance the existing functionality of a smart phone. On Android, there is Play Store and on iOS, there is App Store -- they both have their own ecosystem which fulfills their own users' demand and supply. It plays a huge part in people's everyday life and allows them to be highly connected with the world and their friends. According to a survey conducted by BGR Media in late 2016, the mobile internet usage has surpassed desktop usage for the first time in history, and this can never happen without the countless Mobile Apps that make a mobile platform ecosystem attractive and full of enhanced functionalities <sup>[10]</sup>.
+
+#### Native App 
+
+Native App are basically mobile apps that were developed for use on a particular specific platform. A native mobile app is a smart phone application that is being coded in a particular programming language, for instance, Objective C or Swift for iOS and Java for Android operating systems. There are also other candidates of native mobile app, such as C# and XAML or JavaScript for Universal Windows Platform app (UWP) <sup>[11]</sup>. 
+
+However, the MSTG will focus on Android and iOS platforms at the moment as based on a survey conducted in November 2016, these two mobile operating system takes up 86.8% and 12.5% of market share worldwide, respectively, which takes up over 99% of the entire market share of the mobile operating systems <sup>[12]</sup>.  
+
+Native mobile apps provide fast performance and a high degree of reliability. They have better look and feel as well because most of time, they uses native buttons and user interface which are familiar to the user and looks good on the respective platform. In addition, they usually adhere to the design principles (e.g. Android Design Principles <sup>[13]</sup>), which are usually entirely neglected by the developers who design Hybrid Apps and Web Apps. 
+
+Another feature of an Native mobile apps is their ability of having access to the components of a smart phone, such as its accelerometer, GPS, and camera. Moreover, users are able to use certain apps without having Internet connectivity. However, a Native App is expensive to develop because it require a developer with specific skillset and the resulted app can only run on one platform, forcing the company that creates the app to make duplicated versions of the same app that work on other platforms. More often than not, Android mobile app developers are not proficient in developing iOS apps and vice versa for iOS mobile app developers. 
+
+Usually, when discussing about Mobile App, the assumption is always that it is a Native App. It is also worth noting that a Native App can only be "Native" to one type of mobile operating system: iOS, Android, UWP, etc. For companies that want to publish their Native Apps to multiple mobile operating system will need to develop and maintain a separate piece of software, with entirely different design and implementation, which could easily become complicated to manage, tedious to implement and expensive to maintain. This conveniently brings us to the next two types of Mobile Apps. 
+
+#### Hybrid App
+
+Hybrid Apps are similar to Native Apps, runs on a smart phone or tablet devices, and are written with web technologies, which consists of HTML5, CSS and JavaScript. Hybrid Apps run within a native container, and leverages on the device's browser engine (but not the browser, only the browser engine) to render the HTML content and process the JavaScript locally. A web-to-native abstraction layer enables access to device capabilities that are not accessible in Mobile Web applications, such as the accelerometer, camera and local storage.
+
+Companies usually build hybrid apps as wrappers for an existing web page, as an attempt to gain presence within the app store of the respective mobile operating systems, without spending significant effort for developing a different app. Hybrid apps are also popular because they allow cross platform development and thus significantly reduce development costs. The way it is able to support cross platform development is through the usage of the same HTML code components which is then being reused on different mobile operating systems. 
+
+For example, the HTML, CSS and JavaScript code that is rendered by the browser engine on an Android mobile device could also be rendered in the same way on an iOS mobile device. They will look the same but they may not look native. It is not difficult to visually differentiate between the User Interface (UI) of a Native App and a Hybrid App.   
+
+The following is a non-exhaustive list of the more popular frameworks for developing Hybrid Apps:
+
+* Apache Cordova - https://cordova.apache.org/
+* Framework 7 - http://framework7.io/ 
+* Ionic - https://ionicframework.com/
+* jQuery Mobile - https://jquerymobile.com/
+* Native Script - https://www.nativescript.org/
+* Onsen UI - https://onsen.io/
+* React Native - http://www.reactnative.com/
+* Sencha Touch - https://www.sencha.com/products/touch/
+
+#### Web App
+
+Web App, more commonly known as the Mobile Web App, are simply websites that were designed to look and feel like a native mobile app, but not implemented as such. Web App are run on a browser (unlike Hybrid App which run on browser engine, Web App run on browser) and are usually developed in HTML5. 
+
+Firstly, users will access the Web App on browser via a specific URL, where the look and feel is almost, quite identical to a native mobile app. To perform the installation of the app, a simple bookmark shortcut will be created on the Home screen of the device. 
+
+Web App was very popular when HTML5 was first released and people noticed its capability to achieve a look and feel which is very similar to a native app. Today, as the usage of native apps has increased significantly, it become obvious in differentiating between a Web App and a Native App, even for non-tech savvy personnel. 
 
 ### Testing Process
 
@@ -124,12 +169,12 @@ Usually, dynamic analysis is performed to check whether there are sufficient sec
 
 Dynamic analysis of the traffic exchanged between client and server can be performed by launching a Man-in-the-middle (MITM) attack. This can be achieved by using an interception proxy like Burp Suite or OWASP ZAP for HTTP traffic.  
 
-* [Configuring an Android Device to work with Burp](https://support.portswigger.net/customer/portal/articles/1841101-configuring-an-android-device-to-work-with-burp)
-* [Configuring an iOS Device to work with Burp](https://support.portswigger.net/customer/portal/articles/1841108-configuring-an-ios-device-to-work-with-burp)
+* Configuring an Android Device to work with Burp - https://support.portswigger.net/customer/portal/articles/1841101-configuring-an-android-device-to-work-with-burp
+* Configuring an iOS Device to work with Burp - https://support.portswigger.net/customer/portal/articles/1841108-configuring-an-ios-device-to-work-with-burp
 
 In case another (proprietary) protocol is used in a mobile app that is not HTTP, the following tools can be used to try to intercept or analyze the traffic:
-* [Mallory](https://github.com/intrepidusgroup/mallory)
-* [Wireshark](https://www.wireshark.org/)
+* Mallory - https://github.com/intrepidusgroup/mallory
+* Wireshark - https://www.wireshark.org/
 
 #### Input Fuzzing
 
@@ -142,7 +187,7 @@ Steps in fuzzing
 * Test case delivery
 * Crash monitoring
 
-[OWASP Fuzzing guide](https://www.owasp.org/index.php/Fuzzing)
+Also refer to the OWASP Fuzzing guide - https://www.owasp.org/index.php/Fuzzing
 
 Note: Fuzzing only detects software bugs. Classifying this issue as a security flaw requires further analysis by the researcher.
 
@@ -152,7 +197,7 @@ Note: Fuzzing only detects software bugs. Classifying this issue as a security f
 
 ##### Cross-Site Scripting (XSS)
 
-A typical reflected XSS attack is executed by sending a URL to the victim(s), which for example can contain a payload to connect to some exploitation framework like BeeF [2]. When clicking on it a reverse tunnel is established with the Beef server in order to attack the victim(s). As a WebView is only a slim browser it is not possible for a user to insert a URL into a WebView of an app as no address bar is available. Also clicking on a link will not open the URL in a WebView of an app, instead it will open directly within the browser of Android. Therefore a typical reflected Cross-Site Scripting attack that targets a WebView in an app is not applicable and will not work.
+A typical reflected XSS attack is executed by sending a URL to the victim(s), which for example can contain a payload to connect to some exploitation framework like BeeF [2]. When clicking on it a reverse tunnel is established with the Beef server in order to attack the victim(s). As a WebView is only a slim browser, it is not possible for a user to insert a URL into a WebView of an app as no address bar is available. Also, clicking on a link will not open the URL in a WebView of an app, instead it will open directly within the default browser of the respective mobile device. Therefore, a typical reflected Cross-Site Scripting attack that targets a WebView in an app is not applicable and will not work.
 
 If an attacker finds a stored Cross-Site Scripting vulnerability in an endpoint, or manages to get a Man-in-the-middle (MITM) position and injects JavaScript into the response, then the exploit will be sent back within the response. The attack will then be executed directly within the WebView. This can become dangerous in case:
 
@@ -160,7 +205,7 @@ If an attacker finds a stored Cross-Site Scripting vulnerability in an endpoint,
 * File access is not deactivated in the WebView (see OMTG-ENV-006)
 * The function addJavascriptInterface() is used (see OMTG-ENV-008)
 
-As a summary reflected XSS is no concern for a mobile App, but stored XSS or injected JavaScript through MITM can become a dangerous vulnerability if the WebView in use is configured insecurely.
+As a summary, a reflected Cross-Site Scripting is no concern for a mobile App, but a stored Cross-Site Scripting or injected JavaScript through MITM can become a dangerous vulnerability if the WebView in used is configured insecurely.
 
 ##### Cross-Site Request Forgery (CSRF)
 
@@ -176,9 +221,9 @@ Classification of sensitive information can vary between different industries an
 
 Ideally the customer can share a data classification policy that is already considering all different requirements and clearly defines sensitive information. This will become then the baseline during testing. The data classification should be applicable to:
 * data in transit and
-* data at rest.
+* data at rest
 
-For example regulations in Singapore for financial institutions require to encrypt passwords and PINs explicitly, even though they are already transmitted via HTTPS. Even though this might not be a vulnerability from a testers point of view, it need to be raised as compliance issue.
+For example, regulations in Singapore for financial institutions has imposed a requirement to encrypt passwords and PINs explicitly, even though they are already transmitted via HTTPS. Even though this might not be a vulnerability from the point of view of a tester, it is mandatory to raise this finding as a compliance issue.
 
 If no data classification policy is available, the following should be considered as sensitive information:
 * User authentication information (credentials, PINs etc.),
@@ -187,7 +232,6 @@ If no data classification policy is available, the following should be considere
 * Any data that must be protected by law or for compliance reasons.
 
 Defining sensitive information before the test is important for almost all data storage test cases in Android and iOS, as otherwise the tester has no clear basis on what he might need to look for.
-
 
 ## Tampering and Reverse Engineering
 
@@ -241,7 +285,11 @@ One thing to keep in mind is that modern mobile OSes strictly enforce code signi
 
 Code injection is a very powerful technique that allows you to explore and modify processes during runtime. The injection process can be implemented in various ways, but you'll get by without knowing all the details thanks to freely available, well-documented tools that automate it. These tools give you direct access to process memory and important structures such as live objects instantiated by the app, and come with many useful utility functions for resolving loaded libraries, hooking methods and native functions, and more. Tampering with process memory is more difficult to detect than patching files, making in the preferred method in the majority of cases.
 
-Substrate, Frida and XPosed are the most widely used hooking and code injection frameworks in the mobile world. The three frameworks differ in design philosophy and implementation details: Substrate and Xposed focus on code injection and/or hooking, while Frida aims to be a full-blown "dynamic instrumentation framework" that incorporates both code injection and language bindings, as well as an injectable JavaScript VM and console. However, you can also instrument apps with Substrate by using it to inject Cycript, the programming environment (a.k.a. "Cycript-to-JavaScript" compiler) authored by Saurik of Cydia fame. To complicate things even more, Frida's authors also created a fork of Cycript named ["frida-cycript"](https://github.com/nowsecure/frida-cycript) that replaces Cycript's runtime with a Frida-based runtime called Mjølner. This enables Cycript to run on all the platforms and architectures maintained by frida-core (if you are confused now don't worry, it's perfectly OK to be). The release was accompanied by a blog post by Frida's developer Ole titled "Cycript on Steroids", which [did not go that down that well with Saurik](https://www.reddit.com/r/ReverseEngineering/comments/50uweq/cycript_on_steroids_pumping_up_portability_and/).
+Substrate, Frida and XPosed are the most widely used hooking and code injection frameworks in the mobile world. The three frameworks differ in design philosophy and implementation details: Substrate and Xposed focus on code injection and/or hooking, while Frida aims to be a full-blown "dynamic instrumentation framework" that incorporates both code injection and language bindings, as well as an injectable JavaScript VM and console. 
+
+However, you can also instrument apps with Substrate by using it to inject Cycript, the programming environment (a.k.a. "Cycript-to-JavaScript" compiler) authored by Saurik of Cydia fame. To complicate things even more, Frida's authors also created a fork of Cycript named "frida-cycript" (https://github.com/nowsecure/frida-cycript) that replaces Cycript's runtime with a Frida-based runtime called Mjølner. This enables Cycript to run on all the platforms and architectures maintained by frida-core (if you are confused now don't worry, it's perfectly OK to be). 
+
+The release was accompanied by a blog post by Frida's developer Ole titled "Cycript on Steroids", which did not go that down that well with Saurik - https://www.reddit.com/r/ReverseEngineering/comments/50uweq/cycript_on_steroids_pumping_up_portability_and/.
 
 We'll include some examples for all three frameworks. As your first pick, we recommend starting with Frida, as it is the most versatile of the three (for this reason we'll also include more Frida details and examples). Notably, Frida can inject a Javascript VM into a process on both Android and iOS, while Cycript injection with Substrate only works on iOS. Ultimately however, you can of course achieve many of the same end goals with either framework.
 
@@ -269,7 +317,9 @@ Like always in hacking, the anything-goes-rule applies: Simply use whatever brin
 
 #### Dynamic Binary Instrumentation
 
-Another useful method for dealing with native binaries is dynamic binary instrumentations (DBI). Instrumentation frameworks such as Valgrind and PIN support fine-grained instruction-level tracing of single processes. This is achieved by inserting dynamically generated code at runtime. Valgrind compiles fine on Android, and pre-built binaries are available for download. The [Valgrind README](http://valgrind.org/docs/manual/dist.readme-android.html) contains specific compilation instructions for Android.
+Another useful method for dealing with native binaries is dynamic binary instrumentations (DBI). Instrumentation frameworks such as Valgrind and PIN support fine-grained instruction-level tracing of single processes. This is achieved by inserting dynamically generated code at runtime. Valgrind compiles fine on Android, and pre-built binaries are available for download. 
+
+The Valgrind README contains specific compilation instructions for Android - http://valgrind.org/docs/manual/dist.readme-android.html
 
 #### Emulation-based Dynamic Analysis
 
@@ -302,3 +352,8 @@ In the Android section, you'll find a walkthrough for cracking a simple license 
 * [7] HP DevInspect - https://saas.hpe.com/en-us/software/agile-secure-code-development
 * [8] Codiscope SecureAssist - https://codiscope.com/products/secureassist/
 * [9] Crawling Code - https://www.owasp.org/index.php/Crawling_Code
+* [10] Mobile internet usage surpasses desktop usage for the first time in history - http://bgr.com/2016/11/02/internet-usage-desktop-vs-mobile 
+* [11] Universal Windows Platform (UWP) app - https://docs.microsoft.com/en-us/windows/uwp/get-started/whats-a-uwp
+* [12] Worldwide Smartphone OS Market Share - http://www.idc.com/promo/smartphone-market-share/os 
+* [13] Android Design Principles - https://developer.android.com/design/get-started/principles.html
+
