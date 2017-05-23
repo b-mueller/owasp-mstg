@@ -176,9 +176,53 @@ Many Apps do not automatically logout a user, because of customer convenience. T
 
 #### Overview
 
+Password strength is a key concern when using passwords for authentication. Password policy defines requirements that end users should adhere to. Password length, password complexity and password topologies should properly be included in the Password Policy. A "strong" password policy makes it difficult or even infeasible for one to guess the password through either manual or automated means. 
+
+A good password policy should defines following controls in order to avoid password guessing attacks or even brute-forcing. 
+
+#####  Password Length
+* Minimum length of the passwords should be enforced by the application.
+* Maximum password length should not be set too low, as it will prevent users from creating passphrases. Typical maximum length is 128 characters.
+
+##### Password Complexity
+* Password must meet at least 3 out of the following 4 complexity rules
+1. at least 1 uppercase character (A-Z)
+2. at least 1 lowercase character (a-z)
+3. at least 1 digit (0-9)
+4. at least 1 special character (punctuation)
+* at least 10 characters
+* at most 128 characters
+* not more than 2 identical characters in a row
+
+##### Password Topologies
+* Ban commonly used password topologies.
+* Force multiple users to use different password topologies.
+* Require a minimum topology change between old and new passwords.
 -- TODO [Provide a general description of the issue "Testing the Password Policy".] --
 
 #### Static Analysis
+
+When testing a password policy, a well-defined rule set can be used to verify that source code not contain any previously identified technical or logical security flew. A exemplary rule set (source: VT Password<sup>[1]</sup>) is given below:
+* AllowedCharacterRule - Does a password contain only a specific list of characters
+* AlphabeticalSequenceRule - Does a password contain an alphabetical sequence
+* CharacterCharacteristicRule - Does a password contain the desired mix of character types
+* DictionaryRule - Does a password match a word in a dictionary
+* DictionarySubstringRule - Does a password contain a word in a dictionary
+* DigitCharacterRule - Does a password contain a digit
+* HistoryRule - Does a password match a previous password, supports hashes
+* IllegalCharacterRule - Does a password contain an illegal character
+* LengthRule - Is a password of a certain length
+* LowercaseCharacterRule - Does a password contain a lowercase character
+* NonAlphanumericCharacterRule - Does a password contain a non-alphanumeric character
+* NumericalSequenceRule - Does a password contain a numerical sequence
+* RegexRule - Does a password match a regular expression
+* RepeatCharacterRegexRule - Does a password contain a repeated character
+* SequenceRule - Does a password contain a keyboard sequence
+* SourceRule - Does a password match the password from another system or source
+* QwertySequenceRule - Does a password contain a QWERTY keyboard sequence
+* UppercaseCharacterRule - Does a password contain an uppercase character
+* UsernameRule - Does a password contain a username
+* WhitespaceRule - Does a password contain whitespace
 
 -- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
 
@@ -191,6 +235,16 @@ Many Apps do not automatically logout a user, because of customer convenience. T
 -- TODO [Describe how to test for this issue "Testing the Password Policy" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
 
 #### Remediation
+
+Issues related to Password Policy can easily be mitigated if application architecture is built with it from the beginning of the develpoment. Using regular expressions, developers could implement these policy settings. A list of regaular expressions which was discused in stackoverflow<sup>[2]</sup> is given below:
+* ^                 # start-of-string
+* (?=.*[0-9])       # a digit must occur at least once
+* (?=.*[a-z])       # a lower case letter must occur at least once
+* (?=.*[A-Z])       # an upper case letter must occur at least once
+* (?=.*[@#$%^&+=])  # a special character must occur at least once
+* (?=\S+$)          # no whitespace allowed in the entire string
+* .{8,}             # anything, at least eight places though
+* $                 # end-of-string
 
 -- TODO [Describe the best practices that developers should follow to prevent this issue "Testing the Password Policy".] --
 
@@ -212,14 +266,13 @@ Many Apps do not automatically logout a user, because of customer convenience. T
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+- [1] VT Password - https://code.google.com/archive/p/vt-middleware/wikis/vtpassword.wiki
+- [2] Stackoverflow - http://stackoverflow.com/questions/3802192/regexp-java-for-password-validation
 
 ##### Tools
 
 -- TODO [Add relevant tools for "Testing the Password Policy"] --
 * Enjarify - https://github.com/google/enjarify
-
 
 
 
