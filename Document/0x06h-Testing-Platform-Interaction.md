@@ -1,4 +1,4 @@
-## Testing Platform Interaction
+## Testing Platform Interaction on iOS
 
 ### Testing App permissions
 

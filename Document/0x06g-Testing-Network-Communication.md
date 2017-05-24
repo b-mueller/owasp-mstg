@@ -1,16 +1,4 @@
-## Testing Network Communication
-
-### Testing for Unencrypted Sensitive Data on the Network
-
-It is important to clarify that this control is at the server side, so the testing will be the same for iOS and Android applications. Please look at "Verifying the TLS Settings" in Android for a detailed explanation of this test case.
-
-Nevertheless, there is one implementation detail that should be noted for iOS. Starting from iOS 9 applications must use exclusively HTTPS and TLS 1.2 with Forward Secrecy enabled. Using HTTP requires a developer to define an exception in `Info.plist` file, which specifies the domains that will be using insecure communications. Therefore check `Info.plist` file in the application bundle to verify if there are any endpoints allowed to communicate over HTTP.
-
-
-### Verifying the TLS Settings
-
-It is important to clarify that this control is at the server side, so the testing will be the same for iOS and Android applications. Please look at "Verifying the TLS Settings" in Android for a detailed explanation of this test case.
-
+## Testing Network Communication in iOS Apps
 
 ### Testing Endpoint Identity Verification
 
@@ -56,8 +44,6 @@ It is important to clarify that this control is at the server side, so the testi
 
 -- TODO [Add relevant tools for "Testing Endpoint Identity Verification"] --
 * Enjarify - https://github.com/google/enjarify
-
-
 
 
 ### Testing Custom Certificate Stores and SSL Pinning
@@ -141,51 +127,3 @@ As a best practice, the certificate should be pinned. This can be done in severa
 * [1] Setting Burp Suite as a proxy for iOS Devices : https://support.portswigger.net/customer/portal/articles/1841108-configuring-an-ios-device-to-work-with-burp
 * [2] OWASP - Certificate Pinning for iOS : https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#iOS
 
-
-
-
-### Verifying that Critical Operations Use Secure Communication Channels
-
-#### Overview
-
--- TODO [Provide a general description of the issue "Verifying that Critical Operations Use Secure Communication Channels".] --
-
-#### Static Analysis
-
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
-
--- TODO [Confirm purpose of remark "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
-
--- TODO [Add content on "Verifying that Critical Operations Use Secure Communication Channels" with source code] --
-
-
-#### Dynamic Analysis
-
--- TODO [Describe how to test for this issue "Verifying that Critical Operations Use Secure Communication Channels" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
-
-#### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "Verifying that Critical Operations Use Secure Communication Channels".] --
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
-
-##### OWASP MASVS
-* V5.5 "The app doesn't rely on a single insecure communication channel (email or SMS) for critical operations, such as enrollments and account recovery."
-
-##### CWE
-
--- TODO [Add relevant CWE for "Verifying that Critical Operations Use Secure Communication Channels"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
-
-##### Info
-
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
-
-##### Tools
-
--- TODO [Add relevant tools for "Verifying that Critical Operations Use Secure Communication Channels"] --
-* Enjarify - https://github.com/google/enjarify

@@ -1,6 +1,6 @@
-## Testing Cryptography
+## Testing Cryptography in Android Apps
 
-### Verifying Key Management
+### Testing for Hardcoded Cryptographic Keys
 
 #### Overview
 
@@ -72,7 +72,6 @@ buildTypes {
 
 * shared preferences, typically at /data/data/package_name/shared_prefs
 
-
 #### Remediation
 
 If you need to store a key for repeated use, use a mechanism, such as KeyStore<sup>[2]</sup>, that provides a mechanism for long term storage and retrieval of cryptographic keys.
@@ -100,44 +99,6 @@ If you need to store a key for repeated use, use a mechanism, such as KeyStore<s
 ##### Tools
 * [QARK](https://github.com/linkedin/qark)
 * [Mobile Security Framework](https://github.com/ajinabraham/Mobile-Security-Framework-MobSF)
-
-
-### Testing for Custom Implementations of Cryptography
-
-#### Overview
-
-The use of a non-standard and custom build algorithm for cryptographic functionalities is dangerous because a determined attacker may be able to break the algorithm and compromise data that has been protected. Implementing cryptographic functions is time consuming, difficult and likely to fail. Instead well-known algorithms that were already proven to be secure should be used. All mature frameworks and libraries offer cryptographic functions that should also be used when implementing mobile apps.
-
-#### Static Analysis
-
-Carefully inspect all the cryptographic methods used within the source code, especially those which are directly applied to sensitive data. Pay close attention to seemingly standard but modified algorithms. Remember that encoding is not encryption! Any appearance of bit shift operators like exclusive OR operations might be a good sign to start digging deeper.
-
-#### Dynamic Analysis
-
-Although fuzzing of the custom algorithm might work in case of very weak crypto, the recommended approach would be to decompile the APK and inspect the algorithm to see if custom encryption schemes is really the case (see "Static Analysis").
-
-#### Remediation
-
-Do not develop custom cryptographic algorithms, as it is likely they are prone to attacks that are already well-understood by cryptographers.
-
-When there is a need to store sensitive data, use strong, up-to-date cryptographic algorithms. Select a well-vetted algorithm that is currently considered to be strong by experts in the field, and use well-tested implementations. The KeyStore is suitable for storing sensitive information locally and a list of strong ciphers offered by it can be found in the Android documentation<sup>[1]</sup>.
-
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M6 - Broken Cryptography
-
-##### OWASP MASVS
-- V3.2: "The app uses proven implementations of cryptographic primitives"
-
-##### CWE
-* CWE-327: Use of a Broken or Risky Cryptographic Algorithm
-
-##### Info
-[1] Supported Ciphers in KeyStore - https://developer.android.com/training/articles/keystore.html#SupportedCiphers
-
-
 
 ### Verifying the Configuration of Cryptographic Standard Algorithms
 
@@ -191,8 +152,6 @@ Use cryptographic algorithm configurations that are currently considered strong,
 
 -- TODO [Add relevant tools for "Verifying the Configuration of Cryptographic Standard Algorithms"] --
 * Enjarify - https://github.com/google/enjarify
-
-
 
 ### Testing Random Number Generation
 

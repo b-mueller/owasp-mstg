@@ -1,4 +1,4 @@
-## Testing Local Authentication
+## Testing Local Authentication in Android Apps
 
 Most of the authentication and session management requirements of the MASVS are generic ones, that do not rely on a specific implementation on iOS or Android.
 

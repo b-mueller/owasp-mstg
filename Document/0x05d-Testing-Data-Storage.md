@@ -1,4 +1,4 @@
-## Testing Data Storage
+## Testing Data Storage on Android
 
 For all test cases it need to be known what sensitive information is, in context of the app. Please have a look at "Classification of data" for further details.
 

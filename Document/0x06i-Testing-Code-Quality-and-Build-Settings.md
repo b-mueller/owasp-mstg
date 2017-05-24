@@ -1,4 +1,4 @@
-## Testing Code Quality and Build Settings
+## Testing Code Quality and Build Settings of iOS Apps
 
 ### Verifying that the App is Properly Signed
 

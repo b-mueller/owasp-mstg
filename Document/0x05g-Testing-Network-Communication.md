@@ -1,75 +1,4 @@
-## Testing Network Communication
-
-### Testing for Unencrypted Sensitive Data on the Network
-
-#### Overview
-
-A functionality of most mobile applications requires sending or receiving information from services on the Internet. This reveals another surface of attacks aimed at data on the way. It's possible for an attacker to sniff or even modify (MiTM attacks) an unencrypted information if he controls any part of network infrastructure (e.g. an WiFi Access Point) [1]. For this reason, developers should make a general rule, that any confidential data cannot be sent in a cleartext [2].
-
-#### Static Analysis
-
-Identify all external endpoints (backend APIs, third-party web services), which communicate with tested application and ensure that all those communication channels are encrypted.
-
-#### Dynamic Analysis
-
-The recommended approach is to intercept all network traffic coming to or from tested application and check if it is encrypted. A network traffic can be intercepted using one of the following approaches:
-
-* Capture all network traffic, using Tcpdump. You can begin live capturing via command:
-```
-adb shell "tcpdump -s 0 -w - | nc -l -p 1234"
-adb forward tcp:1234 tcp:1234
-```
-
-Then you can display captured traffic in a human-readable way, using Wireshark
-```
-nc localhost 1234 | sudo wireshark -k -S -i –
-```
-
-* Capture all network traffic using interception proxy, like OWASP ZAP<sup>[3]</sup> or Burp Suite<sup>[4]</sup> and observe whether all requests are using HTTPS instead of HTTP.
-
-> Please note, that some applications may not work with proxies like Burp or ZAP (because of customized HTTP/HTTPS implementation, or Certificate Pinning). In such case you may use a VPN server to forward all traffic to your Burp/ZAP proxy. You can easily do this, using Vproxy.
-
-It is important to capture all traffic (TCP and UDP), so you should run all possible functions of tested application after starting interception. This should include a process of patching application, because sending a patch to application via HTTP may allow an attacker to install any application on victim's device (MiTM attacks).
-
-#### Remediation
-
-Ensure that sensitive information is being sent via secure channels, using HTTPS [5], or SSLSocket [6] for socket-level communication using TLS.
-
-> Please be aware that `SSLSocket` **does not** verify hostname. The hostname verification should be done by using `getDefaultHostnameVerifier()` with expected hostname. Here [7] you can find an example of correct usage.
-
-Some applications may use localhost address, or binding to INADDR_ANY for handling sensitive IPC, what is bad from security perspective, as this interface is accessible for other applications installed on a device. For such purpose developers should consider using secure Android IPC mechanism [8].
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
-
-##### OWASP MASVS
-* V5.1: "Sensitive data is encrypted on the network using TLS. The secure channel is used consistently throughout the app."
-
-##### CWE
-* CWE-319 - Cleartext Transmission of Sensitive Information
-
-##### Info
-* [1] https://cwe.mitre.org/data/definitions/319.html
-* [2] https://developer.android.com/training/articles/security-tips.html#Networking
-* [3] https://security.secure.force.com/security/tools/webapp/zapandroidsetup
-* [4] https://support.portswigger.net/customer/portal/articles/1841101-configuring-an-android-device-to-work-with-burp
-* [5] https://developer.android.com/reference/javax/net/ssl/HttpsURLConnection.html
-* [6] https://developer.android.com/reference/javax/net/ssl/SSLSocket.html
-* [7] https://developer.android.com/training/articles/security-ssl.html#WarningsSslSocket
-* [8] https://developer.android.com/reference/android/app/Service.html
-
-##### Tools
-* Tcpdump - http://www.androidtcpdump.com/
-* Wireshark - https://www.wireshark.org/
-* OWASP ZAP - https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project
-* Burp Suite - https://portswigger.net/burp/
-* Vproxy - https://github.com/B4rD4k/Vproxy
-
-
-
-
+## Testing Network Communication in Android Apps
 
 ### Testing Endpoint Identify Verification
 
@@ -81,7 +10,7 @@ Using TLS for transporting sensitive information over the network is essential f
 
 There are 2 main issues related with validating TLS connection: the first one is verification if a certificate comes from trusted source and the second one is a check whether the endpoint server presents the right certificate [3].
 
-##### Verifying server certificate
+##### Verifying the Server Certificate
 
 A mechanism responsible for verifying conditions to establish a trusted connection in Android is called `TrustedManager`. Conditions to be checked at this point, are the following:
 
@@ -115,7 +44,6 @@ new X509TrustManager()
 
 context.init(null, trustAllCerts, new SecureRandom());
 ```
-
 
 ##### Hostname verification
 
@@ -197,8 +125,6 @@ Ensure, that the hostname and certificate is verified correctly. You can find a 
 * [7] http://www.cert.org/download/mitm/CERT_Tapioca.ova
 * [8] https://insights.sei.cmu.edu/cert/2014/09/-finding-android-ssl-vulnerabilities-with-cert-tapioca.html
 
-
-
 ### Testing Custom Certificate Stores and SSL Pinning
 
 #### Overview
@@ -258,44 +184,3 @@ The SSL pinning process should be implemented as described on the static analysi
 * [1] Setting Burp Suite as a proxy for Android Devices -  https://support.portswigger.net/customer/portal/articles/1841101-configuring-an-android-device-to-work-with-burp)
 * [2] OWASP Certificate Pinning for Android - https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#Android
 
-
-### Verifying that Critical Operations Use Secure Communication Channels
-
-#### Overview
-
-For sensitive applications, like banking apps, OWASP MASVS introduces "Defense in Depth" verification level [1]. Critical operations (e.g. user enrollment, or account recovery) of such sensitive applications are the most attractive targets from attacker's perspective. This creates a need of implementing advanced security controls for such operations, like adding additional channels (e.g. SMS and e-mail) to confirm user's action. Additional channels may reduce a risk of many attacking scenarios (mainly phishing), but only when they are out of any security faults.
-
-#### Static Analysis
-
-Review the code and identify those parts of a code which refers to critical operations. Verify if it uses additional channels to perform such operation. Examples of additional verification channels are following:
-
-* token (e.g. RSA token, yubikey)
-* push notification (e.g. Google Prompt)
-* SMS
-* email
-* data from another website you had to visit/scan
-* data from a physical letter or physical entry point (e.g.: data you receive only after signing a document at the office of a bank)
-
-#### Dynamic Analysis
-
-Identify all critical operations implemented in tested application (e.g. user enrollment, or account recovery, money transfer etc.). Ensure that each of critical operations, requires at least one additional channel (e.g. SMS, e-mail, token etc.). Verify if usage of such channel can be bypassed (e.g. turning off SMS confirmation without using any other channel).
-
-#### Remediation
-
-Ensure that critical operations require at least one additional channel to confirm user's action. Each channel must not be bypassed to execute a critical operation. If you are going to implement additional factor to verify user's identity, you may consider usage of Infobip 2FA library [2], one-time passcodes via Google Authenticator [3].
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
-
-##### OWASP MASVS
-* V5.5 "The app doesn't rely on a single insecure communication channel (email or SMS) for critical operations, such as enrollments and account recovery."
-
-##### CWE
-* CWE-956 - Software Fault Patterns (SFPs) within the Channel Attack cluster
-
-##### Info
-* [1] The Mobile Application Security Verification Standard - https://github.com/OWASP/owasp-masvs/blob/master/Document/0x03-Using_the_MASVS.md
-* [2] Infobip 2FA library - https://2-fa.github.io/libraries/android-library.html
-* [3] Google Authenticator for Android - https://github.com/google/google-authenticator-android
