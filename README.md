@@ -52,7 +52,7 @@ The [OWASP Summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 * [Testing Authentication and Session Management on Endpoints](Document/0x07a-Testing-Authentication-and-Session-Management.md)
 * [Testing Network Communication](Document/0x07b-Testing-Network-Communication.md)
 * [Testing Cryptography](Document/0x07c-Testing-Cryptography.md)
-* [Assessing Anti-Reverse Engineering Schemes](Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)
+* [Assessing Software Protection Schemes](Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)
 * [Testing Tools](Document/0x08-Testing-Tools.md)
 * [Suggested Reading](Document/0x09-Suggested-Reading.md)
 
