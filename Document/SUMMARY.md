@@ -38,5 +38,5 @@
 * [Testing Authentication and Session Management on the Endpoint](0x07a-Testing-Authentication-and-Session-Management.md)
 * [Testing Network Communication](0x07b-Testing-Network-Communication.md)
 * [Testing Cryptography](0x07c-Testing-Cryptography.md)
-* [Assessing Software Protection Schemes](0x07c-Assessing-Anti-Reverse-Engineering-Schemes.md)
+* [Assessing Software Protection Schemes](0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)
 * [Testing Tools](0x08-Testing-Tools.md)
