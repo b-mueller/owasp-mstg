@@ -13,7 +13,7 @@
 - [Android Security Testing Basics](0x05b-Basic-Security_Testing.md)
 - [Testing Data Storage](0x05d-Testing-Data-Storage.md)
 - [Testing Cryptography](0x05e-Testing-Cryptography.md)
-- [Testing Authentication and Session Management](0x05f-Testing-Authentication.md)
+- [Testing Authentication and Session Management](0x05f-Testing-Local-Authentication.md)
 - [Testing Network Communication](0x05g-Testing-Network-Communication.md)
 - [Testing Platform Interaction](0x05h-Testing-Platform-Interaction.md)
 - [Testing Code Quality and Build Settings](0x05i-Testing-Code-Quality-and-Build-Settings.md)
@@ -26,7 +26,7 @@
 - [iOS Security Testing Basics](0x06b-Basic-Security-Testing.md)
 - [Testing Data Storage](0x06d-Testing-Data-Storage.md)
 - [Testing Cryptography](0x06e-Testing-Cryptography.md)
-- [Testing Authentication and Session Management](0x06f-Testing-Authentication-and-Session-Management.md)
+- [Testing Authentication and Session Management](0x06f-Testing-Local-Authentication.md)
 - [Testing Network Communication](0x06g-Testing-Network-Communication.md)
 - [Testing Platform Interaction](0x06h-Testing-Platform-Interaction.md)
 - [Testing Code Quality and Build Settings](0x06i-Testing-Code-Quality-and-Build-Settings.md)
@@ -35,6 +35,7 @@
 
 ### Appendix
 
-* [Security Testing in the Application Development Lifecycle](0x07-Security-Testing-SDLC.md)
-* [Assessing Anti-Reverse Engineering Schemes](0x07b-Assessing-Anti-Reverse-Engineering-Schemes.md)
+* [Testing Authentication and Session Management](0x07a-Testing-Authentication-and-Session-Management.md)
+* [Testing Network Communication](0x07b-Testing-Network-Communication.md)
+* [Assessing Anti-Reverse Engineering Schemes](0x07c-Assessing-Anti-Reverse-Engineering-Schemes.md)
 * [Testing Tools](0x08-Testing-Tools.md)

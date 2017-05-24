@@ -43,10 +43,10 @@ end
 def render_testcases()
   markdown = Redcarpet::Markdown.new(TestcaseRender, fenced_code_blocks: true)
 
-  Dir.foreach('../Document/Testcases') do |fn|
+  Dir.foreach('../Document/') do |fn|
     if fn =~ /\.md$/
       $curfile = fn    
-      file = File.open("../Document/Testcases/#{fn}")
+      file = File.open("../Document//#{fn}")
                   contents = file.read
                   puts markdown.render(contents)
     end

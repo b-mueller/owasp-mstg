@@ -27,7 +27,7 @@ The [OWASP Summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 - [Android Security Testing Basics](Document/0x05b-Basic-Security_Testing.md)
 - [Testing Data Storage](Document/0x05d-Testing-Data-Storage.md)
 - [Testing Cryptography](Document/0x05e-Testing-Cryptography.md)
-- [Testing Authentication and Session Management](Document/0x05f-Testing-Authentication.md)
+- [Testing Local Authentication](Document/0x05f-Testing-Local-Authentication.md)
 - [Testing Network Communication](Document/0x05g-Testing-Network-Communication.md)
 - [Testing Platform Interaction](Document/0x05h-Testing-Platform-Interaction.md)
 - [Testing Code Quality and Build Settings](Document/0x05i-Testing-Code-Quality-and-Build-Settings.md)
@@ -40,7 +40,7 @@ The [OWASP Summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 - [iOS Security Testing Basics](Document/0x06b-Basic-Security-Testing.md)
 - [Testing Data Storage](Document/0x06d-Testing-Data-Storage.md)
 - [Testing Cryptography](Document/0x06e-Testing-Cryptography.md)
-- [Testing Authentication and Session Management](Document/0x06f-Testing-Authentication-and-Session-Management.md)
+- [Testing Local Authentication](Document/0x06f-Testing-Local-Authentication.md)
 - [Testing Network Communication](Document/0x06g-Testing-Network-Communication.md)
 - [Testing Platform Interaction](Document/0x06h-Testing-Platform-Interaction.md)
 - [Testing Code Quality and Build Settings](Document/0x06i-Testing-Code-Quality-and-Build-Settings.md)
@@ -49,8 +49,10 @@ The [OWASP Summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 
 ### Appendix
 
-* [Security Testing in the Application Development Lifecycle](Document/0x07-Security-Testing-SDLC.md)
-* [Assessing Anti-Reverse Engineering Schemes](Document/0x07b-Assessing-Anti-Reverse-Engineering-Schemes.md)
+* [Testing Authentication and Session Management](Document/0x07a-Testing-Authentication-and-Session-Management.md)
+* [Testing Network Communication](Document/0x07b-Testing-Network-Communication.md)
+* [Testing Cryptography](Document/0x07c-Testing-Cryptography.md)
+* [Assessing Anti-Reverse Engineering Schemes](Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)
 * [Testing Tools](Document/0x08-Testing-Tools.md)
 * [Suggested Reading](Document/0x09-Suggested-Reading.md)
 
@@ -65,7 +67,7 @@ The MSTG hasn't been officially released yet. There are several options for conv
 ```bash
 $ git clone https://github.com/OWASP/owasp-mstg/
 $ cd owasp-mstg/Tools/
-$ ./generate_document.sh 
+$ ./generate_document.sh
 ```
 
 You can also use the [document index](https://rawgit.com/OWASP/owasp-mstg/master/Generated/OWASP-MSTG-Table-of-Contents.html) to navigate the master branch of the MSTG.
@@ -90,7 +92,7 @@ Contributors are added to the acknowledgements table based on their contribution
 - Co-Author: Consistently contribute quality content, [at least 500 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
 - Top Contributor: Consistently contribute quality content, [at least 100 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
 - Contributor: Any form of contribution, [at least 1 addition logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
-- Reviewer: People that haven't submitted their own pull requests, but have created issues or given useful feedback in other ways. 
+- Reviewer: People that haven't submitted their own pull requests, but have created issues or given useful feedback in other ways.
 
 Please ping us or create a pull request if you are missing from the table or in the wrong column (note that we update the table frequently, but not in realtime).
 
