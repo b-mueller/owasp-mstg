@@ -18,7 +18,7 @@ The software stack of Android comprises of different layers, where each layer is
 
 ![Android Software Stack](Images/Chapters/0x05a/android_software_stack.png)
 
-On the lowest level Android is using the Linux Kernel where the core operating system is built up on. The hardware abstraction layer defines a standard interface for hardware vendors. HAL implementations are packaged into shared library modules (.so files). These modules will be loaded by the Android system at the appropriate time. The Android Runtime consists of the core libraries and the Dalvik VM (Virtual Machine). Apps are most often implemented in Java and compiled in Java class files and then compiled again into the `dex` format. The `dex` files are then executed within the Dalvik VM.
+On the lowest level Android is using the Linux Kernel where the core operating system is built up on. The hardware abstraction layer defines a standard interface for hardware vendors. HAL implementations are packaged into shared library modules (.so files). These modules will be loaded by the Android system at the appropriate time. The Android Runtime consists of the core libraries and the Dalvik VM (Virtual Machine). Apps are most often implemented in Java and compiled in Java class files. However since Android integrates a Dalvik VM, not JVM, the Java class files are then compiled again into the `dex` format. The `dex` files are packed into APK (a ZIP archive containing all resources, including the executable) and then unpacked and executed within the Dalvik VM.
 In the next image you can see the differences between the normal process of compiling and running a typical project in Java vs the process in Android using Dalvik VM.
 
 ![Java vs Dalvik](Images/Chapters/0x05a/java_vs_dalvik.png)
@@ -30,8 +30,8 @@ In Android, apps are installed as bytecode (.dex files, see "Android Application
 
 #### Android Users and Groups
 
-Android is a system based on Linux, however it does not deal with users the same way Linux does. It does not have a _/etc/password_ file describing a list of Linux users in the system. Instead Android contains a fixed set of users and groups and they are used to isolate processes and grant permissions.
-The file [system/core/include/private/android_filesystem_config.h](http://androidxref.com/7.1.1_r6/xref/system/core/include/private/android_filesystem_config.h) shows the complete list of the predefined users and groups mapped to numbers.
+Android is a system based on the Linux Kernel. However it does not deal with users the same way other Unix-like systems do. It does not have a _/etc/password_ file describing a list of users in the system. Instead Android utilizes the multi-user support of the Linux kernel, to achieve application sandboxing, by running each application under a separate user (with some exceptions).
+The file [system/core/include/private/android_filesystem_config.h](http://androidxref.com/7.1.1_r6/xref/system/core/include/private/android_filesystem_config.h) shows the complete list of the predefined users and groups used for system processes. UIDs for other applications are added as they are installed on the system. For more details you can check this [overview of Android application sandbox.](https://pierrchen.blogspot.mk/2016/09/an-walk-through-of-android-uidgid-based.html)
 File below depicts some of the users defined for Android Nougat:
 
 ```
@@ -49,33 +49,34 @@ File below depicts some of the users defined for Android Nougat:
 
 #### Communication with the Operating System
 
-The Android Framework is creating an abstraction layer for all the layers below, so developers can implement Android apps and can utilize the capabilities of Android without deeper knowledge of them. It also offers a robust implementation that offers common security functions like secure IPC or cryptography.
-
-In Android, apps are developed in Java, and the Operating System offers an API to interact with system resources, like
+As explained above, in Android, applications are written in Java and compiled into a `dex` bytecode. System resources are not accessed directly. Instead the Operating System offers libraries to interact with them. For example:
 * connectivity (Wifi, Bluetooth, NFC, ...),
 * files,
 * cameras,
 * geolocation (GPS),
-* microphone etc.
+* microphone,
+* etc.
 
-System resources cannot be accessed directly, and APIs mediate the access for the user. At the time of writing this guide, the current version of Android API is 7.1 Nougat, API 25.
+The Android Framework is an abstraction layer, offering high-level API easily usable from Java, without the need of deeper understanding of system libraries. Among the rest, it offers common security functions like secure IPC and cryptography. At the time of writing this guide, the current version of Android is 7.1 (Nougat), API level 25.
 
-APIs have evolved a lot since Android creation (the first release happened in September 2008). Early versions are not supported anymore; however, Android is a living project and new features and bug fixes are periodically made.
+APIs have evolved a lot since first Android version (September 2008). Critical bug fixes and security patches are usually propagated several versions back. The oldest Android version supported, at the time of writing this guide, is 4.4 (KitKat), API level 19.
 
-Noteworthy recent API versions are:
+Noteworthy API versions are:
 - Android 4.2 Jelly Bean (API 16) in November 2012 (introduction of SELinux)
 - Android 4.3 Jelly Bean (API 18) in July 2013 (SELinux becomes enabled by default)
 - Android 4.4 KitKat (API 19) in October 2013 (several new APIs and ART is introduced)
 - Android 5.0 Lollipop (API 21) in November 2014 (ART by default and many other new features)
 - Android 6.0 Marshmallow (API 23) in October 2015 (many new features and improvements, including granting fine-grained permissions at run time and not all or nothing at installation time)
-- Android 7.0 Nougat (API 24) in August 2016 (new JIT compiler on ART)
+- Android 7.0 Nougat (API 24-25) in August 2016 (new JIT compiler on ART)
+- Android 8.0 O (API 26) beta (mayor security fixes expected) 
 
-After being developed, apps can be installed on mobiles from a variety of sources: locally through USB, from Googles official store (Google Play Store) or from alternate stores.
+Apps can be installed on an Android device from a variety of sources: locally through USB, from Googles official store (Google Play Store) or from alternate stores.
 
 #### App Folder Structure
 
-Android apps installed (from Google Play Store or from external sources) are located at `/data/app/`. Since this folder cannot be listed without root, another way has to be used to get the exact name of the apk. To list all installed apks, the Android Debug Bridge (adb) can be used. ADB allows a tester to directly interact with the real phone, e.g., to gain access to a console on the device to issue further commands, list installed packages, start/stop processes, etc.
-To do so, the device has to have USB-Debugging enabled (can be found under developer settings) and has to be connected via USB.
+Android apps installed (from Google Play Store or from external sources) are located at `/data/app/`. Since this folder cannot be listed without root, another way has to be used to get the exact name of the APK. To list all installed APKs, the Android Debug Bridge (adb) can be used. ADB allows a tester to directly interact with the real device. E.g. to gain access to a console on the device to issue further commands, list installed packages, start/stop processes, etc.
+To do so, the device has to have USB-Debugging enabled (can be found under developer settings) and has to be connected via USB. Alternatively, you can configure the device so that ADB can be [connected over TCP/IP](https://stackoverflow.com/questions/2604727/how-can-i-connect-to-android-with-adb-over-tcp). As in both cases ADB behaves the same, we further assume the default case where connection over USB is established.
+
 Once USB-Debugging is enabled, the connected devices can be viewed with the following command:
 
 ```bash
@@ -126,7 +127,7 @@ drwxrwx--x u0_a65   u0_a65            2016-01-10 09:44 shared_prefs
 
 #### APK Structure
 
-An app on Android is a file with the extension .apk. This file is a signed zip-file which contains different files for the bytecode, assets, etc. When unzipped the following directory structure can usually be identified:
+An app on Android is a file with the extension .apk. This file is a signed zip-file which contains all of the application's resources, byte code, etc. When unzipped the following directory structure can usually be identified:
 
 ```bash
 $ unzip base.apk

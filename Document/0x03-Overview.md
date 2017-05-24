@@ -12,7 +12,9 @@ Security concerns in the mobile app space differ from traditional desktop softwa
 
 From the view of a mobile app, this means that extra care has to be taken when storing user data, such as using appropriate key storage APIs and taking advantage of hardware-backed security features when available. Here however we encounter another problem: Much depends on the device and operating system the app is running on, as well as its configuration. Is the keychain locked with a passcode? What if the device doesn't offer hardware-backed secure storage, as is the case with some Android devices? Can and should the app even verify this, or is it the responsibility of the user?
 
-Another key difference to their more stationary cousins is that mobile devices regularly connect to a variety of networks, including public WiFi networks shared with other (possibly malicious) clients. This creates great opportunities for network-based attacks, from simple packet sniffing to creating a rogue access point and going SSL man-in-the-middle (or even old-school stuff like routing protocol injection - those baddies use whatever works).
+Data stored on mobile devices also differ from the data stored on desktops and laptops. While both are used to access personal information, it is much more likely to find copies of these information on a mobile device. Further, due to the various connectivity options and their portability, mobile devices are used as keys for electronic door locks, replacement for payment cards, etc.
+
+Finally, mobile devices regularly connect to a variety of networks, including public WiFi networks shared with other (possibly malicious) clients. This creates great opportunities for network-based attacks, from simple packet sniffing to creating a rogue access point and going SSL man-in-the-middle (or even old-school stuff like routing protocol injection - those baddies use whatever works).
 
 ## OWASP Mobile Top 10 2016
 The OWASP Mobile Top 10 is the equivalent counterpart of the OWASP Top Ten Project, but is specifically designed to focus on the mobile application security. Most of the time, folks in the information security industry discuss about the "OWASP Top Ten" project but in fact, they are only referring to the web application security.
@@ -76,7 +78,7 @@ All requirements specified in the MASVS are described in technical detail in the
 
 ### Testing Process and Techniques
 
-This section explains the checklist and how to use it during a project. The different analysis techniques used for the test cases are explained like static and dynamic analysis on source code, but also on binaries. An introduction into tampering and reverse engineering is also part of this section.
+This section explains the checklist and how to use it during project security evaluation. The different analysis techniques used for the test cases are explained like static and dynamic analysis on source code, but also on binaries. An introduction into tampering and reverse engineering is also part of this section.
 
 ### Android Testing Guide
 
