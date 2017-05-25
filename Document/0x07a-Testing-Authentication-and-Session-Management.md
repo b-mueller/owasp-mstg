@@ -8,19 +8,29 @@ The following chapter outlines authentication and session management requirement
 
 Applications often have different areas with, on the one hand public and non-privileged information and functions, and on the other hand sensitive and privileged information and functions. Users can legitimately access the first ones without any restriction; however, in order to make sure sensitive and privileged information and functions are protected and accessible only to legitimate users, proper authentication has to take place.  
 
+There are different mechanisms available to implement server side authentication, either:
+* Cookie-Based Authentication or
+* Token-Based Authentication.
+
+Cookie-Based Authentication is the traditional authentication mechanism used in web applications. In order to adopt to the different requirements of mobile apps Token-Based Authentication was specified and is more and more used nowadays in mobile apps. A prominent example for this is JSON Web Token or JWT<sup>[1]</sup> which can be part of an OAuth2 authentication and authorization framework.
+
 #### Static Analysis
 
-When source code is available, first locate all sections with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the section. Look for keywords in the targeted programming language that are used to authenticate a user or to retrieve and check an existing session token (for instance: KeyStore, SharedPreferences, ...).
+When server source code is available, first identify which authentication mechanisms (Token or Cookie based) is used and enforced on server side. Afterwards locate all sections with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the section. Look for keywords in the server source code that are used to authenticate a user or to retrieve and check an existing session token.
 
--- ToDo: Create more specific content about authentication frameworks, the framework need to be identified and if the best practices offered by the framework are used for authentication. This should not be implemented by the developers themselves.
+Authentication mechanisms shouldn't be implemented from scratch, instead they should be build on top of frameworks that offer this functionality. The framework used on the server side should be identified and the usage of the available APIs should be verified if they are used accordingly to best practices. Sample frameworks on server side are:
 
+- Spring (Java) - https://projects.spring.io/spring-security/
+- PHP - http://php.net/manual/en/features.http-auth.php
+- Ruby on Rails -  http://guides.rubyonrails.org/security.html
+
+JWT is also available for all major programming languages, like PHP<sup>[3]</sup> or Java Spring<sup>[4]</sup>. Please also follow the test cases in the OWASP JWT Cheat Sheet<sup>[1]</sup> if JWT is used. Also the OWASP Testing Guide<sup>[2]</sup> should be consulted for more authentication test cases.
 
 #### Dynamic Analysis
 
-The easiest way to check authentication is to try to browse the app and access privileged sections. When this cannot be done manually, an automated crawler can be used (for instance, try to start an Activity that contains sensitive information with Drozer without providing authentication elements; for further information, please refer to the official Drozer guide available at https://labs.mwrinfosecurity.com/tools/drozer/).
+To verify authentication, first all privileged sections a user can access within an app should be explored. For all requests sent to an endpoint, an interception proxy can be used to capture network traffic while being authenticated. Then, try to replay requests while removing authentication information. If the endpoint is still sending back the requested data, that should only be available for authenticated users, authentication checks are not implemented properly on the endpoint.
 
-In case the app is exchanging information with a backend server, an interception proxy can be used to capture network traffic while being authenticated. Then, log out and try to replay requests while removing authentication information or not.
-Further attacks methods can be found in the OWASP Testing Guide V4 (OTG-AUTHN-004)<sup>[1]</sup>.
+Further attacks methods can be found in the OWASP Testing Guide V4 (OTG-AUTHN-004)<sup>[5]</sup>.
 
 #### Remediation
 
@@ -46,17 +56,18 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 ##### Info
 
-[1] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema
+[1] OWASP JWT Cheat Sheet for Java: `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
+[2] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
+[3] PHP JWT - https://github.com/firebase/php-jwt
+[4] Java Spring with JWT - http://projects.spring.io/spring-security-oauth/docs/oauth2.html
+[5] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema
 
-##### Tools
-
-* Drozer - https://labs.mwrinfosecurity.com/tools/drozer/
 
 ### Testing Session Management
 
 #### Overview
 
-All significant, if not privileged, actions must be done after a user is properly authenticated; the application will remember the user inside a "session". When improperly managed, sessions are subject to a variety of attacks where the session of a legitimate user may be abused, allowing the attacker to impersonate the user. As a consequence, data may be lost, confidentiality compromised or illegitimate actions performed.
+All significant, if not privileged, actions must be done after a user is properly authenticated; the application will remember the user inside a session. When improperly managed, sessions are subject to a variety of attacks where the session of a legitimate user may be abused, allowing the attacker to impersonate the user. As a consequence, data may be lost, confidentiality compromised or illegitimate actions performed.
 
 Sessions must have a beginning and an end. It must be impossible for an attacker to forge a session token: instead, it must be ensured that a session can only be started by the system on the server side. Also, the duration of a session should be as short as possible, and the session must be properly terminated after a given amount of time or after the user has explicitly logged out. It must be impossible to reuse session tokens.
 
@@ -64,34 +75,37 @@ As such, the scope of this test is to validate that sessions are securely manage
 
 #### Static Analysis
 
-When source code is available, the tester should look for the place where sessions are initiated, stored, exchanged, verified and canceled. This must be done whenever any access to privileged information or action takes place. For those matters, automated tools or custom scripts (in any language like Python or Perl) can be used to look for relevant keywords in the target language. Also, team members knowledgeable on the application structure may be involved to cover all necessary entry points or fasten the process.
+When server source code is available, the tester should look for the place where sessions are initiated, stored, exchanged, verified and terminated. This must be done whenever any access to privileged information or action takes place. For those matters, automated tools or manual search can be used to look for relevant keywords in the target programming language. Sample frameworks on server side are:
 
--- ToDo: Create more specific content about session management in frameworks, the framework need to be identified and if the best practices offered by the framework are used for session management. This should not be implemented by the developers themselves.
-
+- Spring (Java) - http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#ns-session-mgmt
+- PHP - http://php.net/manual/en/book.session.php
+- Ruby on Rails -  http://guides.rubyonrails.org/security.html
 
 #### Dynamic Analysis
 
-A best practice is first to crawl the application, either manually or with an automated tool, the goal being to check if all parts of the application leading to privileged information of actions are protected and a valid session token is required or not.
+A best practice is to crawl the application first, either manually or with an automated tool. The goal is to check if all parts of the application leading to privileged information or actions are protected and a valid session token is required or not.
 
-Then, the tester can use any intercepting proxy to capture network traffic between a client and the server and try to manipulate session tokens:
-- modify a valid token to an illegitimate one (for instance, add 1 to the valid token or delete parts of the token);
-- delete a valid token in the request to test if the targeted part of the application can still be accessed;
-- try to log out and re-log in and check if the token has changed or not;
-- when changing privilege level (step-up authentication), try to use the former one (hence with a lower authorization level) to access the privileged part of the application;
-- try to re-use a token after logging out.
+Then, you can use the crawled requests within any intercepting proxy to try to manipulate session tokens:
+- by modifying them into illegitimate ones (for instance, add 1 to the valid session token or delete parts of it).
+- by deleting a valid one in the request to test if the information and/or function of the application can still be accessed.
+- by trying to log out and re-log in again to check if the session token has changed or not.
+- when changing privilege level (step-up authentication). Try to use the former one (hence with a lower authorization level) to access the privileged part of the application.
+- by trying to re-use a session token after logging out.
+
+Also the OWASP Testing Guide<sup>[1]</sup> should be consulted for more session management test cases.
 
 #### Remediation
 
 In order to offer proper protection against the attacks mentioned earlier, session tokens must:
-- always be created on the server side;
-- not be predictable (use proper length and entropy);
-- always be exchanged between the client and the server over secure connections (e.g. HTTPS);
-- be stored securely on the client side;
-- be verified when a user is trying to access privileged parts of an application: a token must be valid, correspond to the proper level of authorization;
-- be renewed when a user is asked to log in again to perform an operation requiring higher privileges;
-- be terminated when a user logs out or after a given amount of time.
+- always be created on the server side,
+- not be predictable (use proper length and entropy),
+- always be exchanged over secure connections (e.g. HTTPS),
+- be stored securely within the mobile app,
+- be verified when a user is trying to access privileged parts of an application (a session token must be valid and correspond to the proper level of authorization),
+- be renewed when a user is asked to log in again to perform an operation requiring higher privileges and
+- be terminated on server side and deleted within the mobile app when a user logs out or after a specified timeout.
 
-It is strongly advised to use built-in session token generators as they are usually more secure than custom tokens. Such generators exist for most platforms and languages.
+It is strongly advised to use session token generators, that are build-in within the framework used, as they are more secure than building a custom one. Such generators exist for most frameworks and languages.
 
 #### References
 
@@ -109,32 +123,29 @@ It is strongly advised to use built-in session token generators as they are usua
 
 ##### Info
 
-[1] OWASP Session Management Cheat Sheet: https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
-[2] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
+[1] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
 
 ##### Tools
 
 * Zed Attack Proxy
 * Burp Suite
 
+
+
 ### Testing the Logout Functionality
 
 #### Overview
 
-Session termination is an important part of the session lifecycle. Reducing the lifetime of the session tokens to a minimum decreases the likelihood of a successful session hijacking attack.
- 
-The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side.
+Session termination is an important part of the session lifecycle. Reducing the lifetime of the session tokens to a minimum decreases the likelihood of a successful session hijacking attack. The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side.
 
 ##### Static Analysis 
 
-If server side code is available, it should be reviewed that the session is being terminated as part of the logout functionality.
-The check needed here will be different depending on the technology used. Here are different examples on how a session can be terminated in order to implement a proper logout on server side:
+If server side code is available, it should be reviewed that the session is being terminated as part of the logout functionality. The check needed here will be different depending on the technology used. Here are different examples on how a session can be terminated in order to implement a proper logout on server side:
 - Spring (Java) -  http://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/web/authentication/logout/SecurityContextLogoutHandler.html
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
 - PHP - http://php.net/manual/en/function.session-destroy.php
 - JSF - http://jsfcentral.com/listings/A20158?link
 - ASP.Net - https://msdn.microsoft.com/en-us/library/ms524798(v=vs.90).aspx
-- Amazon AWS - http://docs.aws.amazon.com/appstream/latest/developerguide/rest-api-session-terminate.html
 
 #### Dynamic Analysis
 
@@ -175,6 +186,8 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 
 * [1] OTG-SESS-006 - https://www.owasp.org/index.php/Testing_for_logout_functionality
 * [2] Session Management Cheat Sheet - https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
+
+
 
 ### Testing the Password Policy
 

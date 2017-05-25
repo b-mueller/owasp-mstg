@@ -17,15 +17,15 @@ The following section is a brief introduction to the 3 different types of mobile
 
 #### Mobile App
 
-The term `mobile app` refers to applications (self-contained computer programs), designed to execute and enhance the functionality of a mobile device. In this guide we will focus on the mobile apps designed to run on Android and iOS operating systems, as cumulatively they take more than 99% of the market share <sup>[12]<sup>. Due to the expansion of these operating systems to other device types, like smart watches, TVs, cars, etc. a more general term `app` is more appropriate. Nevertheless, for historic reasons, both terms are used interchangeably to refer to an application that can run on some of these systems, regardless of the exact device type.
+The term `mobile app` refers to applications (self-contained computer programs), designed to execute and enhance the functionality of a mobile device. In this guide we will focus on the mobile apps designed to run on Android and iOS operating systems, as cumulatively they take more than 99% of the market share<sup>[12]</sup>. Due to the expansion of these operating systems to other device types, like smart watches, TVs, cars, etc. a more general term `app` is more appropriate. Nevertheless, for historic reasons, both terms are used interchangeably to refer to an application that can run on some of these systems, regardless of the exact device type.
 
-Today, mobile internet usage has surpassed desktop usage for the first time in history and mobile apps are the most widespread kind of applications <sup>[10]<sup>.
+Today, mobile internet usage has surpassed desktop usage for the first time in history and mobile apps are the most widespread kind of applications<sup>[10]</sup>.
 
 #### Native App
 
 Most operating systems, including Android and iOS, come with set of high-level APIs that can be used to develop applications specifically for that system. Such applications are called `native` for the system for which they have been developed. Usually, when discussing about `mobile app`, the assumption is that it is a `native app`, that is implemented in a particular programming language for either iOS (Objective-C or Swift) or Android (Java).
 
-Native mobile apps provide fast performance and a high degree of reliability. They usually adhere to the design principles (e.g. Android Design Principles <sup>[13]</sup>), providing a more consistent UI, compared to `hybrid` and `web` apps. Due to their close integration with the operating system, native apps have access to almost every component of the device (camera, sensors, hardware backed key stores, etc.)
+Native mobile apps provide fast performance and a high degree of reliability. They usually adhere to the design principles (e.g. Android Design Principles<sup>[13]</sup>), providing a more consistent UI, compared to `hybrid` and `web` apps. Due to their close integration with the operating system, native apps have access to almost every component of the device (camera, sensors, hardware backed key stores, etc.)
 
 Please note that there is a little ambiguity when discussion `native` apps for Android. Namely, Android provides two sets of APIs to develop against, Android SDK and Android NDK. The SDK (or Software Development Kit) is a Java API and is the default API against which applications are built. The NDK (or Native Development Kit) is a C/C++ based API used for developing only parts of the application that require specific optimization, or can otherwise benefit from lower level API. Normally, you can only distribute apps build with the SDK, which potentially can have parts implemented against NDK. Therefore we say that Android `native **apps**` (build against SDK) can have `native **code**` (build against NDK).
 
@@ -86,11 +86,11 @@ The status column can have one of the following three different values, that nee
 
 #### Reverse Engineering Resiliency Testing
 
-*Resiliency testing* is a new concept introduced in the OWASP MASVS and MSTG. This kind of testing can be used if the app implements defenses against specific client-side threats.. As we know, such protection is never 100% effective. The goal in resiliency testing is to identify glaring holes in the protection scheme and verify that the expectations as to its effectiveness are met. The assessment methodology is described in detail in the appendix "Assessing Anti-Reversing Schemes".
+*Resiliency testing* is a new concept introduced in the OWASP MASVS and MSTG. This kind of testing can be used if the app implements defenses against specific client-side threats.. As we know, such protection is never 100% effective. The goal in resiliency testing is to identify glaring holes in the protection scheme and verify that the expectations as to its effectiveness are met. The assessment methodology is described in detail in the appendix "[Assessing Anti-Reversing Schemes](https://github.com/OWASP/owasp-mstg/blob/master/Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)".
 
 #### Reporting
 
-The checklist itself can be used as a report as it list's down in detail what test cases have been included and verified in the tests and ideally also shows evidence in case a test fails. Also the first page should then be filled out, to include all the meta information needed for a report.
+The checklist itself can be used as a report as it lists down in detail what test cases have been included and verified in the tests and ideally also shows evidence in case a test fails. Also the first page should then be filled out, to include all the meta information needed for a report.
 
 #### The Management Summary
 
@@ -109,7 +109,7 @@ A more detailed overview can also be found in the "Management Summary" tab. This
 
 ### Static Analysis
 
-When executing a static analysis, the source code of the mobile App(s) will be analyzed to ensure sufficient and correct implementation of security controls, specifically on crucial components such as cryptographic and data storage mechanisms. Due to the amount of code a tester will be confronted with the ideal approach for static analysis should be a mixture of using tools that scan the code automatically and manual code review.
+When executing a static analysis, the source code of the mobile App(s) will be analyzed to ensure sufficient and correct implementation of security controls, specifically on crucial components such as cryptographic and data storage mechanisms. Due to the amount of code a tester will be confronted with, the ideal approach for static analysis should be a mixture of using tools that scan the code automatically and manual code review.
 
 Through this approach you can get the best out of both worlds. You can get the so called "low hanging fruits" through the automatic scan, as the scanning engine and the (predefined) rules can easily pick up vulnerable patterns in the code. The manual code review can proficiently make a deep dive into the various code paths to check for logical errors and flaws in the mobile application's design and architecture where automated analysis tools are not able to identify it properly as they mostly do not understand the big picture.
 
@@ -143,8 +143,6 @@ In a Dynamic Analysis approach, the focus is on testing and evaluation of an app
 
 Usually, dynamic analysis is performed to check whether there are sufficient security mechanisms being put in place to prevent disclosure of data in transit, authentication and authorization issues, data validation vulnerabilities (e.g. cross-site scripting, SQL injection, etc.) and server configuration errors.
 
--- ToDo
-
 #### Pros of Dynamic Analysis
 
 * Does not require to have access to the source code
@@ -173,10 +171,10 @@ In case another (proprietary) protocol is used in a mobile app that is not HTTP,
 
 #### Input Fuzzing
 
--- TODO [Write a better description, or remove this] --
+The process of fuzzing is to repeatedly feeding an application with various combinations of input value, with the goal of finding security vulnerabilities in the input-parsing code. There were instances when the application simply crashes, but also were also occations when it did not crash but behave in a manner which the developers did not expect them to be, which may potentially lead to exploitation by attackers.  
 
-Fuzz testing, is a method for testing software input validation by feeding it intentionally malformed input.
-Steps in fuzzing
+Fuzz testing, is a method for testing software input validation by feeding it intentionally malformed input. Below are the steps in performing the fuzzing:
+
 * Identifying a target
 * Generating malicious inputs
 * Test case delivery
@@ -192,7 +190,7 @@ Note: Fuzzing only detects software bugs. Classifying this issue as a security f
 
 ##### Cross-Site Scripting (XSS)
 
-A typical reflected XSS attack is executed by sending a URL to the victim(s), which for example can contain a payload to connect to some exploitation framework like BeeF [2]. When clicking on it a reverse tunnel is established with the Beef server in order to attack the victim(s). As a WebView is only a slim browser, it is not possible for a user to insert a URL into a WebView of an app as no address bar is available. Also, clicking on a link will not open the URL in a WebView of an app, instead it will open directly within the default browser of the respective mobile device. Therefore, a typical reflected Cross-Site Scripting attack that targets a WebView in an app is not applicable and will not work.
+A typical reflected XSS attack is executed by sending a URL to the victim(s), which for example can contain a payload to connect to some exploitation framework like BeeF<sup>[2]</sup>. When clicking on it a reverse tunnel is established with the Beef server in order to attack the victim(s). As a WebView is only a slim browser, it is not possible for a user to insert a URL into a WebView of an app as no address bar is available. Also, clicking on a link will not open the URL in a WebView of an app, instead it will open directly within the default browser of the respective mobile device. Therefore, a typical reflected Cross-Site Scripting attack that targets a WebView in an app is not applicable and will not work.
 
 If an attacker finds a stored Cross-Site Scripting vulnerability in an endpoint, or manages to get a Man-in-the-middle (MITM) position and injects JavaScript into the response, then the exploit will be sent back within the response. The attack will then be executed directly within the WebView. This can become dangerous in case:
 
@@ -216,13 +214,14 @@ Classification of sensitive information can vary between different industries an
 
 Ideally the customer can share a data classification policy that is already considering all different requirements and clearly defines sensitive information. This will become then the baseline during testing. The data classification should be applicable to:
 
-* data at rest,
-* data in use and
-* data in transit
+* Data at rest,
+* Data in use and
+* Data in transit
 
 For example, regulations in Singapore for financial institutions has imposed a requirement to encrypt passwords and PINs explicitly, even though they are already transmitted via HTTPS. Even though this might not be a vulnerability from the point of view of a tester, it is mandatory to raise this finding as a compliance issue.
 
 If no data classification policy is available, the following should be considered as sensitive information:
+
 * User authentication information (credentials, PINs etc.),
 * Personal Identifiable Information (PII) that can be abused for identity theft: Social security numbers, credit card numbers, bank account numbers, health information,
 * Highly sensitive data that would lead to reputational harm and/or financial costs if compromised,
@@ -230,8 +229,6 @@ If no data classification policy is available, the following should be considere
 * Finally any technical data, generated by the application or it's related systems, that is used to protect other data or the system, should also be considered as sensitive information (e.g. encryption keys).
 
 Defining sensitive information before the test is important for almost all data storage test cases in Android and iOS, as otherwise the tester has no clear basis on what he might need to look for.
-
-
 
 ## Security Testing in the Software Development life cycle
 
@@ -243,8 +240,7 @@ As time was passing and software development was maturing, also competition was 
 
 Originally, security was not part of software development. It was seen as an afterthought, and was performed by Operation teams at the network level: those teams had to find ways to compensate for poor security in software programs! However, while this was possible when software programs were located inside a perimeter, the concept became obsolete as new ways to consume software emerged with Web and Mobile technologies. Nowadays, security has to be baked **inside** software as it is often very hard in this new paradigm to compensate for existing vulnerabilities.
 
-The way to incorporate security during software development is to put in place a Secure SDLC (Software Development Life Cycle). A Secure SDLC does not depend on any methodology nor on any language, and it is possible to incorporate one in Waterfall or Agile: no excuse not to use one!
-This chapter will focus on Agile and Secure SDLC, in particular in the DevOps world. The reader will find below details on state-of-the-art ways to develop and deliver secure software in a fast-paced and collaborative manner that promotes autonomy and automation.
+The way to incorporate security during software development is to put in place a Secure SDLC (Software Development Life Cycle). A Secure SDLC does not depend on any methodology nor on any language, and it is possible to incorporate one in Waterfall or Agile: no excuse not to use one! This chapter will focus on Agile and Secure SDLC, in particular in the DevOps world. The reader will find below details on state-of-the-art ways to develop and deliver secure software in a fast-paced and collaborative manner that promotes autonomy and automation.
 
 ### Agile and DevOps
 
@@ -256,7 +252,7 @@ DevOps refers to practices that focus on a close collaboration between all stake
 
 The term DevOps might be mistaken for only expressing collaboration between development and operations teams, however, as Gene Kim, a DevOps thought leader, puts it: “At first blush, it seems as though the problems are just between dev and ops," he says, "but test is in there, and you have information security objectives, and the need to protect systems and data. These are top-level concerns of management, and they have become part of the DevOps picture."
 
-In other words, when you hear "DevOps" today, you should probably be thinking DevOpsQATestInfoSec.” (Source: https://techbeacon.com/evolution-devops-new-thinking-gene-kim)
+In other words, when you hear "DevOps" today, you should probably be thinking DevOpsQATestInfoSec.”<sup>[16]</sup>
 
 Security is just as important for the business success as the overall quality, performance and usability of an application. As development cycles are shortened and deployment frequencies increased it is elementary to ensure that quality and security is built in from the very beginning.
 
@@ -264,24 +260,24 @@ From the human aspect, this is achieved by creating cross functional teams that 
 
 ### General Considerations
 
-* Release time for apple store
-* Why are black listed, and how to avoid it.
-* Common gotchas: Ensure that the app is always fully removed and re-installed. Otherwise there might be issues that are hard to re-produce.
-*
+* Release time for Apple store
+* What are black listed, and how to avoid it
+* Common gotchas: Ensure that the app is always fully removed and re-installed. Otherwise there might be issues that are hard to reproduce
 
 ### SDLC Overview
 
 #### General description of SDLC
 
 Whatever the development methodology that is being used, a SDLC always follows the same process:
-* perform a risk assessment of the application and it's components to identify their risk profile. This risk profile typically depends on the risk appetite of the organization and the regulatory requirements for the application in scope. The risk assessment is additionally influenced by other factors such as whether the application is accessible from the internet, or what kind of data is processed and stored. A data classification policy determines which data is considered sensitive and prescribes how this data has to be secured.
-* at the beginning of a project or a development cycle, at the same time when functional requirements are gathered, **Security Requirements** are listed and clarified. As use cases are built, **Abuse Cases** are added. Also, **Security Risks** are analysed, the same way other risks of the project (financial, marketing, industrial, ...) are handled. Teams (including development teams) may be trained on security if needed (Secure Coding, ...);
-* for mobile applications the OWASP MASVS [todo: link to the other guide] can be leveraged to determine the security requirements based on the risk assessment that was conducted in this initial step. It is common, especially for agile projects, to iteratively review the set of requirements based on newly added features and new classes of data that is handled by the application.
-* then, as architecture and design are ongoing, a foundational artefact must be performed: **Threat Modeling**. Based on the threat model, the **Security Architecture** is defined (both for software and hardware aspects). **Secure Coding rules** are established and the list of **Security tools** that will be used is created. Also, the strategy for **Security testing** is clarified;
-* all security requirements and design considerations should be stored in the Application Life cycle Management System (ALM), which is typically known as issue tracker, that the development/ops team already uses to ensure that security requirements are tightly integrated into the development workflow. The security requirements should ideally also contain the relevant source code snippets for the used programming language, to ensure that developers can quickly reference them. Another strategy for secure coding guidelines is to create a dedicated repository under versioning control, that only contains these ode snippets, which has many benefits over the traditional apporach of storing these guidelines in word documents or PDFs.
-* the next step is to develop software, including **Code Reviews** (usually with peers), **Static Analysis** with automated tools and **Unit Tests** dedicated to security;
-* then comes the long-awaited moment to perform tests on the release candidate: **Penetration Testing** ("Pentests"), using both manual and automated techniques;
-* and finally, after software has been **Accredited** by all stakeholders, it can be transitioned to Operation teams and safely put in Production.
+
+* Perform a risk assessment of the application and it's components to identify their risk profile. This risk profile typically depends on the risk appetite of the organization and the regulatory requirements for the application in scope. The risk assessment is additionally influenced by other factors such as whether the application is accessible from the internet, or what kind of data is processed and stored. A data classification policy determines which data is considered sensitive and prescribes how this data has to be secured.
+* At the beginning of a project or a development cycle, at the same time when functional requirements are gathered, **Security Requirements** are listed and clarified. As use cases are built, **Abuse Cases** are added. Also, **Security Risks** are analysed, the same way other risks of the project (financial, marketing, industrial, ...) are handled. Teams (including development teams) may be trained on security if needed (Secure Coding, ...);
+* For mobile applications the OWASP MASVS [todo: link to the other guide] can be leveraged to determine the security requirements based on the risk assessment that was conducted in this initial step. It is common, especially for agile projects, to iteratively review the set of requirements based on newly added features and new classes of data that is handled by the application.
+* Then, as architecture and design are ongoing, a foundational artefact must be performed: **Threat Modeling**. Based on the threat model, the **Security Architecture** is defined (both for software and hardware aspects). **Secure Coding rules** are established and the list of **Security tools** that will be used is created. Also, the strategy for **Security testing** is clarified;
+* All security requirements and design considerations should be stored in the Application Life cycle Management System (ALM), which is typically known as issue tracker, that the development/ops team already uses to ensure that security requirements are tightly integrated into the development workflow. The security requirements should ideally also contain the relevant source code snippets for the used programming language, to ensure that developers can quickly reference them. Another strategy for secure coding guidelines is to create a dedicated repository under versioning control, that only contains these ode snippets, which has many benefits over the traditional apporach of storing these guidelines in word documents or PDFs.
+* The next step is to develop software, including **Code Reviews** (usually with peers), **Static Analysis** with automated tools and **Unit Tests** dedicated to security;
+* Then comes the long-awaited moment to perform tests on the release candidate: **Penetration Testing** ("Pentests"), using both manual and automated techniques;
+* And finally, after software has been **Accredited** by all stakeholders, it can be transitioned to Operation teams and safely put in Production.
 
 The picture below shows all the phases with the different artefacts:
 -- TODO [Add a picture of a SDLC diagram that clarifies the description above] --
@@ -291,6 +287,7 @@ Based on the risks of the project, some artefacts may be simplified (or even ski
 #### Diving into phases and artefacts
 
 Now, let's have a closer look at the five phases listed above and let's clarify their main purposes, what is done while they take place and who performs them:
+
 * **Initiation** phase: this is the first phase of a project, when requirements are gathered from the field and defined for the project. They should include both functional (e.g. what features will be created for the end user) and security (e.g. what security features will need to be implemented to allow end users to trust the software product) requirements. In this phase, all activities that need to happen before technical work starts and all others that can be anticipated will take place. This is also the moment when Proof of Concepts may be done and when the project viability is confirmed. Typically, teams close to business functions such as marketing (marketing people, or product owners, ...), management and finance are involved.
 * **Architecture and Design** phase: after the project has been confirmed, the technical team will start working on early technical activities that will enable coding teams to be productive. In this matter, risks are analysed and relevant countermeasures identified and clarified. The architecture and coding approach as well as testing strategies and the appropriate tools are confirmed, and the different environnements (e.g. DEV, QA, SIT, UAT, PROD) are created and put in place. This phase is pivotal as its main goal is to go from a non-technical definition of needs to the point where technical teams are ready to give birth to code that will make up the software product. Typically, Architects, Designers, QA teams, Testers and AppSec experts are involved.
 * **Coding** phase: this is the moment when code is produced and efforts become visible. This may be seen as the most important phase; however, one must keep in mind that all activities happening before and after the current phase are meant to support code creation and make sure it reaches proper standards for quality and security while meeting deadlines and budgets. In this phase, development teams work in the defined environnement to implement requirements following previously defined guidelines. The main people who are involved are developers.
@@ -314,13 +311,15 @@ The following diagram provides an overview of the way to perform test in the SDL
 #### Detailed Description
 
 As stated before, several kinds of tests can be made along the SDLC. According to the risk profile of the targeted software, several kind of tests can be performed:
-* **Static Analysis**: by nature, static analysis is about analysing source code without running it. The goal of this artefact is twofold: make sure the Secure Coding rules the team has agreed on are correctly implemented when writing code, and finding vulnerabilities. Often, specialized software tools are used to automate this task, as hundreds and thousands of lines of code may need to be analysed. However, the drawback is that tools can only find what they have been told to look for and, today, are not as successful as human beings. This is the reason why sometimes Static Analysis is performed by humans (in addition to tools or not): it may take more time for humans, but they have a more creative way to detect vulnerabilities. Examples of tools for Static Analysis are given in another section.
+
+* **Analysis**: by nature, static analysis is about analysing source code without running it. The goal of this artefact is twofold: make sure the Secure Coding rules the team has agreed on are correctly implemented when writing code, and finding vulnerabilities. Often, specialized software tools are used to automate this task, as hundreds and thousands of lines of code may need to be analysed. However, the drawback is that tools can only find what they have been told to look for and, today, are not as successful as human beings. This is the reason why sometimes Static Analysis is performed by humans (in addition to tools or not): it may take more time for humans, but they have a more creative way to detect vulnerabilities. Examples of tools for Static Analysis are given in another section.
 * **Unit Tests**: unit tests make up the family of tests that are the closest to source code (e.g. they are focused on a single unit) as they are performed along with code. According to the methodology in use, they can be created either before code is developed (known as Test Driven Development (TDD)) or right after. Whatever the case, the end goal is to verify that produced code is behaving as expected, but also that proper controls are put in place to prevent abuse cases (input filtering / validation, whitelisting, ...) and cannot be circumvented. Unit Tests are used to detect issues early in the development life cycle in order to fix them as quickly and effectively as possible. They are different from other forms of tests, like Integration / Verification / Validation tests, and may not be used to detect the same kind of issue. Often, Unit Tests are aided with tools; a few of them are listed in another section.
 * **Penetration Testing**: this is the "king" of security tests, the one that is the most famous and often performed. However, one must keep in mind that they happen late in the development life cycle and that they cannot find every kind of flaw. They are too often constrained by available resources (time, money, expertise, ...), and as such should be complemented by other kind of tests. The current guide is about pentesting, and the reader will find a lot of useful information to conduct added-value tests and find even more vulnerabilities. Pentesting techniques include vulnerability scanning and fuzzing; however, Penetration Tests can be much more multi-facetted than these two examples. Useful tools are listed in another section.
 
 A clear difference shall be made between quality testing and security testing: while quality testing is about making sure an explicitely planned feature has been implemented in the proper way, security testing is about making sure that:
-- existing features cannot be used in a malicious way
-- no new feature has unvoluntarily been introduced that could endanger the system or its users.
+
+* existing features cannot be used in a malicious way
+* no new feature has unvoluntarily been introduced that could endanger the system or its users.
 
 As a consequence, performing one type of tests is not enough to pretend having covered both types and that the produced software is both usable and secure. The same care should be given to both types of tests as they are of the same importance and that final users now put a strong emphasis both on quality (e.g. the fact features that are brought to them perform the way they expect them to) and security (e.g. that they can trust the software vendor that their money will not be stolen or their private life will remain private).
 
@@ -333,30 +332,34 @@ The purpose of a test strategy is to define which tests will be performed all al
 A Test Strategy does not always need to be formally written: it may be described through Stories (in Agile projects), quickly written in the form of checklists, or test cases could be written in a given tool; however, it definitely needs to be shared, as it may be defined by the Architecture team, but will have to be implemented by other teams such as Development, Testing, QA. Moreover, it needs to be agreed upon by all technical teams as it should not place unacceptable burdens on any of them.
 
 Ideally, a Test Strategy addresses topics such as:
-- objectives to be met and description of risks to be put under control.
-- how these objectives will be met and risks reduced to an acceptable level: which tests will be mandatory, who will perform them, how, when, and at which frequency.
-- acceptance criteria of the current project.
+
+* Objectives to be met and description of risks to be put under control.
+* How these objectives will be met and risks reduced to an acceptable level: which tests will be mandatory, who will perform them, how, when, and at which frequency.
+* Acceptance criteria of the current project.
 
 In order to follow its effectiveness and progress, metrics should be defined, updated all along the project and periodically communicated. An entire book could be written on the relevant metrics to choose; the best that can be said is that they depend on risk profiles, projects and organizations. However, some examples of metrics include:
-- the number of stories related to security controls that are implemented,
-- code coverage for unit tests on security controls and sensitive features,
-- the number of security bugs found by static analysis tools upon each build,
-- the trend of the backlog for security bugs (may be sorted by criticality).
+
+* The number of stories related to security controls that are implemented,
+* Code coverage for unit tests on security controls and sensitive features,
+* The number of security bugs found by static analysis tools upon each build,
+* The trend of the backlog for security bugs (may be sorted by criticality).
+
 These are only suggestions, and other metrics may be even more relevant in your case. Metrics are really powerful tools to get a project under control, provided they give a clear view and in a timely manner to project managers on what is happening and what needs to be improved to reach targets.
 
-
---
-
 ### Testing methods
-#### White box
-#### Grey box
+
 #### Black box
+
+#### White box
+
+#### Grey box
+
 ### Team management
 
 -- TODO [Develop content on Team Management in SDLC] --
 
-- explain the importance of Separation of Duties (developers VS testers, ...)
-- internal VS sub-contracted pentests
+* explain the importance of Separation of Duties (developers VS testers, ...)
+* internal VS sub-contracted pentests
 
 ### Security Testing in the DevOps environments
 
@@ -368,18 +371,9 @@ As the frequency of deployments to production increases, and DevOps high-perform
 
 Depending on the maturity of the organisation, or development team, the deployment pipeline can be very sophisticated. In it's simplest form, the deployment pipeline consists of a commit phase. The commit phase commonly runs simple compiler checks, the unit tests suite, as well as creates a deployable artefact of the application which is called release candidate. A release candidate is the latest version of changes that has been checked into the trunk of the versioning control system and will be evaluated by the deployment pipeline to verify if it is in-line with the established standards to be potentially deployed to production.
 
-The commit phase is designed to provide instant feedback to developers and as such is run on every commit to the trunk. Because of that, certain time constraints exists. Typically, the commit phase should run within 5 minutes, but in any case, shouldn't take longer than 10 minutes to complete. This time constraint is quite challenging in the security context, as many of the currently existing tools can't run in that short amount of time.
+The commit phase is designed to provide instant feedback to developers and as such is run on every commit to the trunk. Because of that, certain time constraints exists. Typically, the commit phase should run within 5 minutes, but in any case, shouldn't take longer than 10 minutes to complete. This time constraint is quite challenging in the security context, as many of the currently existing tools can't run in that short amount of time<sup>[14][15]</sup>.
 
 Todo: Automating security tools in Jenkins,...
-
-
-
-### References
-
-- Official (ISC)2 Guide to the CSSLP (ISC2 Press), Mano Paul - https://www.amazon.com/Official-Guide-CSSLP-Second-Press/dp/1466571276/
-- Software Security: Building Security In (Addison-Wesley Professional), Gary McGraw - https://www.amazon.com/Software-Security-Building-Gary-McGraw/dp/0321356705/
-
-
 
 ## Tampering and Reverse Engineering
 
@@ -435,9 +429,9 @@ Code injection is a very powerful technique that allows you to explore and modif
 
 Substrate, Frida and XPosed are the most widely used hooking and code injection frameworks in the mobile world. The three frameworks differ in design philosophy and implementation details: Substrate and Xposed focus on code injection and/or hooking, while Frida aims to be a full-blown "dynamic instrumentation framework" that incorporates both code injection and language bindings, as well as an injectable JavaScript VM and console.
 
-However, you can also instrument apps with Substrate by using it to inject Cycript, the programming environment (a.k.a. "Cycript-to-JavaScript" compiler) authored by Saurik of Cydia fame. To complicate things even more, Frida's authors also created a fork of Cycript named "frida-cycript" (https://github.com/nowsecure/frida-cycript) that replaces Cycript's runtime with a Frida-based runtime called Mjølner. This enables Cycript to run on all the platforms and architectures maintained by frida-core (if you are confused now don't worry, it's perfectly OK to be).
+However, you can also instrument apps with Substrate by using it to inject Cycript, the programming environment (a.k.a. "Cycript-to-JavaScript" compiler) authored by Saurik of Cydia fame. To complicate things even more, Frida's authors also created a fork of Cycript named "frida-cycript" that replaces Cycript's runtime with a Frida-based runtime called Mjølner<sup>[17]</sup>. This enables Cycript to run on all the platforms and architectures maintained by frida-core (if you are confused now don't worry, it's perfectly OK to be).
 
-The release was accompanied by a blog post by Frida's developer Ole titled "Cycript on Steroids", which did not go that down that well with Saurik - https://www.reddit.com/r/ReverseEngineering/comments/50uweq/cycript_on_steroids_pumping_up_portability_and/.
+The release was accompanied by a blog post by Frida's developer Ole titled "Cycript on Steroids", which did not go that down that well with Saurik<sup>[18]</sup>.
 
 We'll include some examples for all three frameworks. As your first pick, we recommend starting with Frida, as it is the most versatile of the three (for this reason we'll also include more Frida details and examples). Notably, Frida can inject a Javascript VM into a process on both Android and iOS, while Cycript injection with Substrate only works on iOS. Ultimately however, you can of course achieve many of the same end goals with either framework.
 
@@ -475,13 +469,13 @@ Running an app in the emulator gives you powerful ways to monitor and manipulate
 
 #### Custom Tooling using Reverse Engineering Frameworks
 
-Even though most professional GUI-based disassemblers feature scripting facilities and extensibility, they sometimes simply not well-suited to solving a particular problem. Reverse engineering frameworks allow you perform and automate any kind of reversing task without the dependence for heavy-weight GUI, while also allowing for increased flexibility. Notably, most reversing frameworks are open source and/or available for free. Popular frameworks with support for mobile architectures include Radare2 <sup>[4]</sup> and Angr <sup>[5]</sup>.
+Even though most professional GUI-based disassemblers feature scripting facilities and extensibility, they sometimes simply not well-suited to solving a particular problem. Reverse engineering frameworks allow you perform and automate any kind of reversing task without the dependence for heavy-weight GUI, while also allowing for increased flexibility. Notably, most reversing frameworks are open source and/or available for free. Popular frameworks with support for mobile architectures include Radare2<sup>[4]</sup> and Angr <sup>[5]</sup>.
 
 ##### Example: Program Analysis using Symbolic / Concolic Execution
 
 In the late 2000s, symbolic-execution based testing has gained popularity as a means of identifying security vulnerabilities. Symbolic "execution" actually refers to the process of representing possible paths through a program as formulas in first-order logic, whereby variables are represented by symbolic values, which are actually entire ranges of values. Satisfiability Modulo Theories (SMT) solvers are used to check satisfiability of those formulas and provide a solution, including concrete values for the variables needed to reach a certain point of execution on the path corresponding to the solved formula.
 
-Typically, this approach is used in combination with other techniques such as dynamic execution (hence the name concolic stems from *conc*rete and symb*olic*), in order to tone down the path explosion problem specific to classical symbolic execution. This together with improved SMT solvers and current hardware speeds, allow concolic execution to explore paths in medium size software modules (i.e. in the order of 10s KLOC). However, it also comes in handy for supporting de-obfuscation tasks, such as simplifying control flow graphs. For example, Jonathan Salwan and Romain Thomas have shown how to reverse engineer VM-based software protections using Dynamic Symbolic Execution (i.e., using a mix of actual execution traces, simulation and symbolic execution) <sup>[6]</sup>.
+Typically, this approach is used in combination with other techniques such as dynamic execution (hence the name concolic stems from *conc*rete and symb*olic*), in order to tone down the path explosion problem specific to classical symbolic execution. This together with improved SMT solvers and current hardware speeds, allow concolic execution to explore paths in medium size software modules (i.e. in the order of 10s KLOC). However, it also comes in handy for supporting de-obfuscation tasks, such as simplifying control flow graphs. For example, Jonathan Salwan and Romain Thomas have shown how to reverse engineer VM-based software protections using Dynamic Symbolic Execution (i.e., using a mix of actual execution traces, simulation and symbolic execution)<sup>[6]</sup>.
 
 In the Android section, you'll find a walkthrough for cracking a simple license check in an Android application using symbolic execution.
 
@@ -503,3 +497,8 @@ In the Android section, you'll find a walkthrough for cracking a simple license 
 * [10] Mobile internet usage surpasses desktop usage for the first time in history - http://bgr.com/2016/11/02/internet-usage-desktop-vs-mobile
 * [12] Worldwide Smartphone OS Market Share - http://www.idc.com/promo/smartphone-market-share/os
 * [13] Android Design Principles - https://developer.android.com/design/get-started/principles.html
+* [14] Official (ISC)2 Guide to the CSSLP (ISC2 Press), Mano Paul - https://www.amazon.com/Official-Guide-CSSLP-Second-Press/dp/1466571276/
+* [15] Software Security: Building Security In (Addison-Wesley Professional), Gary McGraw - https://www.amazon.com/Software-Security-Building-Gary-McGraw/dp/0321356705/
+* [16] The evolution of DevOps: Gene Kim on getting to continuous delivery - https://techbeacon.com/evolution-devops-new-thinking-gene-kim
+* [17] Cycript fork powered by Frida - https://github.com/nowsecure/frida-cycript
+* [18] Cycript on steroids: Pumping up portability and performance with Frida - https://www.reddit.com/r/ReverseEngineering/comments/50uweq/cycript_on_steroids_pumping_up_portability_and/
