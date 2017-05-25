@@ -876,7 +876,7 @@ Regardless of using either key/value or auto backup, it needs to be identified:
 * if sensitive information is protected through encryption before sending it to the cloud.
 
 **Auto Backup**
-When setting the attribute `android:allowBackup` to true in the manifest file, auto backup is enabled. The attribute `android:fullBackupOnly` can also be used to activate auto backup when implementing a backup agent, but this is only available from Android 6.0 onwards. Other Android versions will be using key/value backup instead.
+Auto Backup is configured through the boolean attribute `android:allowBackup` within the application's manifest file. If not explicitly set, applications targeting Android 6.0 (API Level 23) or higher enable Auto Backup by default<sup>[10]</sup>. The attribute `android:fullBackupOnly` can also be used to activate auto backup when implementing a backup agent, but this is only available from Android 6.0 onwards. Other Android versions will be using key/value backup instead.
 
 ```xml
 android:fullBackupOnly
@@ -958,6 +958,7 @@ Files can also be excluded from Auto Backup<sup>[2]</sup>, in case they should n
 [7] Oracle JCE Unlimited Strength Jurisdiction Policy Files JRE7 - http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
 [8] Oracle JCE Unlimited Strength Jurisdiction Policy Files JRE8 - http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
 [9] AutoBackup - https://developer.android.com/guide/topics/data/autobackup.html
+[10] Enabling AutoBackup - https://developer.android.com/guide/topics/data/autobackup.html#EnablingAutoBackup
 
 
 ##### Tools

@@ -8,13 +8,15 @@ Proper cryptographic key management is a common pitfall when designing mobile ap
 
 #### Overview
 
-Choosing good cryptographic algorithm alone is not enough. Often security of otherwise sound algorithms can be affected if misconfigured. Many previously strong algorithms and their configurations are now considered vulnerable or non-compliant with best practices. It is therefore important to periodically check current best practices and adjust configurations accordingly.  
+Choosing strong cryptographic algorithm alone is not enough. Often security of otherwise sound algorithms can be affected if misconfigured. Many previously strong algorithms and their configurations are now considered vulnerable or non-compliant with best practices. It is therefore important to periodically check current best practices and adjust configurations accordingly.  
 
 Many cryptographic algorithms and protocols should not be used because they have been shown to have significant weaknesses or are otherwise insufficient for modern security requirements.
 
 #### Static Analysis
 
-* Cryptographic algorithms are up to date and in-line with industry standards. This includes, but is not limited to outdated block ciphers (e.g. DES), stream ciphers (e.g. RC4), as well as hash functions (e.g. MD5) and broken random number generators like Dual_EC_DRBG (even if they are NIST certified). All of these should be marked as insecure and should not be used and removed from the application and server.
+The following list shows different checks to validate the usage of cryptographic algorithms in source code:
+
+* Cryptographic algorithms are up to date and in-line with industry standards. This includes, but is not limited to outdated block ciphers (e.g. DES), stream ciphers (e.g. RC4), as well as hash functions (e.g. MD5) and broken random number generators like Dual_EC_DRBG (even if they are NIST certified). All of these should be marked as insecure and should not be used and removed from the app and server code base.
 * Key lengths are in-line with industry standards and provide protection for sufficient amount of time. An online comparison of different key lengths and protection they provide taking into account Moore's law is available online<sup>[3]</sup>.
 * Cryptographic parameters are well defined within reasonable range. This includes, but is not limited to: cryptographic salt, which should be at least the same length as hash function output, reasonable choice of password derivation function and iteration count (e.g. PBKDF2, scrypt or bcrypt), IVs being random and unique, fit-for-purpose block encryption modes (e.g. ECB should not be used, except specific cases), key management being done properly (e.g. 3DES should have three independent keys) and so on.
 
@@ -36,13 +38,22 @@ Example initialization of DES algorithm, that is considered weak:
 Cipher cipher = Cipher.getInstance("DES");
 ```
 
+##### Block cipher encryption modes
+ECB (Electronic Codebook) encryption mode should not be used, as it is basically a raw cipher. A message is divided into blocks of fixed size and each block is encrypted separately<sup>[6]</sup>.
+
+![Electronic Codebook (ECB mode encryption)](Images/Chapters/0x07c/ECB.png)
+
+The problem with this encryption method is that any resident properties of the plaintext might well show up in the cipher text, just possibly not as clearly. That's what blocks and key schedules are supposed to protect against, but analyzing the patterns you may be able to deduce properties that you otherwise thought were hidden.
+
+![Difference of encryption modes](Images/Chapters/0x07c/EncryptionMode.png)
+
 #### Dynamic Analysis
 
 -- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
 
 #### Remediation
 
-Periodically ensure that the cryptography has not become obsolete. Some older algorithms, once thought to require a billion years of computing time, can now be broken in days or hours. This includes MD4, MD5, SHA1, DES, and other algorithms that were once considered as strong. Examples of currently recommended algorithms<sup>[1][2]</sup>:
+Periodically ensure that the cryptography has not become obsolete. Some older algorithms, once thought to require years of computing time, can now be broken in days or hours. This includes MD4, MD5, SHA1, DES, and other algorithms that were once considered as strong. Examples of currently recommended algorithms<sup>[1] [2]</sup>:
 
 * Confidentiality: AES-256
 * Integrity: SHA-256, SHA-384, SHA-512
@@ -68,10 +79,13 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 - [3] Security "Crypto" provider deprecated in Android N -  https://android-developers.googleblog.com/2016/06/security-crypto-provider-deprecated-in.html
 - [4] NIST recommendations (2016) - https://www.keylength.com/en/4/
 - [5] BSI recommendations (2017) - https://www.keylength.com/en/8/
+- [6] Electronic Codebook (ECB) - https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_Codebook_.28ECB.29
 
 ##### Tools
 * QARK - https://github.com/linkedin/qark
 * Mobile Security Framework - https://github.com/ajinabraham/Mobile-Security-Framework-MobSF
+
+
 
 ### Testing for Custom Implementations of Cryptography
 

@@ -7,11 +7,11 @@
 -- REVIEW --
 The use of a hard-coded or world-readable cryptographic key significantly increases the possibility that encrypted data may be recovered. Once it is obtained by an attacker, the task to decrypt the sensitive data becomes trivial, and the initial idea to protect confidentiality fails.
 
-When using symmetric cryptography the key need to be stored within the device and it is just a matter of time and effort from the attacker to identify it.
+When using symmetric cryptography, the key needs to be stored within the device and it is just a matter of time and effort from the attacker to identify it.
 
 #### Static Analysis
 
-Consider the following scenario: An application is reading and writing to an encrypted database but the decryption is done based on hardcoded key:
+Consider the following scenario: An application is reading and writing to an encrypted database but the decryption is done based on a hardcoded key:
 
 ```Java
 this.db = localUserSecretStore.getWritableDatabase("SuperPassword123");
@@ -100,6 +100,8 @@ If you need to store a key for repeated use, use a mechanism, such as KeyStore<s
 * [QARK](https://github.com/linkedin/qark)
 * [Mobile Security Framework](https://github.com/ajinabraham/Mobile-Security-Framework-MobSF)
 
+
+
 ### Verifying the Configuration of Cryptographic Standard Algorithms
 
 #### Overview
@@ -152,6 +154,8 @@ Use cryptographic algorithm configurations that are currently considered strong,
 
 -- TODO [Add relevant tools for "Verifying the Configuration of Cryptographic Standard Algorithms"] --
 * Enjarify - https://github.com/google/enjarify
+
+
 
 ### Testing Random Number Generation
 

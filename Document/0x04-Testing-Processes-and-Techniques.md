@@ -13,35 +13,37 @@ The context of mobile security testing is a conjunction of multiple different ti
 
 ### Different Types of Mobile Apps
 
-The following section is a brief introduction to the 3 different types of mobile applications, namely the (1) Native App, (2) Hybrid App and (3) Web App. Before we dive into them, it is essential to first understand what is Mobile App.
+The following section is a brief introduction to the 3 different types of mobile applications, namely the (1) Native App, (2) Hybrid App and (3) Web App. Before we dive into them, it is essential to first understand what a mobile app is.
 
 #### Mobile App
 
-In the past, people uses Personal Computers (PCs) to perform daily tasks at work and at leisure, such as creating a PowerPoint presentation slide or writing a report. Then, when computation power increases and web technologies become more popular, some of these capabilities that used to be only able to perform on PCs, they can be performed on the Web Browser. Today, a smart phone in one's pocket has more processor and RAM than a full-fledge PC back in those days! These mobile devices are capable to perform daily tasks and they has special processor designed for high performance and capabilities to support multitasking and high productivity daily tasks. As such, it has formed its own ecosystem where there are high demand for various types of mobile apps, be it designed for enhancing one's productivity, lifestyle or social connectivity.
+The term `mobile app` refers to applications (self-contained computer programs), designed to execute and enhance the functionality of a mobile device. In this guide we will focus on the mobile apps designed to run on Android and iOS operating systems, as cumulatively they take more than 99% of the market share <sup>[12]<sup>. Due to the expansion of these operating systems to other device types, like smart watches, TVs, cars, etc. a more general term `app` is more appropriate. Nevertheless, for historic reasons, both terms are used interchangeably to refer to an application that can run on some of these systems, regardless of the exact device type.
 
-In short, mobile applications (hereby referred to as simply 'Mobile App'), are essentially self-contained programs that were designed to enhance the existing functionality of a smart phone. On Android, there is Play Store and on iOS, there is App Store -- they both have their own ecosystem which fulfills their own users' demand and supply. It plays a huge part in people's everyday life and allows them to be highly connected with the world and their friends. According to a survey conducted by BGR Media in late 2016, the mobile internet usage has surpassed desktop usage for the first time in history, and this can never happen without the countless Mobile Apps that make a mobile platform ecosystem attractive and full of enhanced functionalities <sup>[10]</sup>.
+Today, mobile internet usage has surpassed desktop usage for the first time in history and mobile apps are the most widespread kind of applications <sup>[10]<sup>.
 
 #### Native App
 
-Native App are basically mobile apps that were developed for use on a particular specific platform. A native mobile app is a smart phone application that is being coded in a particular programming language, for instance, Objective C or Swift for iOS and Java for Android operating systems. There are also other candidates of native mobile app, such as C# and XAML or JavaScript for Universal Windows Platform app (UWP) <sup>[11]</sup>.
+Most operating systems, including Android and iOS, come with set of high-level APIs that can be used to develop applications specifically for that system. Such applications are called `native` for the system for which they have been developed. Usually, when discussing about `mobile app`, the assumption is that it is a `native app`, that is implemented in a particular programming language for either iOS (Objective-C or Swift) or Android (Java).
 
-However, the MSTG will focus on Android and iOS platforms at the moment as based on a survey conducted in November 2016, these two mobile operating system takes up 86.8% and 12.5% of market share worldwide, respectively, which takes up over 99% of the entire market share of the mobile operating systems <sup>[12]</sup>.  
+Native mobile apps provide fast performance and a high degree of reliability. They usually adhere to the design principles (e.g. Android Design Principles <sup>[13]</sup>), providing a more consistent UI, compared to `hybrid` and `web` apps. Due to their close integration with the operating system, native apps have access to almost every component of the device (camera, sensors, hardware backed key stores, etc.)
 
-Native mobile apps provide fast performance and a high degree of reliability. They have better look and feel as well because most of time, they uses native buttons and user interface which are familiar to the user and looks good on the respective platform. In addition, they usually adhere to the design principles (e.g. Android Design Principles <sup>[13]</sup>), which are usually entirely neglected by the developers who design Hybrid Apps and Web Apps.
+Please note that there is a little ambiguity when discussion `native` apps for Android. Namely, Android provides two sets of APIs to develop against, Android SDK and Android NDK. The SDK (or Software Development Kit) is a Java API and is the default API against which applications are built. The NDK (or Native Development Kit) is a C/C++ based API used for developing only parts of the application that require specific optimization, or can otherwise benefit from lower level API. Normally, you can only distribute apps build with the SDK, which potentially can have parts implemented against NDK. Therefore we say that Android `native **apps**` (build against SDK) can have `native **code**` (build against NDK).
 
-Another feature of an Native mobile apps is their ability of having access to the components of a smart phone, such as its accelerometer, GPS, and camera. Moreover, users are able to use certain apps without having Internet connectivity. However, a Native App is expensive to develop because it require a developer with specific skillset and the resulted app can only run on one platform, forcing the company that creates the app to make duplicated versions of the same app that work on other platforms. More often than not, Android mobile app developers are not proficient in developing iOS apps and vice versa for iOS mobile app developers.
+Biggest downside of native apps is that they target only one specific platform. To build the same app for both Android and iOS, one needs to maintain two independent code bases.
 
-Usually, when discussing about Mobile App, the assumption is always that it is a Native App. It is also worth noting that a Native App can only be "Native" to one type of mobile operating system: iOS, Android, UWP, etc. For companies that want to publish their Native Apps to multiple mobile operating system will need to develop and maintain a separate piece of software, with entirely different design and implementation, which could easily become complicated to manage, tedious to implement and expensive to maintain. This conveniently brings us to the next two types of Mobile Apps.
+#### Web App
+
+Mobile Web apps, or simply Web apps, are websites designed to look and feel like a native app. They run in a browser and are usually developed in HTML5. Normally, both Android and iOS allow for launcher icons to be created out of bookmarked Web apps, which simply run the default web browser and load the bookmarked app.
+
+Web apps have limited integration with the components of the device and usually have a noticeable difference in performance. Since they typically target multiple platforms, their UI does not follow some of the design principles users are used to. Their biggest advantage is the price for supporting multiple platforms (only slight adaptation in the UI can server well most desktop and mobile operating systems), as well as their flexibility for delivering new content (as they are not delivered over an official application store, which sometimes take weeks to distribute through).
 
 #### Hybrid App
 
-Hybrid Apps are similar to Native Apps, runs on a smart phone or tablet devices, and are written with web technologies, which consists of HTML5, CSS and JavaScript. Hybrid Apps run within a native container, and leverages on the device's browser engine (but not the browser, only the browser engine) to render the HTML content and process the JavaScript locally. A web-to-native abstraction layer enables access to device capabilities that are not accessible in Mobile Web applications, such as the accelerometer, camera and local storage.
+Hybrid apps attempt to fill the gap between native and web apps. Namely, hybrid apps are (distributed and executed as) native apps, that have majority of their content implemented on top of web technologies, running in an embedded web browser (web view). As such, hybrid apps inherit some of the pros and cons of both native and web apps.
 
-Companies usually build hybrid apps as wrappers for an existing web page, as an attempt to gain presence within the app store of the respective mobile operating systems, without spending significant effort for developing a different app. Hybrid apps are also popular because they allow cross platform development and thus significantly reduce development costs. The way it is able to support cross platform development is through the usage of the same HTML code components which is then being reused on different mobile operating systems.
+A web-to-native abstraction layer enables access to device capabilities for hybrid apps that are not accessible to mobile web applications. Depending on the framework used for developing, one code base can result in multiple applications, targeting separate platforms, with a UI closely resembling that of the targeted platform. Nevertheless, usually significant effort is required to exactly match the look and feel of a native app.
 
-For example, the HTML, CSS and JavaScript code that is rendered by the browser engine on an Android mobile device could also be rendered in the same way on an iOS mobile device. They will look the same but they may not look native. It is not difficult to visually differentiate between the User Interface (UI) of a Native App and a Hybrid App.   
-
-The following is a non-exhaustive list of the more popular frameworks for developing Hybrid Apps:
+Following is a non-exhaustive list of more popular frameworks for developing Hybrid Apps:
 
 * Apache Cordova - https://cordova.apache.org/
 * Framework 7 - http://framework7.io/
@@ -51,14 +53,6 @@ The following is a non-exhaustive list of the more popular frameworks for develo
 * Onsen UI - https://onsen.io/
 * React Native - http://www.reactnative.com/
 * Sencha Touch - https://www.sencha.com/products/touch/
-
-#### Web App
-
-Web App, more commonly known as the Mobile Web App, are simply websites that were designed to look and feel like a native mobile app, but not implemented as such. Web App are run on a browser (unlike Hybrid App which run on browser engine, Web App run on browser) and are usually developed in HTML5.
-
-Firstly, users will access the Web App on browser via a specific URL, where the look and feel is almost, quite identical to a native mobile app. To perform the installation of the app, a simple bookmark shortcut will be created on the Home screen of the device.
-
-Web App was very popular when HTML5 was first released and people noticed its capability to achieve a look and feel which is very similar to a native app. Today, as the usage of native apps has increased significantly, it become obvious in differentiating between a Web App and a Native App, even for non-tech savvy personnel.
 
 ### Testing Process
 
@@ -507,6 +501,5 @@ In the Android section, you'll find a walkthrough for cracking a simple license 
 * [8] Codiscope SecureAssist - https://codiscope.com/products/secureassist/
 * [9] Crawling Code - https://www.owasp.org/index.php/Crawling_Code
 * [10] Mobile internet usage surpasses desktop usage for the first time in history - http://bgr.com/2016/11/02/internet-usage-desktop-vs-mobile
-* [11] Universal Windows Platform (UWP) app - https://docs.microsoft.com/en-us/windows/uwp/get-started/whats-a-uwp
 * [12] Worldwide Smartphone OS Market Share - http://www.idc.com/promo/smartphone-market-share/os
 * [13] Android Design Principles - https://developer.android.com/design/get-started/principles.html
