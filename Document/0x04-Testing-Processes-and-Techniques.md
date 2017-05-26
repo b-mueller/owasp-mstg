@@ -84,9 +84,9 @@ The status column can have one of the following three different values, that nee
 * **Fail:** Requirement is applicable to mobile app but not fulfilled.
 * **N/A:** Requirement is not applicable to mobile app.
 
-#### Reverse Engineering Resiliency Testing
+#### Resilience Testing
 
-*Resiliency testing* is a new concept introduced in the OWASP MASVS and MSTG. This kind of testing can be used if the app implements defenses against specific client-side threats.. As we know, such protection is never 100% effective. The goal in resiliency testing is to identify glaring holes in the protection scheme and verify that the expectations as to its effectiveness are met. The assessment methodology is described in detail in the appendix "[Assessing Anti-Reversing Schemes](https://github.com/OWASP/owasp-mstg/blob/master/Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)".
+*Resilience testing* is a new concept introduced in the OWASP MASVS and MSTG. This kind of testing can be used if the app implements defenses against specific client-side threats.. As we know, such protection is never 100% effective. The goal in resiliency testing is to identify glaring holes in the protection scheme and verify that the expectations as to its effectiveness are met. The assessment methodology is described in detail in the appendix "[Assessing Anti-Reversing Schemes](https://github.com/OWASP/owasp-mstg/blob/master/Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)".
 
 #### Reporting
 
@@ -397,7 +397,7 @@ Mobile security testing requires at least basic reverse engineering skills for s
 
 **2. To enhance static analysis in black-box security testing.** In a black-box test, static analysis of the app bytecode or binary code is helpful for getting a better understanding of what the app is doing. It also enables you to identify certain flaws, such as credentials hardcoded inside the app.
 
-**3. To assess resiliency against reverse engineering.**  Apps that implement the software protection measures listed in MASVS-R should be resilient against reverse engineering to a certain degree. In this case, testing the reverse engineering defenses ("resiliency assessment") is part of the overall security test. In the resiliency assessment, the tester assumes the role of the reverse engineer and attempts to bypass the defenses.
+**3. To assess resilience against reverse engineering.**  Apps that implement the software protection measures listed in MASVS-R should be resilient against reverse engineering to a certain degree. In this case, testing the reverse engineering defenses ("resiliency assessment") is part of the overall security test. In the resilience assessment, the tester assumes the role of the reverse engineer and attempts to bypass the defenses.
 
 In this guide, we'll cover basic tampering techniques such as patching and hooking, as well as common tools and processes for reverse engineering (and comprehending) mobile apps without access to the original source code. Reverse engineering is an immensely complex topic however - covering every possible aspect would easily fill several books. Links and pointers to useful resources are included in the "references" section at the end of each chapter.
 

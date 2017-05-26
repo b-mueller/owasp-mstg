@@ -6,19 +6,31 @@ What's more, mobile app security testers encounter anti-reversing mechanisms in 
 
 The point of software-based reversing defenses is indeed to add obscurity - enough to deter some adversaries from achieving certain goals. There are several reason why developers choose to do this: For example, the intention could be to make it more difficult to steal the source code and IP, or to prevent malware running on the same device from tampering with the runtime behaviour of the app.
 
-Resiliency testing is the process of evaluating the robustness of the a software protection scheme against particular threats. Typically, this kind of testing is performed using a black-box approach, with the objective of circumventing the software protection scheme and reaching a pre-defined goal, such as extracting sensitive assets. This process requires skills that are not typically associated with penetration testing: The tester must be able to handle advanced anti-reversing tricks and obfuscation techniques. Traditionally, this is the domain of malware analysts.
+Resilience testing is the process of evaluating the robustness of the a software protection scheme against particular threats. Typically, this kind of testing is performed using a black-box approach, with the objective of circumventing the software protection scheme and reaching a pre-defined goal, such as extracting sensitive assets. This process requires skills that are not typically associated with penetration testing: The tester must be able to handle advanced anti-reversing tricks and obfuscation techniques. Traditionally, this is the domain of malware analysts.
 
-Resiliency testing can be performed in the context of a regular mobile app security test, or stand-alone to verify the effectiveness of a software protection scheme. The process consists of the following high-level steps:
+This form of testing can be performed in the context of a regular mobile app security test, or stand-alone to verify the effectiveness of a software protection scheme. The process consists of the following high-level steps:
 
 1. Assess whether a suitable and reasonable threat model exists, and the anti-reversing controls fit the threat model;
 2. Assess the effectiveness of the defenses in countering the identified threats using hybrid static/dynamic analysis. In other words, play the role of the adversary, and crack the defenses!
 3. In some scenarios, white-box testing can be added to assess specific features of the protection scheme in an isolated fashion (e.g., a particular obfuscation method).
 
+Note that software protections must never be used as a replacement for security controls. The controls listed in MASVR-R are intended to add threat-specific, additional protective controls to apps that also fulfil the MASVS security requirements.
+
 ## Assessing the Threat Model and Software Protection Architecture
 
-Client-side protections are desirable in some cases, but unnecessary or even counter-productive in others. In the worst case, software protections cause a false sense of security and encourage bad programming practices. It is impossible to provide a generic set of resiliency controls that "just works" in every possible case. For this reason, proper attack modeling is a necessary prerequisite before implementing any form of software protections.
+Client-side protections are desirable in some cases, but unnecessary or even counter-productive in others. In the worst case, software protections cause a false sense of security and encourage bad programming practices. It is impossible to provide a generic set of resilience controls that "just works" in every possible case. For this reason, proper attack modeling is a necessary prerequisite before implementing any form of software protections.
 
-The software protection scheme must be designed to protect against clearly defined threats. The OWASP Reverse Engineering and Code Modification Prevention Project <sup>[1]</sup> lists the following threats associated with reverse engineering and tampering:
+--[ TODO From the MASVS: ] --
+
+```
+A threat model must be defined that clearly outlines the client-side threats defended against. Additionally, the grade of protection the scheme is meant to provide must be specified. For example, a stated goal could be to force authors of targeted malware seeking to instrument the app to invest significant manual reverse engineering effort.
+
+The threat model must be sensical. For example, hiding a cryptographic key in a white-box implementation is besides the point if the attacker can simply code-lift the white-box as a whole.
+
+The effectiveness of the protection should always be verified by a human expert with experience in testing the particular types of anti-tampering and obfuscation used (see also the "reverse engineering" and "assessing software protections" chapters in the Mobile Security Testing Guide).
+```
+
+The OWASP Reverse Engineering and Code Modification Prevention Project <sup>[1]</sup> lists the following threats associated with reverse engineering and tampering:
 
 - Spoofing Identity - Attackers may attempt to modify the mobile application code on a victim’s device to force the application to transmit a user’s authentication credentials (username and password) to a third party malicious site. Hence, the attacker can masquerade as the user in future transactions;
 
@@ -41,11 +53,11 @@ The effectiveness of software protection schemes depends to some extent on origi
 3. List robustness criteria for specific types of obfuscation and tampering;
 3. Provide testers with knowledge, processes and tools for verifying effectiveness.
 
-Item 1 and 2 are covered in the "Resiliency Against Reverse Engineering" group of controls in the MASVS (MASVS-R), and further elaborated on in the Testing Guide. The MSTG also goes into great detail on item 3 and 4. We went to great length to document both offensive and defensive techniques. Note however that the process cannot be completely formalized. To perform a meaningful assessement, the test must be performed by a skilled reverse engineer who is familiar with the state-of-the-art in mobile app reversing and anti-reversing.
+Item 1 and 2 are covered in the "Resilience Against Reverse Engineering" group of controls in the MASVS (MASVS-R), and further elaborated on in the Testing Guide. The MSTG also goes into great detail on item 3 and 4. We went to great length to document both offensive and defensive techniques. Note however that the process cannot be completely formalized. To perform a meaningful assessement, the test must be performed by a skilled reverse engineer who is familiar with the state-of-the-art in mobile app reversing and anti-reversing.
 
 ## The Assessment Process
 
-Software protection effectiveness can be assessed using the white-box or black-box approach. Just like in a "regular" security assessment, the tester performs static and dynamic analysis but with a different objective: Instead of identifying security flaws, the goal is to identify holes in the anti-reversing defenses, and the property assessed is *resiliency* as opposed to *security*. Also, scope and depth of the assessment must be tailored to specific scenario(s), such as tampering with a particular function. Note that the resiliency assessment can be performed as part of a regular security assessment.
+Software protection effectiveness can be assessed using the white-box or black-box approach. Just like in a "regular" security assessment, the tester performs static and dynamic analysis but with a different objective: Instead of identifying security flaws, the goal is to identify holes in the anti-reversing defenses, and the property assessed is *resilience* as opposed to *security*. Also, scope and depth of the assessment must be tailored to specific scenario(s), such as tampering with a particular function. Note that the resilience assessment can be performed as part of a regular security assessment.
 
 --[ TODO - multiple approaches which can be combined,...] --
 
@@ -53,7 +65,7 @@ Software protection effectiveness can be assessed using the white-box or black-b
 
 Review and evaluate the design and implementation the software protection scheme and its individual components (anti-tampering, anti-debugging, device binding, obfuscating transformations, etc.).
 
-### Black-box Resiliency Testing
+### Black-box Resilience Testing
 
 Evaluate the robustness of their White-Box cryptographic solution against specific attacks. Without prior knowledge about the implementation, with the objective to break or circumvent the protections.
 
@@ -158,7 +170,7 @@ To achieve this deterrant effect, one needs to combine a multitude of defenses, 
 As a general rule of thumb, at least two to three defensive controls should be implemented for each category. These controls should operate independently of each other, i.e. use different techniques and APIs.
 
 ```
-8.7 The app implements multiple mechanisms to fulfil requirements 8.1 to 8.6. Note that resiliency scales with the amount, diversity of the originality of the mechanisms used.
+8.7 The app implements multiple mechanisms to fulfil requirements 8.1 to 8.6. Note that resilience scales with the amount, diversity of the originality of the mechanisms used.
 ```
 
 ```
@@ -347,7 +359,7 @@ Different types of obfuscating transformations vary in their impact on program c
 
 --[ TODO ] --
 
-**Resiliency against Automated Program Analysis**
+**Resilience against Automated Program Analysis**
 
 --[ TODO ] --
 
@@ -419,11 +431,9 @@ Boxplot of attack efficiency from the Ceccato et. al.  experiment to measure the
 
 The above results are evidence that obfuscations do in fact make code comprehension more difficult. Unfortunately, there’s not nearly enough data to support a comprehensive model that can predict the effectiveness of a set of obfuscations in terms of slowing down the attacker. Many more studies will be needed to filter out the best effectiveness indicators and link them to empirical effects.
 
-Human studies would be immensely helpful for refining the scoring system, while at the time linking the various grades and scores to empirical data. The hope is that higher values on the resiliency scale would be correlated to a certain amount of reverse engineering slowdown that, with sufficient evidence, could eventually be quantified.
-
 ### Dependence on Skill Level of the Assessor
 
-Note that performing the resiliency assessment requires a varied skillset. The assessor must be proficient in general reverse engineering techniques as well as the environment in question: The target architecture, operating system, binary format, programming language, and so on. She must also keep up-to-date with state-of-the-art techniques and tools available to reverse engineers. The quality of the resiliency assessment suffers if the assessor’s skills do not fulfill the minimum requriements.
+Note that performing the resilience assessment requires a varied skillset. The assessor must be proficient in general reverse engineering techniques as well as the environment in question: The target architecture, operating system, binary format, programming language, and so on. She must also keep up-to-date with state-of-the-art techniques and tools available to reverse engineers. The quality of the resilience assessment suffers if the assessor’s skills do not fulfill the minimum requriements.
 
 ### The Device Binding Problem
 
