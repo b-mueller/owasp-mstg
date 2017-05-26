@@ -1086,19 +1086,15 @@ Inline hooks are implemented by overwriting the first few bytes of a function wi
 
 -- TODO [Needs more research and code samples] --
 
-#### Static Analysis
+#### Bypassing Runtime Integrity Checks
 
 -- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
 
 -- TODO [Confirm purpose of sentence "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
 
-#### Dynamic Analysis
+#### Effectiveness Assessment
 
 -- TODO [Describe how to test for this issue by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
-
-#### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "-- TODO [Add content on "Testing Memory Integrity Checks" with source code] --".] --
 
 #### References
 
@@ -1130,71 +1126,6 @@ Inline hooks are implemented by overwriting the first few bytes of a function wi
 
 The goal of device binding is to impede an attacker when he tries to copy an app and its state from device A to device B and continue the execution of the app on device B. When device A has been deemend trusted, it might have more privileges than device B, which should not change when an app is copied from device A to device B.
 In the past, Android developers often relied on the Secure ANDROID_ID (SSAID) and MAC addresses. However, the behavior of the SSAID has changed since Android O and the behavior of MAC addresses have changed in Android N <sup>[1]</sup>. Google has set a new set of recommendations in their SDK documentation regarding identifiers as well <sup>[2]</sup>.
-
-#### Static Analysis
-
-When the source-code is available, then there are a few codes you can look for, such as:
-- The presence of unique identifiers that no longer work in the future
-  - `Build.SERIAL` without the presence of `Build.getSerial()`
-  - `htc.camera.sensor.front_SN` for HTC devices
-  - `persist.service.bdroid.bdadd`
-  - `Settings.Secure.bluetooth_address`, unless the system permission LOCAL_MAC_ADDRESS is enabled in the manifest.
-
-- The presence of using the ANDROID_ID only as an identifier. This will influence the possible binding quality over time given older devices.
-- The absence of both InstanceID, the `Build.SERIAL` and the IMEI.
-
-```java
-  TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-  String IMEI = tm.getDeviceId();
-```
-
-
-Furthermore, to reassure that the identifiers can be used, the AndroidManifest.xml needs to be checked in case of using the IMEI and the Build.Serial. It should contain the following permission: `<uses-permission android:name="android.permission.READ_PHONE_STATE"/>`.
-
-#### Dynamic Analysis
-
-There are a few ways to test the application binding:
-
-##### Dynamic Analysis using an Emulator
-
-1. Run the application on an Emulator
-2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
-3. Retrieve the data from the Emulator This has a few steps:
-- ssh to your simulator using ADB shell
-- run-as <your app-id (which is the package as described in the AndroidManifest.xml)>
-- chmod 777 the contents of cache and shared-preferences
-- exit the current user
-- copy the contents of /dat/data/<your appid>/cache & shared-preferences to the sdcard
-- use ADB or the DDMS to pull the contents
-4. Install the application on another Emulator
-5. Overwrite the data from step 3 in the data folder of the application.
-- copy the contents of step 3 to the sdcard of the second emulator.
-- ssh to your simulator using ADB shell
-- run-as <your app-id (which is the pacakge as described in the AndroidManifest.xml)>
-- chmod 777 the folders cache and shared-preferences
-- copy the older contents of the sdcard to /dat/data/<your appid>/cache & shared-preferences
-6. Can you continue in an authenticated state? If so, then binding might not be working properly.
-
-##### Dynamic Analysis using two different rooted devices.
-
-1. Run the application on your rooted device
-2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
-3. Retrieve the data from the first rooted device
-4. Install the application on the second rooted device
-5. Overwrite the data from step 3 in the data folder of the application.
-6. Can you continue in an authenticated state? If so, then binding might not be working properly.
-
-#### Remediation
-
-Like mentioned earlier in the guide: Android developers often relied on the Secure ANDROID_ID (SSAID) and MAC addresses. However, the behavior of the SSAID has changed since Android O and the behavior of MAC addresses have changed in Android N <code>[1]</code>. Google has set a new set of recommendations in their SDK documentation regarding identifiers as well <code>[2]</code>. Because of this new behavior, we recommend developers to no relie on the SSAID alone, as the identifier has become less stable. For instance: The SSAID might change upon a factory reset or when the app is reinstalled after the upgrade to Android O. Please note that there are amounts of devices which have the same ANDROID_ID and/or have an ANDROID_ID that can be overriden.
-Next, the Build.Serial was often used. Now, apps targetting Android O will get "UNKNOWN" when they request the Build.Serial.
-Before we describe the usable identifiers, let's quickly discuss how they can be used for binding. There are 3 methods which allow for device binding:
-
-- augment the credentials used for authentication with device identifiers. This can only make sense if the application needs to re-authenticate itself and/or the user frequently.
-- obfuscate the data stored on the device using device-identifiers as keys for encryption methods. This can help in binding to a device when a lot of offline work is done by the app or when access to APIs depends on access-tokens stored by the application.
-- Use a token based device authentication (InstanceID) to reassure that the same instance of the app is used.
-
-The following 3 identifiers can be possibly used.
 
 ##### Google InstanceID
 
@@ -1310,6 +1241,67 @@ Please note that Google recommends against using these identifiers unless there 
 ```java
   String SSAID = Settings.Secure.ANDROID_ID;
 ```
+#### Effectiveness Assessment
+
+When the source-code is available, then there are a few codes you can look for, such as:
+- The presence of unique identifiers that no longer work in the future
+  - `Build.SERIAL` without the presence of `Build.getSerial()`
+  - `htc.camera.sensor.front_SN` for HTC devices
+  - `persist.service.bdroid.bdadd`
+  - `Settings.Secure.bluetooth_address`, unless the system permission LOCAL_MAC_ADDRESS is enabled in the manifest.
+
+- The presence of using the ANDROID_ID only as an identifier. This will influence the possible binding quality over time given older devices.
+- The absence of both InstanceID, the `Build.SERIAL` and the IMEI.
+
+```java
+  TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+  String IMEI = tm.getDeviceId();
+```
+
+Furthermore, to reassure that the identifiers can be used, the AndroidManifest.xml needs to be checked in case of using the IMEI and the Build.Serial. It should contain the following permission: `<uses-permission android:name="android.permission.READ_PHONE_STATE"/>`.
+
+There are a few ways to test the application binding:
+
+##### Dynamic Analysis using an Emulator
+
+1. Run the application on an Emulator
+2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
+3. Retrieve the data from the Emulator This has a few steps:
+- ssh to your simulator using ADB shell
+- run-as <your app-id (which is the package as described in the AndroidManifest.xml)>
+- chmod 777 the contents of cache and shared-preferences
+- exit the current user
+- copy the contents of /dat/data/<your appid>/cache & shared-preferences to the sdcard
+- use ADB or the DDMS to pull the contents
+4. Install the application on another Emulator
+5. Overwrite the data from step 3 in the data folder of the application.
+- copy the contents of step 3 to the sdcard of the second emulator.
+- ssh to your simulator using ADB shell
+- run-as <your app-id (which is the pacakge as described in the AndroidManifest.xml)>
+- chmod 777 the folders cache and shared-preferences
+- copy the older contents of the sdcard to /dat/data/<your appid>/cache & shared-preferences
+6. Can you continue in an authenticated state? If so, then binding might not be working properly.
+
+##### Dynamic Analysis using two different rooted devices.
+
+1. Run the application on your rooted device
+2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
+3. Retrieve the data from the first rooted device
+4. Install the application on the second rooted device
+5. Overwrite the data from step 3 in the data folder of the application.
+6. Can you continue in an authenticated state? If so, then binding might not be working properly.
+
+#### Remediation
+
+The behavior of the SSAID has changed since Android O and the behavior of MAC addresses have changed in Android N <code>[1]</code>. Google has set a new set of recommendations in their SDK documentation regarding identifiers as well <code>[2]</code>. Because of this new behavior, we recommend developers to no relie on the SSAID alone, as the identifier has become less stable. For instance: The SSAID might change upon a factory reset or when the app is reinstalled after the upgrade to Android O. Please note that there are amounts of devices which have the same ANDROID_ID and/or have an ANDROID_ID that can be overriden.
+Next, the Build.Serial was often used. Now, apps targetting Android O will get "UNKNOWN" when they request the Build.Serial.
+Before we describe the usable identifiers, let's quickly discuss how they can be used for binding. There are 3 methods which allow for device binding:
+
+- augment the credentials used for authentication with device identifiers. This can only make sense if the application needs to re-authenticate itself and/or the user frequently.
+- obfuscate the data stored on the device using device-identifiers as keys for encryption methods. This can help in binding to a device when a lot of offline work is done by the app or when access to APIs depends on access-tokens stored by the application.
+- Use a token based device authentication (InstanceID) to reassure that the same instance of the app is used.
+
+The following 3 identifiers can be possibly used.
 
 #### References
 
@@ -1353,17 +1345,13 @@ N/A
 ![Identifier Renaming with ProGuard](Images/Chapters/0x05j/proguard.jpg)
 *Identifier renaming with ProGuard.*
 
-#### Static Analysis
+#### Effectiveness Assessment
 
 -- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
 
 -- TODO [Confirm purpose of sentence "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>." ] --
 
 -- TODO [Add content on "Testing Obfuscation" without source code] --
-
-#### Dynamic Analysis
-
--- TODO [Describe how to test for this issue by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
 
 -- TODO [Dumping process memory] --
 
@@ -1389,10 +1377,6 @@ out_file.write(chunk)
 mem_file.close()
 out_file.close()
 ```
-
-#### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Obfuscation".] --
 
 #### References
 
