@@ -30,7 +30,7 @@ Some apps attempt to detect whether the iOS device they're installed on is jailb
 
 The core dilemma with this approach is that, by definition, jailbreaking causes the app's environment to be unreliable: The APIs used to test whether a device is jailbroken can be manipulated, and with code signing disabled, the jailbreak detection code can easily be patched out. It is therefore not a very effective way of impeding reverse engineers. Nevertheless, jailbreak detection can be useful in the context of a larger software protection scheme. Also, MASVS L2 requires displaying a warning to the user, or terminate the app, when a jailbreak has been detected - the idea here is to inform users opting to jailbreak their device about the potential security implications (and not so much hindering determined reverse engineers).
 
-We'll revisit this topic in the chapter "Testing Resiliency Against Reverse Engineering".
+We'll revisit this topic in the chapter "Testing Resilience Against Reverse Engineering".
 
 ### Reverse Engineering iOS Apps
 
