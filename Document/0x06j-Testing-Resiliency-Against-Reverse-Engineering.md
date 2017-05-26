@@ -667,7 +667,7 @@ int xyz(char *dst) {
 -- TODO [Add relevant tools for "Testing Detection of Reverse Engineering Tools"] --
 * Enjarify - https://github.com/google/enjarify
 
-### Testing Memory Integrity Checks
+### Testing Runtime Integrity Checks
 
 #### Overview
 
