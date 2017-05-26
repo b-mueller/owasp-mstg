@@ -1074,30 +1074,49 @@ Controls in this category verify the integrity of the app's own memory space, wi
 
 There is some overlap with the category "detecting reverse engineering tools and frameworks", and in fact we already demonstrated the signature-based approach in that chapter, when we showed how to search for frida-related strings in process memory. Below are a few more examples for different kinds of integrity monitoring.
 
+##### Examples
+
+**Checking the Java stack trace for suspicous method calls**
+
+Detection code from the dead && end blog <sup>[3]</sup>.
+
+```java
+try {
+  throw new Exception();
+}
+catch(Exception e) {
+  int zygoteInitCallCount = 0;
+  for(StackTraceElement stackTraceElement : e.getStackTrace()) {
+    if(stackTraceElement.getClassName().equals("com.android.internal.os.ZygoteInit")) {
+      zygoteInitCallCount++;
+      if(zygoteInitCallCount == 2) {
+        Log.wtf("HookDetection", "Substrate is active on the device.");
+      }
+    }
+    if(stackTraceElement.getClassName().equals("com.saurik.substrate.MS$2") && 
+        stackTraceElement.getMethodName().equals("invoked")) {
+      Log.wtf("HookDetection", "A method on the stack trace has been hooked using Substrate.");
+    }
+    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") && 
+        stackTraceElement.getMethodName().equals("main")) {
+      Log.wtf("HookDetection", "Xposed is active on the device.");
+    }
+    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") && 
+        stackTraceElement.getMethodName().equals("handleHookedMethod")) {
+      Log.wtf("HookDetection", "A method on the stack trace has been hooked using Xposed.");
+    }
+
+  }
+}
+```
+
 **Verifying the Global Offset Table**
 
 In the world of ELF binaries, the Global Offset Table (GOT) is used as a layer of indirection for calling library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. Because the GOT is located in writeable memory, it is possible to overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hooks can be detected by verifying that each GOT entry points into a legitimately loaded library.
 
 In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). During runtime, we can therefore expect all GOT entries to point to valid memory locations within the code sections of their respective libraries.
 
-**Detecting Inline Hooks***
-
-Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code. They can be detected by scanning the function prologue of each function for unusual and telling instructions. For example, substrate 
-
-
-inline int checkSubstrateTrampoline() attribute((always_inline));
-int checkSubstrateTrampoline(void * funcptr) {
- 
-    unsigned int *funcaddr = (unsigned int *)funcptr;
- 
-    if(funcptr)
-        // assuming the first word is the trampoline 
-        if (funcaddr[0] == 0xe51ff004) // 0xe51ff004 = ldr pc, [pc-4]
-            return 1; // bad
- 
-    return 0; // good
-}
-Example code from the Netitude blog <code>[2]</code>.
+**Detecting Inline Hooks**
 
 -- TODO [Needs more research and code samples] --
 
@@ -1130,6 +1149,7 @@ Example code from the Netitude blog <code>[2]</code>.
 
 - [1] Michael Hale Ligh, Andrew Case, Jamie Levy, Aaron Walters (2014) *The Art of Memory Forensics.* Wiley. "Detecting GOT Overwrites", p. 743.
 - [2] Netitude Blog - "Who owns your runtime?" - https://labs.nettitude.com/blog/ios-and-android-runtime-and-anti-debugging-protections/
+- [3] dead && end blog - Android Anti-Hooking Techniques in Java - http://d3adend.org/blog/?p=589
 
 ##### Tools
 
@@ -1141,6 +1161,7 @@ Example code from the Netitude blog <code>[2]</code>.
 #### Overview
 
 The goal of device binding is to impede an attacker when he tries to copy an app and its state from device A to device B and continue the execution of the app on device B. When device A has been deemend trusted, it might have more privileges than device B, which should not change when an app is copied from device A to device B.
+
 In the past, Android developers often relied on the Secure ANDROID_ID (SSAID) and MAC addresses. However, the behavior of the SSAID has changed since Android O and the behavior of MAC addresses have changed in Android N <sup>[1]</sup>. Google has set a new set of recommendations in their SDK documentation regarding identifiers as well <sup>[2]</sup>.
 
 ##### Google InstanceID
