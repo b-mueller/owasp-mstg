@@ -673,21 +673,28 @@ int xyz(char *dst) {
 
 -- TODO [Provide a general description of the issue "Testing Memory Integrity Checks".] --
 
-#### Static Analysis
+#### Examples
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+**Detecting Substrate Inline Hooks***
 
--- [Confirm purpose of remark "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code. They can be detected by scanning the function prologue of each function for unusual and telling instructions. For example, substrate 
 
-##### With Source Code
 
--- TODO [Add content for static analysis of "Testing Memory Integrity Checks" with source code] --
+inline int checkSubstrateTrampoline() attribute((always_inline));
+int checkSubstrateTrampoline(void * funcptr) {
+ 
+    unsigned int *funcaddr = (unsigned int *)funcptr;
+ 
+    if(funcptr)
+        // assuming the first word is the trampoline 
+        if (funcaddr[0] == 0xe51ff004) // 0xe51ff004 = ldr pc, [pc-4]
+            return 1; // bad
+ 
+    return 0; // good
+}
+Example code from the Netitude blog <code>[2]</code>.
 
-##### Without Source Code
-
--- TODO [Add content for static analysis of "Testing Memory Integrity Checks" without source code] --
-
-#### Dynamic Analysis
+#### Effectiveness Assessment
 
 -- TODO [Describe how to test for this issue "Testing Memory Integrity Checks" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
 

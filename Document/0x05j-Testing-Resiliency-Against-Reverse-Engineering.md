@@ -1072,7 +1072,7 @@ Controls in this category verify the integrity of the app's own memory space, wi
 1. Comparing the contents of memory, or a checksum over the contents, with known good values;
 2. Searching memory for signatures of unwanted modifications.
 
-You might notice some overlap with the category "detecting reverse engineering tools and frameworks", and in fact we already demonstrated the signature-based approach in that chapter, when we showed how to search for frida-related strings in memory. 
+There is some overlap with the category "detecting reverse engineering tools and frameworks", and in fact we already demonstrated the signature-based approach in that chapter, when we showed how to search for frida-related strings in process memory. Below are a few more examples for different kinds of integrity monitoring.
 
 **Verifying the Global Offset Table**
 
@@ -1082,8 +1082,7 @@ In contrast to GNU <code>ld</code>, which resolves symbol addresses only once th
 
 **Detecting Inline Hooks***
 
-Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code.
-Example code from 
+Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code. They can be detected by scanning the function prologue of each function for unusual and telling instructions. For example, substrate 
 
 
 inline int checkSubstrateTrampoline() attribute((always_inline));
@@ -1098,6 +1097,7 @@ int checkSubstrateTrampoline(void * funcptr) {
  
     return 0; // good
 }
+Example code from the Netitude blog <code>[2]</code>.
 
 -- TODO [Needs more research and code samples] --
 
