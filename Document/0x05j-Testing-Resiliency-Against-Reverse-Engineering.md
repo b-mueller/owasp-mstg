@@ -1083,6 +1083,21 @@ In contrast to GNU <code>ld</code>, which resolves symbol addresses only once th
 **Detecting Inline Hooks***
 
 Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code.
+Example code from 
+
+
+inline int checkSubstrateTrampoline() attribute((always_inline));
+int checkSubstrateTrampoline(void * funcptr) {
+ 
+    unsigned int *funcaddr = (unsigned int *)funcptr;
+ 
+    if(funcptr)
+        // assuming the first word is the trampoline 
+        if (funcaddr[0] == 0xe51ff004) // 0xe51ff004 = ldr pc, [pc-4]
+            return 1; // bad
+ 
+    return 0; // good
+}
 
 -- TODO [Needs more research and code samples] --
 
@@ -1114,6 +1129,7 @@ Inline hooks are implemented by overwriting the first few bytes of a function wi
 ##### Info
 
 - [1] Michael Hale Ligh, Andrew Case, Jamie Levy, Aaron Walters (2014) *The Art of Memory Forensics.* Wiley. "Detecting GOT Overwrites", p. 743.
+- [2] Netitude Blog - "Who owns your runtime?" - https://labs.nettitude.com/blog/ios-and-android-runtime-and-anti-debugging-protections/
 
 ##### Tools
 
