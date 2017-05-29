@@ -233,7 +233,7 @@ As mentioned in the "Reverse Engineering and Tampering" chapter, we have to deal
 
 Anti-debugging features can be preventive or reactive. As the name implies, preventive anti-debugging tricks prevent the debugger from attaching in the first place, while reactive tricks attempt to detect whether a debugger is present and react to it in some way (e.g. terminating the app, or triggering some kind of hidden behaviour). The "more-is-better" rule applies: To maximize effectiveness, defenders combine multiple methods of prevention and detection that operate on different API layers and are distributed throughout the app.
 
-##### Sample Anti-JDWP-Debugging Methods
+##### Anti-JDWP-Debugging Examples
 
 In the chapter "Reverse Engineering and Tampering", we talked about JDWP, the protocol used for communication between the debugger and the Java virtual machine. We also showed that it easily possible to enable debugging for any app by either patching its Manifest file, or enabling debugging for all apps by changing the ro.debuggable system property. Let's look at a few things developers do to detect and/or disable JDWP debuggers.
 
@@ -391,7 +391,7 @@ JNIEXPORT void JNICALL Java_sg_vantagepoint_jdwptest_MainActivity_JDWPfun(
 }
 ```
 
-##### Sample Anti-Native-Debugging Methods
+##### Anti-Native-Debugging Examples
 
 Most Anti-JDWP tricks (safe for maybe timer-based checks) won't catch classical, ptrace-based debuggers, so separate defenses are needed to defend against this type of debugging. Many "traditional" Linux anti-debugging tricks are employed here.
 
@@ -579,7 +579,7 @@ As usual, there is no generic way of bypassing anti-debugging: It depends on the
 2. Using Frida or Xposed to hook APIs on the Java and native layers. Manipulate the return values of functions such as isDebuggable and isDebuggerConnected to hide the debugger.
 3. Change the environment. Android is an open enviroment. If nothing else works, you can modify the operating system to subvert the assumptions the developers made when designing the anti-debugging tricks.
 
-###### Example: UnCrackable App for Android Level 2
+###### Bypass Example: UnCrackable App for Android Level 2
 
 -- TODO [Bypassing Debugger Detection - Solve UnCrackable Level 2] --
 
@@ -981,7 +981,7 @@ N/A
 
 In the context of anti-reversing, the goal of emulator detection is to make it a bit more difficult to run the app on a emulated device, which in turn impedes some tools and techniques reverse engineers like to use. This forces the reverse engineer to defeat the emulator checks or utilize the physical device. This provides a barrier to entry for large scale device analysis.
 
-#### Detection Techniques
+#### Emulator Detection Examples
 
 There are several static indicators that indicate the device in question is being emulated. While all of these API calls could be hooked, this provides a modest first line of defense.
 
@@ -1074,7 +1074,7 @@ Controls in this category verify the integrity of the app's own memory space, wi
 
 There is some overlap with the category "detecting reverse engineering tools and frameworks", and in fact we already demonstrated the signature-based approach in that chapter, when we showed how to search for frida-related strings in process memory. Below are a few more examples for different kinds of integrity monitoring.
 
-##### Examples
+##### Runtime Integrity Check Examples
 
 **Checking the Java stack trace for suspicous method calls**
 
@@ -1110,11 +1110,13 @@ catch(Exception e) {
 }
 ```
 
-**Verifying the Global Offset Table**
+**Native Hook Detection**
 
-In the world of ELF binaries, the Global Offset Table (GOT) is used as a layer of indirection for calling library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. Because the GOT is located in writeable memory, it is possible to overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hooks can be detected by verifying that each GOT entry points into a legitimately loaded library.
+Native function hooks can be installed by overwriting function addresses in the GOT, tampering with PLT stubs, or replacing parts of the function code itself. 
 
-In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). During runtime, we can therefore expect all GOT entries to point to valid memory locations within the code sections of their respective libraries.
+In the world of ELF binaries, the Global Offset Table (GOT) is used as a layer of indirection for calling library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. Because the GOT is located in writeable memory, it is possible to overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hook can be detected by verifying that each GOT entry points into a legitimately loaded library.
+
+In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). Some hook detection methods therefore verify that all GOT entries to point to valid memory locations within the code sections of their respective libraries.
 
 **Detecting Inline Hooks**
 
