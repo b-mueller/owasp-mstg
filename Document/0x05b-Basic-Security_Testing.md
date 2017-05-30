@@ -8,7 +8,7 @@ This section will give an overview of different methods on how an Android app ca
 
 #### Preparation
 
-The goal of a test is to verify if the app and the endpoint(s) it's communicating with, are implemented in a secure way. Several security controls like SSL Pinning or root detection might be implemented. These can slow down the testing dramatically and might already take days to bypass, depending on the implementation.
+Security testing involves many invasive tasks such as monitoring and manipulating the network traffic between the mobile app and its remote endpoints, inspecting the app's data files, and instrumenting API calls. Security controls like SSL Pinning and root detection might can impede these tasks and slow down the testing dramatically.
 
 During the preparation phase it should be discussed with the company developing the mobile app, to provide two versions of the app. One app should be built as release to check if the implemented controls like SSL Pinning are working properly or can be easily bypassed. The same app should also be provided as debug build that deactivates certain security controls. Through this approach all scenarios and test cases can be tested in the most efficient way.
 
@@ -153,10 +153,9 @@ See also test case "Testing Custom Certificate Stores and SSL Pinning" for furth
 
 ##### Root Detection
 
-To implement root detection on Android, libraries like RootBeer<sup>[14]</sup> or custom checks are used to verify if the device is rooted or not. See also test case "Testing Root Detection" and "Testing Advanced Root Detection" for further details.
+Root detection can be implemented using pre-made libraries like RootBeer<sup>[14]</sup> or custom checks. An extensive list of root detection methods is presented in the "Testing Anti-Reversing Defenses on Android" chapter.
 
-To be able to efficiently test during a white box test, a debug build with disabled root detection should be provided.
-
+In a typical mobile app security build, you'll usually want to test a debug build with root detection disabled. If such a build is not available for testing, root detection can be disabled using a variety of methods which will be introduced later in this book.
 
 ### Testing Methods
 
