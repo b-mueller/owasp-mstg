@@ -286,39 +286,46 @@ Does this mean that obfuscation is impossible? Well, it depends on what you obfu
 
 Unfortunately, reseachers don't agree on whether obfuscation effectiveness can ever be proven or quantified, and there are no widely accepted methods of doing it. In the following sections, we provide a taxonomy of commonly used types of obfuscation. We then outline the requirements for achieving what we would consider *robust* obfuscation, given the de-obfuscation tools and research available at the time of writing. Note however that the field is rapidly involving, so in practice, the most recent developments must always be taken into account.
 
-### Obfuscation Types
+### Obfuscation Controls in the MASVS
 
-*Obfuscating transformations* are modifications applied during the build process to the source code, binary, intermediate representation of the code, or other elements such as data or executable headers. We broadly categorize them into two types:
+The MASVS lists only two requirements that deal with obfuscation. The first requirement is V8.11:
 
-1. Strip information
-2. Obfuscate control flow and data
+```
+"8.11 All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
+```
 
-**1. Strip Meaningful Information**
+This requirement simply says that the code should be made to look fairly incomprehensible to someone inspecting it in a common disassembler or decompiler. This can be achieved by doing a combination of the following.
 
-Compiled programs often retain explanative information that is meaningful to humans, but isn’t actually needed for the program to run. Debugging symbols that map machine code or byte code to line numbers, function names and variable names are obvious examples.
+**Stripping information**
+
+The first simple and highly effective step involves stripping any explanative information that is meaningful to humans, but isn’t actually needed for the program to run. Debugging symbols that map machine code or byte code to line numbers, function names and variable names are obvious examples.
 
 For instance, class files generated with the standard Java compiler include the names of classes, methods and fields, making it trivial to reconstruct the source code. ELF and Mach-O binaries have a symbol table that contains debugging information, including the names of functions, global variables and types used in the executable.
 
 Stripping this information makes a compiled program less intelligible while fully preserving its functionality. Possible methods include removing tables with debugging symbols, or renaming functions and variables to random character combinations instead of meaningful names. This process sometimes reduces the size of the compiled program and doesn’t affect its runtime behavior.
 
-**2. Obfuscate Control Flow and Data**
+**Packing, encryption, and other tricks**
 
-Program code and data can be obfuscated in unlimited ways - and indeed, there is a rich body of informal and academic research dedicated to it.
+In addition to stripping information, there's many ways of making apps difficult and annoying to analyze, such as:
 
-*Packing and Encryption*
+- Splitting up code and data between Java bytecode and native code; 
+- Encrypting strings;
+- Encrypting parts of the code and data withing the program;
+- Encrypting whole binary files and class files.
 
-Simple transformations with little impact on program complexity can be used to defeat standard static analysis tools without causing too much size and performance penalties. The execution trace of the obfuscated function(s) remains more or less unchanged. De-obfuscation is relatively trivial, and can be accomplished with standard tools without scripting or customization.
+This kind of transformations are "cheap" in the sense that they don't add significant runtime overhead. They form a part of every effective software protection scheme, no matter the particular threat model. The goal is simply to make it hard to understand what is going on, adding to the overall effectiveness of the protections. Seen in isolation, these techniques are not highly resilient against manual or automated de-obfuscation.
 
-*Transforming Code and/or Data*
+The second requirement, V8.12, deals with cases where obfuscation is meant to perform a specific function, such as hiding a cryptographic key, or concealing some portion of code that is considered sensitive.
 
-Advanced methods aim to hide the semantics of a computation by computing the same function in a more complicated way, or encoding code and data in ways that are not easily comprehensible. Transformations in this category have the following properties:
+```
+8.12: If the goal of obfuscation is to protect sensitive computations, an obfuscation scheme is used that is both appropriate for the particular task and robust against manual and automated de-obfuscation methods, considering currently published research. The effectiveness of the obfuscation scheme must be verified through manual testing. Note that hardware-based isolation features should prefered over obfuscation whenever possible."
+```
 
-- The size and performance penalty can be sizable (scales with the obfuscation settings)
-- De-obfuscation requires advanced methods and/or custom tools
+This is where more "advanced" (and often controversial) forms of obfuscation, such as white-box cryptography, come into play. This kind of obfuscation is meant to be truly robust against both human and automated analysis, and usually increases the size and complexity of the program. The methods aim to hide the semantics of a computation by computing the same function in a more complicated way, or encoding code and data in ways that are not easily comprehensible.
 
 A simple example for this kind of obfuscations are opaque predicates. Opaque predicates are redundant code branches added to the program that always execute the same way, which is known a priori to the programmer but not to the analyzer. For example, a statement such as if (1 + 1) = 1 always evaluates to false, and thus always result in a jump to the same location. Opaque predicates can be constructed in ways that make them difficult to identify and remove in static analysis.
 
-Some types of obfuscation that fall into this category are:
+Other obfuscation methods that fall into this category are:
 
 - Pattern-based obfuscation, when instructions are replaced with more complicated instruction sequences
 - Control flow obfuscation
@@ -329,31 +336,7 @@ Some types of obfuscation that fall into this category are:
 - Virtualization
 - White-box cryptography
 
-### Obfuscation Requirements in the MASVS
 
-The MASVS lists only two requirements that deal with obfuscation. The first requirement is V8.11:
-
-```
-"8.11 All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
-```
-
-This requirement simply says that the code should be made to look fairly incomprehensible to someone inspecting it in a common disassembler or decompiler. This can be achieved by doing a combination of the following:
-
-- Stripping the names of classes, variables, methods and functions;
-- Splitting up code and data between Java bytecode and native code;
-- Encrypting strings;
-- Encrypting parts of the code and data withing the program;
-- Encrypting whole binary files and class files.
-
-Such "cheap" transformations form a part of every effective software protection scheme, no matter the particular threat model. The goal is simply to make it hard to understand what is going on, adding to the overall effectiveness of the protections.
-
-The second requirement, V8.12, deals with cases where obfuscation is meant to perform a specific function, such as hiding a cryptographic key, or concealing some portion of code that is considered sensitive.
-
-```
-8.12: If the goal of obfuscation is to protect sensitive computations, an obfuscation scheme is used that is both appropriate for the particular task and robust against manual and automated de-obfuscation methods, considering currently published research. The effectiveness of the obfuscation scheme must be verified through manual testing. Note that hardware-based isolation features should prefered over obfuscation whenever possible."
-```
-
-This is where more "advanced" (and often controversial) forms of obfuscation, such as white-box cryptography, come into play. 
 
 ### Obfuscation Effectiveness
 
