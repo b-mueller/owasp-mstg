@@ -73,13 +73,21 @@ The following is a summarised list of App Transport Security Requirements<sup>[1
 
 - The Certificate has a SHA256 fingerprint and must be signed with at least 2048-bit RSA key or a 256-bit Elliptic-Curve Cryptography (ECC) key.
 
-ATS restrictions can be disabled by configuring exceptions in the file Info.plist under the NSAppTransportSecurity key. These exceptions can be allied to:
-- Allow insecure connections (HTTP),
-- Lower the minimum TLS version,
-- Disable PFS and
-- Allow connections to local domains.
 
-Starting from January 1 2017, Apple App Store reviews require justification if ATS exceptions are defined.
+##### ATS Exceptions
+
+ATS restrictions can be disabled by configuring exceptions in the Info.plist file under the NSAppTransportSecurity key. These exceptions can be applied to
+* allow insecure connections (HTTP),
+* lower the minimum TLS version,
+* disable PFS and 
+* allow connections to local domains
+
+
+Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating “To give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed”<sup>[5]</sup>
+
+* NSAllowsArbitraryLoads - disables ATS globally for all the domains
+* NSExceptionAllowsInsecureHTTPLoads - disables ATS for a single domain
+* NSExceptionMinimumTLSVersion - enable support for TLS versions less than 1.2
 
 -- TODO: Describe ATS exceptions --
 
