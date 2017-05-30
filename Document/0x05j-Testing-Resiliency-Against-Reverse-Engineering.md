@@ -581,11 +581,11 @@ As usual, there is no generic way of bypassing anti-debugging: It depends on the
 
 ###### Bypass Example: UnCrackable App for Android Level 2
 
--- TODO [Bypassing Debugger Detection - Solve UnCrackable Level 2] --
-
-When dealing with obfuscated apps, you'll often find that developers purposely "hide away" data and functionality in native libraries. You'll find an example for this in level 2 of the "UnCrackable App'.
+When dealing with obfuscated apps, you'll often find that developers purposely "hide away" data and functionality in native libraries. You'll find an example for this in level 2 of the "UnCrackable App for Android'.
 
 At first glance, the code looks similar to the prior challenge. A class called "CodeCheck" is responsible for verifying the code entered by the user. The actual check appears to happen in the method "bar()", which is declared as a *native* method.
+
+-- TODO [Example for Bypassing Debugger Detection] --
 
 ```java
 package sg.vantagepoint.uncrackable2;
@@ -606,33 +606,6 @@ public class CodeCheck {
     static {
         System.loadLibrary("foo");
     }
-```
-
-
--- TODO [Add a generic bypass script using Frida (?)] --
-
-```python
-#v0.1
- 
-import frida
-import sys
- 
-session = frida.get_remote_device().attach("com.example.targetapp")
- 
-script = session.create_script("""
- 
-var funcPtr = Module.findExportByName("libdvm.so", "_Z25dvmDbgIsDebuggerConnectedv");
-Interceptor.replace(funcPtr, new NativeCallback(function (pathPtr, flags) {
-    return 0;
-}, 'int', []));
-""") 
-
-def on_message(message, data):
-    print(message)
- 
-script.on('message', on_message)
-script.load()
-sys.stdin.read()
 ```
 
 #### Effectiveness Assessment
@@ -1118,9 +1091,9 @@ catch(Exception e) {
 
 **Native Hook Detection**
 
-Native function hooks can be installed by overwriting function addresses in the GOT, tampering with PLT stubs, or replacing parts of the function code itself. 
+With ELF binaries, native function hooks can be installed by either overwriting function pointers in memory (e.g. GOT or PLT hooking), or patching parts of the function code itself (inline hooking). Checking the integrity of the respective memory regions is one technique to detect this kind of hooks.
 
-In the world of ELF binaries, the Global Offset Table (GOT) is used as a layer of indirection for calling library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. Because the GOT is located in writeable memory, it is possible to overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hook can be detected by verifying that each GOT entry points into a legitimately loaded library.
+The Global Offset Table (GOT) is used to resolve library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. GOT hooks overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hook can be detected by enumarating the process memory mapp and verifying that each GOT entry points into a legitimately loaded library.
 
 In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). Some hook detection methods therefore verify that all GOT entries to point to valid memory locations within the code sections of their respective libraries.
 

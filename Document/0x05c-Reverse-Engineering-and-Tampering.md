@@ -240,7 +240,14 @@ Dalvik and ART both support the Java Native Interface (JNI), which defines defin
 
 Android JNI functions consist of native code compiled into Linux ELF libraries. It's pretty much standard Linux fare. However, instead of relying on widely used C libraries such as glibc, Android binaries are built against a custom libc named Bionic <sup>[17]</sup>. Bionic adds support for important Android-specific services such as system properties and logging, and is not fully POSIX-compatible.
 
-Download HelloWorld-JNI.apk from the OWASP MSTG repository and, optionally, install and run it on your emulator or Android device. The app is not exactly spectacular: All it does is show a label with the text "Hello from C++". In fact, this is the default app Android generates when you create a new project with C/C++ support - enough however to show the basic principles of how JNI calls work.
+Download HelloWorld-JNI.apk from the OWASP MSTG repository and, optionally, install and run it on your emulator or Android device.
+
+```bash
+$ wget HelloWord-JNI.apk
+$ adb install HelloWord-JNI.apk
+```
+
+This app is not exactly spectacular: All it does is show a label with the text "Hello from C++". In fact, this is the default app Android generates when you create a new project with C/C++ support - enough however to show the basic principles of how JNI calls work.
 
 <img src="Images/Chapters/0x05c/helloworld.jpg" width="300px" />
 
@@ -413,10 +420,11 @@ $ cd ..
 $ apksigner sign --ks  ~/.android/debug.keystore --ks-key-alias signkey UnCrackable-Repackaged.apk
 ```
 
-Note: If you experience JRE compatibility issues with <code>apksigner</code>, you can use <code>jarsigner</code> instead:
+Note: If you experience JRE compatibility issues with <code>apksigner</code>, you can use <code>jarsigner</code> instead. Note that in this case, <code>zipalign</code> is called *after* signing.
 
 ```bash
 $ jarsigner -verbose -keystore ~/.android/debug.keystore UnCrackable-Repackaged.apk signkey
+$ zipalign -v 4 dist/UnCrackable-Level1.apk ../UnCrackable-Repackaged.apk
 ```
 
 4. Reinstall the app:
@@ -563,7 +571,7 @@ A pretty neat trick is setting up a project in an IDE with the decompiled source
 
 In order to debug an app from the decompiled source code, you should first create your Android project and copy the decompiled java sources into the source folder as described above at "Statically Analyzing Java Code" part. Set the debug app (in this tutorial it is Uncrackable1) and make sure you turned on "Wait For Deugger" switch from "Developer Options".
 
-Once you tap the Uncrackable app icon from the launcher, it will get suspended and wait for a debugger to attach its process.
+Once you tap the Uncrackable app icon from the launcher, it will get suspended in "wait for a debugger" mode.
 
 <img src="Images/Chapters/0x05c/waitfordebugger.png" width="350px" />
 
@@ -571,21 +579,21 @@ Now you can set breakpoints and attach to the Uncrackable1 app process using the
 
 <img src="Images/Chapters/0x05c/set_breakpoint_and_attach_debugger.png" width="700px" />
 
-While debugging an application from decompiled sources, it is useful to set breakpoints on methods even method breakpoints may slow down the debugging process. Hence we don't have the original source code, the decompiled source code won't match with the bytecode running on the device. As a result, the breakpoints which are set within the methods won't get hit most of the time (line breakpoints won't work). Once you set the breakpoints on the methods, you will get the chance to single step throughout the method execution. 
+Note that only method breakpoints work when debugging an app from decompiled sources. Once a method breakpoint is hit, you will get the chance to single step throughout the method execution. 
 
 <img src="Images/Chapters/0x05c/Choose_Process.png" width="300px" />
 
-After you choose the Uncrackable1 application from the list, debugger will attach to the app process and you will hit the breakpoint that was set on the <code>onCreate()</code> method. Uncrackable1 app triggers anti-debugging and anti-tampering controls within the <code>onCreate()</code> method. That's why it is a good idea to set a breakpoint on the <code>onCreate()</code> method just before the anti-tampering and anti-debugging checks performed.
+After you choose the Uncrackable1 application from the list, the debugger will attach to the app process and you will hit the breakpoint that was set on the <code>onCreate()</code> method. Uncrackable1 app triggers anti-debugging and anti-tampering controls within the <code>onCreate()</code> method. That's why it is a good idea to set a breakpoint on the <code>onCreate()</code> method just before the anti-tampering and anti-debugging checks performed.
 
-Then we will step into the <code>onCreate()</code> method by clicking "Force Step Into" button on the Debugger view. This will allow you to move step by step throughout the <code>onCreate()</code> method. It might be useful to "Force Step Into" button insted of "Step Into" since we want to debug the Android framework functions and core Java classes which are normally ignored by debuggers. 
+Next, we will single-step through the <code>onCreate()</code> method by clicking the "Force Step Into" button on the Debugger view. The "Force Step Into" option allows you to debug the Android framework functions and core Java classes that are normally ignored by debuggers. 
 
 <img src="Images/Chapters/0x05c/Force_Step_Into.png" width="700px" />
 
-Once you "Force Step Into", debugger will stop at the beginning of the next method which is the <code>a()</code> method of class <code>sg.vantagepoint.a.c</code>.
+Once you "Force Step Into", the debugger will stop at the beginning of the next method which is the <code>a()</code> method of class <code>sg.vantagepoint.a.c</code>.
 
 <img src="Images/Chapters/0x05c/fucntion_a_of_class_sg_vantagepoint_a.png" width="700px" />
 
-This method will search for "su" binary within well known directories. Since we are running the app on a rooted device/emulator we need to defeat this check by manipulating variables and/or function return values. 
+This method searches for "su" binary within well known directories. Since we are running the app on a rooted device/emulator we need to defeat this check by manipulating variables and/or function return values. 
 
 <img src="Images/Chapters/0x05c/variables.png" width="700px" />
 
@@ -593,7 +601,7 @@ You can see the directory names inside the "Variables" window by stepping into t
 
 <img src="Images/Chapters/0x05c/step_over.png" width="700px" />
 
-It will call the <code>getenv</code> method of core Java class <code>System</code> and we could be able step into the <code>System</code> class by using the "Force Step Into" functionality. 
+Step into the <code>System.getenv</code> method call y using the "Force Step Into" functionality.
 
 After you get the colon seperated directory names, the debugger cursor will return back to the beginning of <code>a()</code> method; not to the next executable line. This is just because we are working on the decompiled code insted of the original source code. So it is crucial for the analyst to follow the code flow while debugging decompiled applications. Othervise, it might get complicated to identify which line will be executed next.
 
@@ -601,27 +609,27 @@ If you don't want to debug core Java and Android classes, you can step out of th
 
 <img src="Images/Chapters/0x05c/step_out.png" width="700px" />
 
-After it gets the directory names, <code>a()</code> method will search for the existance of su binary within these directories. In order to defeat this control, you can modify the directory names (parent) or binary name (child) in each cycle so that the searched binary will not be able to found within the filesystem. You can modify the binary name by pressing F2 or Right-Click and "Set Value".
+After it gets the directory names, <code>a()</code> method will search for the existence of the </code>su</code> binary within these directories. In order to defeat this control, you can modify the directory names (parent) or file name (child) at cycle which would otherwise detect the <code>su</code> binary on your device. You can modify the variable content by pressing F2 or Right-Click and "Set Value".
 
 <img src="Images/Chapters/0x05c/set_value.png" width="700px" />
 
 <img src="Images/Chapters/0x05c/modified_binary_name.png" width="700px" />
 
-Once you modify the binary name or the directory name, <code>exist</code> method of <code>File</code> class will return <code>false</code>.
+Once you modify the binary name or the directory name, <code>File.exists</code> should return <code>false</code>.
 
 <img src="Images/Chapters/0x05c/file_exists_false.png" width="700px" />
 
-You will defeat the first root detection control that was implemented in the Uncrackable1 app by modifying the variables. Then you need to defeat other two anti-tampering and one anti-debugging controls in a similar way to finally reach secret string verification functionality. 
+This defeats the first root detection control of Uncrackable App Level 1. The remaining anti-tampering and anti-debugging controls can be defeated in similar ways to finally reach secret string verification functionality. 
 
 <img src="Images/Chapters/0x05c/anti_debug_anti_tamper_defeated.png" width="350px" />
 
 <img src="Images/Chapters/0x05c/MainActivity_verify.png" width="700px" />
 
-The secret code is verified by <code>a()</code> method of class <code>sg.vantagepoint.uncrackable1.a</code>. So you can set a breakpoint on method <code>a()</code> and "Force Step Into" when you hit the breakpoint. Then step through the method until you reach <code>equals</code> method of class <code>String</code>. This is where user supplied input is compared with the secret string. 
+The secret code is verified by the method <code>a()</code> of class <code>sg.vantagepoint.uncrackable1.a</code>. Set a breakpoint on method <code>a()</code> and "Force Step Into" when you hit the breakpoint. Then, single-step until you reach the call to <code>String.equals</code>. This is where user supplied input is compared with the secret string. 
 
 <img src="Images/Chapters/0x05c/sg_vantagepoint_uncrackable1_a_function_a.png" width="700px" />
 
-You can see the secret string in the Variables view at the time you reach <code>equals</code> method of <code>String</code> class.
+You can see the secret string in the "Variables" view at the time you reach the <code>String.equals</code> method call.
 
 <img src="Images/Chapters/0x05c/secret_code.png" width="700px" />
 
