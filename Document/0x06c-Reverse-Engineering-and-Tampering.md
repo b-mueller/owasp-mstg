@@ -6,25 +6,52 @@
 
 #### XCode and iOS SDK
 
--- TODO [Where to get XCode] --
+Xcode is an Integrated Development Environment (IDE) for macOS containing a suite of software development tools developed by Apple for developing software for macOS, iOS, watchOS and tvOS. The latest release as of the writing of this book is Xcode 8 and it can be downloaded from the official Apple website<sup>[7]</sup>.
+
+The iOS SDK (Software Development Kit), formerly known as iPhone SDK, is a software development kit developed by Apple for developing native applications for iOS. The latest release as of the writing of this book is iOS 10 SDK and it can be downloaded from the Official Apple website as well<sup>[8]</sup>.
 
 #### Utilities
 
-Class-dump by Steve Nygard [1] is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
+Class-dump by Steve Nygard<sup>[1]</sup> is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
 
-Class-dump-dyld by Elias Limneos [2] allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
+Class-dump-z<sup>[9]</sup> is written from scratch using C++ avoiding using dynamic calls, unlike class-dump and class-dump-x which are written in Objective-C. Removing these unnecessary calls makes class-dump-z near 10 times faster than the precedences.
 
-MachoOView [3] is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries.
+Class-dump-dyld by Elias Limneos<sup>[2]</sup> allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
+
+MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries
 
 ### Jailbreaking iOS
 
 In the iOS world, jailbreaking means disabling Apple's code code signing mechanisms so that apps not signed by Apple can be run. If you're planning to do any form of dynamic security testing on an iOS device, you'll have a much easier time on a jailbroken device, as most useful testing tools are only available outside the app store.
 
-Developing a jailbreak for any given version of iOS is not an easy endeavor. As a security tester, you'll most likely want to use publicly available jailbreak tools (don't worry, we're all script kiddies in some areas). Even so, we recommend studying the techniques used to jailbreak various versions of iOS in the past - you'll encounter many highly interesting exploits and learn a lot about the internals of the OS. For example, Pangu9 for iOS 9.x exploited at least five vulnerabilities, including a use-after-free bug in the kernel (CVE-2015-6794) and an arbitrary file system access vulnerability in the Photos app (CVE-2015-7037) [3].
+Developing a jailbreak for any given version of iOS is not an easy endeavor. As a security tester, you'll most likely want to use publicly available jailbreak tools (don't worry, we're all script kiddies in some areas). Even so, we recommend studying the techniques used to jailbreak various versions of iOS in the past - you'll encounter many highly interesting exploits and learn a lot about the internals of the OS. For example, Pangu9 for iOS 9.x exploited at least five vulnerabilities, including a use-after-free bug in the kernel (CVE-2015-6794) and an arbitrary file system access vulnerability in the Photos app (CVE-2015-7037) <sup>[4]</sup>.
 
 In jailbreak lingo, we talk about tethered and untethered jailbreaking methods. In the "tethered" scenario, the jailbreak doesn't persist throughout reboots, so the device must be connected (tethered) to a computer during every reboot to re-apply it. "Untethered" jailbreaks need only be applied once, making them the most popular choice for end users.
 
+#### Why Jailbreak iOS?
+
+Some of the benefits of jailbreaking an iOS Device includes the following:
+
+* Removing the security (and other) limitations on the OS imposed by Apple
+* Providing root access to the operating system
+* Allowing important testing software tools to be installed
+* Providing access to the Objective-C Runtime
+
+iOS applications store data in the application sandbox which is not accessible to the public (but is available to root and the application itself). Without root access, it is not possible to assess the application sandbox, analyse the data that were stored in the device and how they were stored. 
+
+#### How to Jailbreak iOS?
+
+Before we get into how to perform jailbreak on iOS, it is important to note that this section is merely served as a general guideline and is only up to date as of the writing of this guide. OWASP and the MSTG will not be responsible if you happen to brick your iOS device while performing the steps to jailbreak your iOS device. 
+
 -- TODO [Jailbreaking howto] --
+
+Some reliable resources to read about content regarding jailbreak iOS
+
+* The iPhone Wiki - https://www.theiphonewiki.com/wiki/Jailbreak
+* Redmond Pie - http://www.redmondpie.com/
+* Reddit Jailbreak - https://www.reddit.com/r/jailbreak/
+
+#### The Dilemma of Jailbreak iOS
 
 Some apps attempt to detect whether the iOS device they're installed on is jailbroken. The reason for this jailbreaking deactivates some of iOS' default security mechanisms, leading to a less trustable environment.
 
@@ -52,7 +79,7 @@ Even though the XNU kernel implements the <code>ptrace()</code> system call as w
 
 -- TODO [Complete lldb tutorial] --
 
-iOS ships with a console app, debugserver, that allows for remote debugging using gdb or lldb. By default however, debugserver cannot be used to attach to arbitrary processes (it is usually only used for debugging self-developed apps deployed with XCode). To enable debugging of third-part apps, the task_for_pid entitlement must be added to the debugserver executable. An easy way to do this is adding the entitlement to the debugserver binary shipped with XCode [5].
+iOS ships with a console app, debugserver, that allows for remote debugging using gdb or lldb. By default however, debugserver cannot be used to attach to arbitrary processes (it is usually only used for debugging self-developed apps deployed with XCode). To enable debugging of third-part apps, the task_for_pid entitlement must be added to the debugserver executable. An easy way to do this is adding the entitlement to the debugserver binary shipped with XCode <sup>[5]</sup>.
 
 To obtain the executable mount the following DMG image:
 
@@ -134,10 +161,13 @@ http://iphonedevwiki.net/index.php/Cycript_Tricks
 
 ### References
 
-- [1] Class-dump - http://stevenygard.com/projects/class-dump/
-- [2] Class-dump-dyld - https://github.com/limneos/classdump-dyld/
-- [3] MachOView - https://sourceforge.net/projects/machoview/
-- [3] Jailbreak Exploits on the iPhone Dev Wiki - https://www.theiphonewiki.com/wiki/Jailbreak_Exploits#Pangu9_.289.0_.2F_9.0.1_.2F_9.0.2.29)
-- [4] Stack Overflow - http://stackoverflow.com/questions/413242/how-do-i-detect-that-an-ios-app-is-running-on-a-jailbroken-phone
-- [5] Debug Server on the iPhone Dev Wiki - http://iphonedevwiki.net/index.php/Debugserver
-- [6] Uninformed - Replacing ptrace() - http://uninformed.org/index.cgi?v=4&a=3&p=14
+* [1] Class-dump - http://stevenygard.com/projects/class-dump/
+* [2] Class-dump-dyld - https://github.com/limneos/classdump-dyld/
+* [3] MachOView - https://sourceforge.net/projects/machoview/
+* [3] Jailbreak Exploits on the iPhone Dev Wiki - https://www.theiphonewiki.com/wiki/Jailbreak_Exploits#Pangu9_.289.0_.2F_9.0.1_.2F_9.0.2.29)
+* [4] Stack Overflow - http://stackoverflow.com/questions/413242/how-do-i-detect-that-an-ios-app-is-running-on-a-jailbroken-phone
+* [5] Debug Server on the iPhone Dev Wiki - http://iphonedevwiki.net/index.php/Debugserver
+* [6] Uninformed - Replacing ptrace() - http://uninformed.org/index.cgi?v=4&a=3&p=14
+* [7] Apple Xcode IDE - https://developer.apple.com/xcode/ide/
+* [8] Apple iOS 10 SDK - https://developer.apple.com/ios/
+* [9] Class-dump-z - https://code.google.com/archive/p/networkpx/wikis/class_dump_z.wiki
