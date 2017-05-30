@@ -333,7 +333,7 @@ Some types of obfuscation that fall into this category are:
 
 The MASVS lists only two requirements that deal with obfuscation. The first requirement is V8.11:
 
-````
+```
 "8.11 All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
 ```
 
