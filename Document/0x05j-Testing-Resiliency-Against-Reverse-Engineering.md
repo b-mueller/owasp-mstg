@@ -188,7 +188,7 @@ Develop bypass methods for the root detection mechanisms and answer the followin
 - How long did it take you to successfully bypass it?
 - What is your subjective assessment of difficulty?
 
-Also note how well the root detection mechanisms are integrated within the overall protection scheme. For example, the detection functions should obfuscated and protected from tampering.
+For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### Remediation
 
@@ -399,7 +399,7 @@ Most Anti-JDWP tricks (safe for maybe timer-based checks) won't catch classical,
 
 When the <code>ptrace</code> system call is used to attach to a process, the "TracerPid" field in the status file of the debugged process shows the PID of the attaching process. The default value of "TracerPid" is "0" (no other process attached). Consequently, finding anything else than "0" in that field is a sign of debugging or other ptrace-shenanigans.
 
-The following implementation is taken from Tim Strazzere's Anti-Emulator project [3].
+The following implementation is taken from Tim Strazzere's Anti-Emulator project <sup>[3]</sup>.
 
 ```
     public static boolean hasTracerPid() throws IOException {
@@ -651,9 +651,7 @@ Work on bypassing the anti-debugging defenses and answer the following questions
 - Did you need to write custom code to disable the defenses? How much time did you need to invest?
 - What is your subjective assessment of difficulty?
 
-Consider how the anti-debugging mechansims fit into the overall protection scheme. For example, anti-debugging defenses should obfuscated and protected from tampering.
-
-Note that some anti-debugging implementations respond in a stealthy way so that changes in behaviour are not immediately apparent. For example, a soft token app might not visibly respond when a debugger is detected, but instead secretly alter the state of an internal variable so that an incorrect OTP is generated at a later point. Make sure to run through the complete workflow to determine if attaching the debugger causes a crash or malfunction.
+For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### Remediation
 
@@ -715,7 +713,14 @@ Refer to the "Tampering and Reverse Engineering section" for examples of patchin
 
 #### Effectiveness Assessment
 
-Run the app on the device in an unmodified state and make sure that everything works. Then, apply simple patches to the classes.dex and any .so libraries contained in the app package. Re-package and re-sign the app as described in the chapter "Basic Security Testing" and run it. The app should detect the modification an cease to function. Note that some anti-tampering implementations respond in a stealthy way so that changes in behaviour are not immediately apparent.
+Run the app on the device in an unmodified state and make sure that everything works. Then, apply simple patches to the classes.dex and any .so libraries contained in the app package. Re-package and re-sign the app as described in the chapter "Basic Security Testing" and run it. The app should detect the modification and respond in some way. At the very least, the app should alert the user and/or terminate the app. Work on bypassing the defenses and answer the following questions:
+
+- Can the mechanisms be bypassed using trivial methods (e.g. hooking a single API function)?
+- How difficult is it to identify the anti-debugging code using static and dynamic analysis?
+- Did you need to write custom code to disable the defenses? How much time did you need to invest?
+- What is your subjective assessment of difficulty?
+
+For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### References
 
@@ -743,18 +748,7 @@ Reverse engineers use a lot of tools, frameworks and apps to aid the reversing p
 
 ##### Detection Methods
 
-Popular tools, if installed in their original form, can be detected by looking for associated application packages, files, processes, or other tool-specific modifications and artefacts.
-
--- TODO [Add list of tools and associated files, processes, libs, etc. etc. Cover the tools below] --
-
-- Substrate for Android
-- Xposed
-- Frida
-- Radare2
-- Introspy-Android
-- Drozer
-- RootCloak
-- Android SSL Trust Killer
+Popular reverse engineering tools, if installed in an unmodified form, can be detected by looking for associated application packages, files, processes, or other tool-specific modifications and artefacts. In the following examples, we'll show how different ways of detecting the frida instrumentation framework which is used extensively in this guide. Other tools, such as Substrate and Xposed, can be detected using similar means. Note that DBI/injection/hooking tools can often also be detected implicitly through runtime integrity checks, which are discussed separately below.
 
 ###### Example: Ways of Detecting Frida
 
@@ -948,9 +942,24 @@ Refer to the "Tampering and Reverse Engineering section" for examples of patchin
 
 #### Effectiveness Assessment
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+Launch the app systematically with various apps and frameworks installed. Include at least the following:
 
--- TODO [Confirm purpose of sentence "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+- Substrate for Android
+- Xposed
+- Frida
+- Introspy-Android
+- Drozer
+- RootCloak
+- Android SSL Trust Killer
+
+The app should respond in some way to the presence of any of those tools. At the very least, the app should alert the user and/or terminate the app. Work on bypassing the defenses and answer the following questions:
+
+- Can the mechanisms be bypassed using trivial methods (e.g. hooking a single API function)?
+- How difficult is it to identify the anti-debugging code using static and dynamic analysis?
+- Did you need to write custom code to disable the defenses? How much time did you need to invest?
+- What is your subjective assessment of difficulty?
+
+For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### References
 
@@ -1039,8 +1048,6 @@ Keep in mind that a hooking framework such as Xposed or Frida could hook this AP
 
 #### References
 
-- [1] Timothy Vidas & Nicolas Christin - Evading Android Runtime Analysis via Sandbox Detection - https://users.ece.cmu.edu/~tvidas/papers/ASIACCS14.pdf
-
 ##### OWASP Mobile Top 10 2016
 
 * M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
@@ -1055,8 +1062,7 @@ N/A
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+- [1] Timothy Vidas & Nicolas Christin - Evading Android Runtime Analysis via Sandbox Detection - https://users.ece.cmu.edu/~tvidas/papers/ASIACCS14.pdf
 
 ##### Tools
 
@@ -1425,13 +1431,13 @@ out_file.close()
 
 ##### OWASP MASVS
 
--- TODO [Update reference "VX.Y" below and description] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+- V8.8: "All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
+- v8.9: "Obfuscating transformations and functional defenses are interdependent and well-integrated throughout the app."
+- V8.12: "If the architecture requires sensitive computations be performed on the client-side, these computations are isolated from the operating system by using a hardware-based SE or TEE. Alternatively, the computations are protected using obfuscation. Considering current published research, the obfuscation type and parameters are sufficient to cause significant manual effort to reverse engineers seeking to comprehend the sensitive portions of the code and/or data."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Obfuscation"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- N/A
 
 ##### Info
 
