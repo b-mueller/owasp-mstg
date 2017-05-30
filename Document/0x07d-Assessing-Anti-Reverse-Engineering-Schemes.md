@@ -331,21 +331,26 @@ Some types of obfuscation that fall into this category are:
 
 ### Obfuscation Requirements in the MASVS
 
--- TODO [Describe obfuscation requirements in the MASVS] --
+The MASVS lists only two requirements that deal with obfuscation. The first requirement is V8.11:
 
-"All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis should not reveal important code or data."
+````
+"8.11 All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
+```
+
+This simply means that the binary code should be made to look incomprehensible by whatever means.
+
+8.12 If the goal of obfuscation is to protect sensitive computations, an obfuscation scheme is used that is both appropriate for the particular task and robust against manual and automated de-obfuscation methods, considering currently published research. The effectiveness of the obfuscation scheme must be verified through manual testing. Note that hardware-based isolation features should prefered over obfuscation whenever possible.
+
+-- TODO [Describe obfuscation requirements in the MASVS] --
 
 ### Obfuscation Effectiveness
 
 --[ TODO ] --
 
-An obfuscation scheme is effective if:
+An obfuscation scheme is effective if it is:
 
-1. Robust transformations are applied appropriately to the code and/or data;
-2. A sufficient increase in program complexity is achieved so that manual analysis becomes infeasible;
-3. The transformations used are resilient against state-of-the-art de-obfuscation techniques.
-
-Different types of obfuscating transformations vary in their impact on program complexity. The spectrum goes from simple *tricks*, such as packing and encryption of large code blocks and manipulations of executable headers, to more intricate forms of obfuscation like just-in-time compilation and virtualization that add significant complexity to parts of the code, data and execution trace.
+1. Resilient against human analysis: A sufficient increase in program complexity is achieved so that manual analysis becomes infeasible.
+2. Resilient against automated program analysis: The transformations used are resilient against state-of-the-art de-obfuscation methods.
 
 #### General Criteria
 
