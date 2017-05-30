@@ -337,11 +337,23 @@ The MASVS lists only two requirements that deal with obfuscation. The first requ
 "8.11 All executable files and libraries belonging to the app are either encrypted on the file level and/or important code and data segments inside the executables are encrypted or packed. Trivial static analysis does not reveal important code or data."
 ```
 
-This simply means that the binary code should be made to look incomprehensible by whatever means.
+This requirement simply says that the code should be made to look fairly incomprehensible to someone inspecting it in a common disassembler or decompiler. This can be achieved by doing a combination of the following:
 
-8.12 If the goal of obfuscation is to protect sensitive computations, an obfuscation scheme is used that is both appropriate for the particular task and robust against manual and automated de-obfuscation methods, considering currently published research. The effectiveness of the obfuscation scheme must be verified through manual testing. Note that hardware-based isolation features should prefered over obfuscation whenever possible.
+- Stripping the names of classes, variables, methods and functions;
+- Splitting up code and data between Java bytecode and native code;
+- Encrypting strings;
+- Encrypting parts of the code and data withing the program;
+- Encrypting whole binary files and class files.
 
--- TODO [Describe obfuscation requirements in the MASVS] --
+Such "cheap" transformations form a part of every effective software protection scheme, no matter the particular threat model. The goal is simply to make it hard to understand what is going on, adding to the overall effectiveness of the protections.
+
+The second requirement, V8.12, deals with cases where obfuscation is meant to perform a specific function, such as hiding a cryptographic key, or concealing some portion of code that is considered sensitive.
+
+```
+8.12: If the goal of obfuscation is to protect sensitive computations, an obfuscation scheme is used that is both appropriate for the particular task and robust against manual and automated de-obfuscation methods, considering currently published research. The effectiveness of the obfuscation scheme must be verified through manual testing. Note that hardware-based isolation features should prefered over obfuscation whenever possible."
+```
+
+This is where more "advanced" (and often controversial) forms of obfuscation, such as white-box cryptography, come into play. 
 
 ### Obfuscation Effectiveness
 
