@@ -179,11 +179,13 @@ As a general rule of thumb, at least two to three defensive controls should be i
 
 The effort required to reverse engineer an application highly depends on how much information is initially available to the adversary. This includes information about the functionality being reversed as well as knowledge about the obfuscation and anti-tampering techniques used by the target application. Therefore, the level of innovation that went into designing anti-reversing tricks is an important factor.
 
-Adversaries are more likely to be familiar with unqiquituous techniques that are repeatedly documented in reverse engineering books, papers, presentations and tutorials and are more likely to be familiar to the  and can either be bypassed using generic tools, or require little innovation to be bypassed. Below is a possible classification of anti-reversing tricks.
+Adversaries are more likely to be familiar with ubiquituous techniques that are repeatedly documented in reverse engineering books, papers, presentations and tutorials. Such tricks can either be bypassed using generic tools or with little innovation. In contrast, a secret trick that hasn't been presented anywhere can only be bypassed by a reverser who truly understands the subject, and may force them to do additional research and/or scripting/coding.
+
+Defenses can be roughly categorized into the following categories in terms of originality:
 
 - Standard API: The feature relies on APIs that are specifically meant to prevent reverse engineering. It can be bypassed easily using generic tools.
-- Widely known: A well-documented and commonly used technique is used. It can be bypassed by using widely available tools with a moderate amount of customization.
-- Proprietary: The feature is not commonly found in published anti-reverse-engineering resources for the target operating system, or a known technique has been sufficiently extended / customized to cause significant effort for the reverse engineer.
+- Widely known: A well-documented and commonly used technique is used. It can be bypassed using commonly available tools with a moderate amount of customization.
+- Proprietary: The feature is not commonly found in reversing resources and research papers, or a known technique has been sufficiently extended / customized to cause significant effort for the reverse engineer.
 
 ##### API Layer
 
