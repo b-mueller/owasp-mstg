@@ -77,33 +77,27 @@ Drawbacks: For one, the result is highly influenced by the skill level of the as
 
 <img src="Images/Chapters/0x07b/blackbox-resiliency-testing.png" width="650px" />
 
-### White-box Assessment of Obfuscation Effectiveness
+### Obfuscation Effectiveness Assessment
 
-The tester gets full access to the source code as well as complete information about the obfuscation methods and tampering defenses applied. The assessment is done in cooperation with the development team.
-
---[ TODO ] --
+Complex obfuscation schemes, such as custom implementations of white-box cryptography or virtual machines, are better assessed in an isolated fashion using the white-box approach. Such an assessment requires specialized expertise in cracking the particular type(s) of obfuscation. In this type of assessment, the goal is to determine resilience against current state-of-the-art de-obfuscation techniques, and providing an estimate of robustness against manual analysis.
 
 ## Key Questions
 
---[ TODO ] --
+Any resiliency test should answer the following questions:
 
 **Does the protection scheme impede the threat(s) they are supposed to?**
 
 It is worth re-iterating that there is no anti-reversing silver bullet. 
 
---[ TODO ] --
+**Does the protection scheme achieve the desired level of resilience?**
 
-**Does the app defend comprehensively against processes and tools used by reverse engineers?**
+It is worth re-iterating that there is no anti-reversing silver bullet. 
 
-Programmatic defenses aim to hinder various processes used by reverse engineers, which we have grouped into five categories. To fully adhere to MASVS-R, an app must implement a number of defenses in each category.
+**Does the scheme defend comprehensively against processes and tools used by reverse engineers?**
 
 --[ TODO ] --
 
 **Are suitable types of obfuscation used in the approriate places and with the right parameters?**
-
---[ TODO ] --
-
-**How effective are the defenses taken as a whole?**
 
 --[ TODO ] --
 
@@ -335,7 +329,6 @@ Other obfuscation methods that fall into this category are:
 - Variable splitting
 - Virtualization
 - White-box cryptography
-
 
 
 ### Obfuscation Effectiveness
