@@ -8,6 +8,7 @@
 
 #### Static Analysis
 
+-- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
 
 #### Dynamic Analysis
 
@@ -53,7 +54,7 @@ The main goal of static analysis is to ensure the following:
 * Key lengths are in-line with industry standards and provide protection for sufficient amount of time. An online comparison of different key lengths and protection they provide taking into account Moore's law is available online<sup>[3]</sup>.
 * Cryptographic parameters are well defined within reasonable range. This includes, but is not limited to: cryptographic salt, which should be at least the same length as hash function output, reasonable choice of password derivation function and iteration count (e.g. PBKDF2, scrypt or bcrypt), IVs being random and unique, fit-for-purpose block encryption modes (e.g. ECB should not be used, except specific cases), key management being done properly (e.g. 3DES should have three independent keys) and so on.
 
-If the app is using standard cryptographic implementations provided by Apple, the easiest way is to decompile the application and check for calls to functions from `CommonCryptor`, such as `CCCrypt`, `CCCryptorCreate`, etc. The source code<sup>[5]</sup> contains signatures of all functions.
+If the app is using standard cryptographic implementations provided by Apple, the easiest way is to decompile the application and check for calls to functions from `CommonCryptor`, such as `CCCrypt`, `CCCryptorCreate`, etc. The source code<sup>[4]</sup> contains signatures of all functions.
 For instance, `CCCryptorCreate` has following signature:
 ```
 CCCryptorStatus CCCryptorCreate(
@@ -108,23 +109,41 @@ Obviously, there are other non-standard libraries that your application might be
 
 #### Overview
 
--- TODO [Provide a general description of the issue "Testing Random Number Generation".] --
+To test for the security implementation of the random number generation, it is essential to understand what is it about. In essence, the concept of Random number generation is to perform the generation of a sequence of numbers or symbols that cannot be reasonably predicted better than by a random chance, usually through a Random Number Generator (RNG).
 
 #### Static Analysis
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+In static analysis where we have the source code of the application, it is important to understand how it works and identify the code snippet that perform the function; in this case, the random number generation. In iOS, Apple has provided developers with the Randomisation Services application programming interface (API) that generates cryptographically secure random numbers<sup>[1]</sup>.
 
--- [Confirm purpose of remark "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+The Randomisation Services API uses the `SecRandomCopyBytes` function to perform the numbers generation. It is reliably random because it is a wrapper function for `/dev/random` device file, which provides cryptographically secure pseudorandom value from 0 to 255 and perform concatenation<sup>[2]</sup>. 
 
--- TODO [Add content for "Testing Random Number Generation" with source code] --
+The following is the `SecRandomCopyBytes` function API in Swift<sup>[3]</sup>:
+```
+func SecRandomCopyBytes(_ rnd: SecRandomRef?, 
+                      _ count: Int, 
+                      _ bytes: UnsafeMutablePointer<UInt8>) -> Int32
+```
+
+The following is the `SecRandomCopyBytes` function API in Objective-C<sup>[4]</sup>:
+```
+int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes);
+```
+
+The following is an example of its usage:
+```
+int result = SecRandomCopyBytes(kSecRandomDefault, 16, randomBytes);
+```
 
 #### Dynamic Analysis
 
 -- TODO [Describe how to test for this issue "Testing Random Number Generation" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
 
+-- TODO [Can probably write about generating multiple values via the random number generation and compare them to analyse the entropy] --
+
 #### Remediation
 
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Random Number Generation".] --
+The recommended remediation to fix this issue is to always use the Randomisation Services API for any random number generation purposes. 
+Avoid implementing custom cryptography algorithms and standards. Also, only supply cryptographically strong random numbers to cryptographic functions. 
 
 #### References
 
@@ -135,12 +154,14 @@ Obviously, there are other non-standard libraries that your application might be
 * V3.6: "All random values are generated using a sufficiently secure random number generator."
 
 ##### CWE
--- TODO [Add relevant CWE for "Testing Random Number Generation"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-337 - Predictable Seed in PRNG
+- CWE-338 - Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG)
 
 ##### Info
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+- [1] Randomization Services - https://developer.apple.com/reference/security/randomization_services
+- [2] Generating Random Numbers - https://developer.apple.com/library/content/documentation/Security/Conceptual/cryptoservices/RandomNumberGenerationAPIs/RandomNumberGenerationAPIs.html
+- [3] SecRandomCopyBytes (Swift) - https://developer.apple.com/reference/security/1399291-secrandomcopybytes
+- [4] SecRandomCopyBytes (Objective-C) - https://developer.apple.com/reference/security/1399291-secrandomcopybytes?language=objc
 
 ##### Tools
 -- TODO [Add links to relavant tools for "Testing Random Number Generation"] --
