@@ -104,27 +104,28 @@ Obviously, there are other non-standard libraries that your application might be
 * Enjarify - https://github.com/google/enjarify
 
 
-
 ### Testing Random Number Generation
 
 #### Overview
 
-To test for the security implementation of the random number generation, it is essential to understand what is it about. In essence, the concept of Random number generation is to perform the generation of a sequence of numbers or symbols that cannot be reasonably predicted better than by a random chance, usually through a Random Number Generator (RNG).
+It is fundamentally impossible to produce truly random numbers on any deterministic device. Pseudo-random number generators (RNG) compensate for this by producing a stream of pseudo-random numbers - a stream of numbers that *appear* as if they were randomly generated. The quality of the generated numbers varies with the type of algorihm used. *Cryptographically secure* RNGs generate random numbers that that pass statistical randomness tests, and are resilient against prediction attacks.
+
+Mobile SDKs offer standard implementations of RNG algorithms that produce numbers with sufficient artificial randomness.
 
 #### Static Analysis
 
-In static analysis where we have the source code of the application, it is important to understand how it works and identify the code snippet that perform the function; in this case, the random number generation. In iOS, Apple has provided developers with the Randomisation Services application programming interface (API) that generates cryptographically secure random numbers<sup>[1]</sup>.
+Apple provides developers with the Randomisation Services application programming interface (API) that generates cryptographically secure random numbers<sup>[1]</sup>.
 
-The Randomisation Services API uses the `SecRandomCopyBytes` function to perform the numbers generation. It is reliably random because it is a wrapper function for `/dev/random` device file, which provides cryptographically secure pseudorandom value from 0 to 255 and perform concatenation<sup>[2]</sup>. 
+The Randomisation Services API uses the `SecRandomCopyBytes` function to perform the numbers generation. This is a wrapper function for the <code>/dev/random</code> device file, which provides cryptographically secure pseudorandom value from 0 to 255 and performs concatenation<sup>[2]</sup>. 
 
-The following is the `SecRandomCopyBytes` function API in Swift<sup>[3]</sup>:
+In Swift, the `SecRandomCopyBytes` API is defined as follows:<sup>[3]</sup>:
 ```
 func SecRandomCopyBytes(_ rnd: SecRandomRef?, 
                       _ count: Int, 
                       _ bytes: UnsafeMutablePointer<UInt8>) -> Int32
 ```
 
-The following is the `SecRandomCopyBytes` function API in Objective-C<sup>[4]</sup>:
+The Objective-C is version looks as follows <sup>[4]</sup>:
 ```
 int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes);
 ```
