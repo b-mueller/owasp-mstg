@@ -333,13 +333,10 @@ Other obfuscation methods that fall into this category are:
 
 ### Obfuscation Effectiveness
 
-To determine whether a particular obfuscation scheme is depends on the exact definition of "effective". If the purpose of the scheme is to deter casual reverse engineers, a mixture of cost-efficient tricks is sufficient. If the purpose is to achieve a level of resilience against advanced analysis methods, the scheme must achieve the following:
+To determine whether a particular obfuscation scheme is depends on the exact definition of "effective". If the purpose of the scheme is to deter casual reverse engineers, a mixture of cost-efficient tricks is sufficient. If the purpose is to achieve a level of resilience against advanced analysis performed by skilled reverse engineers, the scheme must achieve the following:
 
-1. Resilience against human analysis (a.k.a. potency): A sufficient increase in program complexity is achieved so that manual analysis becomes infeasible.
-2. Resilience against automated program analysis: The transformations used are resilient against state-of-the-art de-obfuscation methods.
-
-In other words, it is necessary to obfuscate the semantics of the program on the execution trace level, using robust transformations that increase program complexity.
-
+1. Potency: Program complexity must increased by a sufficient amount to significantly impede human/manual analysis. Note that there is always a trade off between complexity and size and/or performance.
+2. Resilience against automated program analysis. For example, if the type of obfuscation is known to be "vulnerable" to concolic analysis, the scheme must include transformations that cause problems for this type of analysis.
 
 #### General Criteria
 
