@@ -17,9 +17,11 @@ Copyright © 2017 The OWASP Foundation. This document is released under the Crea
 
 Note: This table is generated based on the contribution log, which can be found under https://github.com/OWASP/owasp-mstg/graphs/contributors. For more details, see the GitHub Repository README under https://github.com/OWASP/owasp-mstg/blob/master/README.md. Note that this isn't updated in real time (yet) - we do this manually every few weeks, so don't panic if you're not listed immediately.
 
-| Project Leaders and Authors | Co-Authors | Top Contributors | Contributors | Reviewers |
+| Project Leaders and Authors | Co-Authors | Top Contributors | Contributors | Mini-Contributors |
 | --- | --- | --- | --- | --- |
-| Bernhard Mueller, Sven Schleier | Romuald Szkudlarek, Francesco Stillavato, Pawel Rzepa, Abdessamad Temmar, Slawomir Kosowski | Jin Kung Ong,  Alexander Antukh,  Jeroen Willemsen, Henry Hoggard, Gerhard Wagner, Ryan Teoh, Daniel Ramirez Martin, Claudio André, Prathan Phongthiproek, Luander Ribeiro| Michael Helwig, Oguzhan Topgul, Pishu Mahtani, *D00gs*, Stefan Streichsbier, Ben Actis, Anatoly Rosencrantz, Ali Yazdani, Sebastian Banescu, Prabhant Singh, *Romantic668*, Stephen Corbiaux, *Demonbensa*, Anuruddha (L3Osi13nT), Ben Gardiner | Anant Shrivastava, Stephanie Vanroelen |
+| Bernhard Mueller, Sven Schleier | Romuald Szkudlarek | Francesco Stillavato, Pawel Rzepa, Henry Hoggard, Abdessamad Temmar, Slawomir Kosowski | Andreas Happe, Wen Bin Kong, Jin Kung Ong, Gerhard Wagner, Michael Helwig, Jeroen Willemsen, Alexander Antukh,  Ryan Teoh, Daniel Ramirez Martin, Claudio André, Prathan Phongthiproek, Luander Ribeiro, Dharshin De Silva, Oguzhan Topgul, Pishu Mahtani, Anuruddha (L3Osi13nT) | *D00gs*, Ali Yazdani, Anatoly Rosencrantz, Stefan Streichsbier, Ben Actis, Sebastian Banescu, Prabhant Singh, Ehsan Mahsadi, *decidedlygray*, *Romantic668*, Stephen Corbiaux, *bwhaley*, *demonbensa*, Daniel Grunwell, Ruikai Liu, *MelvinKool, Keyvan Arj, Ben Gardiner |
+
+Reviewers: Anant Shrivastava
 
 ### Older Versions
 

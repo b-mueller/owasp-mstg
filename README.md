@@ -89,9 +89,10 @@ If there's something you really want to see in the guide, or you want to suggest
 Contributors are added to the acknowledgements table based on their contributions logged by GitHub. The list of names is sorted by the number of lines added. Authors are categorized as follows:
 
 - Project Leader / Author: Manage development of the guide continuosly and write a large amount of content.
-- Co-Author: Consistently contribute quality content, [at least 500 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
-- Top Contributor: Consistently contribute quality content, [at least 100 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
-- Contributor: Any form of contribution, [at least 1 addition logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
+- Co-Author: Consistently contribute quality content, [at least 2,000 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
+- Top Contributor: Consistently contribute quality content, [at least 500 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
+- Contributor: Any form of contribution, [at least 50 additions logged](https://github.com/OWASP/owasp-mstg/graphs/contributors).
+- Mini-contributor: Everything below 50 additions, e.g. committing a single word or sentence.
 - Reviewer: People that haven't submitted their own pull requests, but have created issues or given useful feedback in other ways.
 
 Please ping us or create a pull request if you are missing from the table or in the wrong column (note that we update the table frequently, but not in realtime).

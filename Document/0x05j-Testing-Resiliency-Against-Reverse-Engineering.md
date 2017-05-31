@@ -725,8 +725,6 @@ Popular reverse engineering tools, if installed in an unmodified form, can be de
 
 ###### Example: Ways of Detecting Frida
 
--- TODO [Write a few introductionary words] --
-
 An obvious method for detecting frida and similar frameworks is to check the environment for related artefacts, such as package files, binaries, libraries, processes, temporary files, and others. As an example, I'll home in on fridaserver, the daemon responsible for exposing frida over TCP. One could use a Java method that iterates through the list of running processes to check whether fridaserver is running:
 
 ```c
@@ -954,8 +952,7 @@ N/A
 
 ##### Tools
 
--- TODO [Add link to tools for "Testing Detection of Reverse Engineering Tools"] --
-* Enjarify - https://github.com/google/enjarify
+* frida - https://www.frida.re/
 
 ### Testing Emulator Detection
 
