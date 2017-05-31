@@ -1,15 +1,12 @@
 ## Testing Local Authentication in Android Apps
 
-Most of the authentication and session management requirements of the MASVS are generic ones, that do not rely on a specific implementation on iOS or Android.
-
-As a result only requirement "4.6	Biometric authentication, if any, is not event-bound (i.e. using an API that simply returns "true" or "false"). Instead, it is based on unlocking the keychain/keystore." is described in this chapter. All other test need to verify server side implementations and can be found in the Appendix "Testing Authentication".
-
+Most of the authentication and session management requirements of the MASVS refer to architectural and server-side issues that can be verified independent of the specific implementation on iOS or Android. In the MSTG, we therefore discuss these test cases in a platform-independent way (see the appendix "Testing Authentication and Session Management on the Endpoint").
 
 ### Testing Biometric Authentication
 
 #### Overview
 
-Android 6.0 introduced public APIs for authenticating users via fingerprint. Access to the fingerprint hardware is provided through the  <code>FingerprintManager</code> class <sup>[1]</sup>. An app can request fingerprint authentication instantiating a <code>FingerprintManager</code> object and calling its <code>authenticate()</code> method. The caller registers callback methods to handle possible outcomes of the authentication process (success, failure or error).
+Android 6.0 introduced public APIs for authenticating users via fingerprint. Access to the fingerprint hardware is provided through the  <code>FingerprintManager</code> class <sup>[1]</sup>. An app can request fingerprint authentication by instantiating a <code>FingerprintManager</code> object and calling its <code>authenticate()</code> method. The caller registers callback methods to handle possible outcomes of the authentication process (success, failure or error).
 
 By using the fingerprint API in conjunction with the Android KeyGenerator class, apps can create a cryptographic key that must be "unlocked" with the user's fingerprint. This can be used to implement more convenient forms of user login. For example, to allow users access to a remote service, a symmetric key can be created and used to encrypt the user PIN or authentication token. By calling <code>setUserAuthenticationRequired(true)</code> when creating the key, it is ensured that the user must re-authenticate using their fingerprint to retrieve it. The encrypted authentication data itself can then be saved using regular storage (e.g. SharedPreferences).
 
@@ -25,13 +22,13 @@ Verify the authentication logic. For the authentication to be successful, the re
 
 #### Dynamic Analysis
 
-Patch the app or us runtime instrumentation to bypass fingerprint authentication on the client. For example, you could use Frida call the <code>onAuthenticationSucceeded</code> callback directly. Refer to the chapter "Tampering and Reverse Engineering on Android" for more information.
+Patch the app or use runtime instrumentation to bypass fingerprint authentication on the client. For example, you could use Frida call the <code>onAuthenticationSucceeded</code> callback directly. Refer to the chapter "Tampering and Reverse Engineering on Android" for more information.
 
 #### Remediation
 
 Fingerprint authentication should be implemented allong the following lines:
 
-Check whether fingerprint authentication is possible. The device must run Android 6.0 or higher (SDK 23+) and feature a fingerprint sensor. The user must have protected their logscreen and registered at least one fingerprint on the device. If any of those checks failed, the option for fingerprint authentication should not be offered.
+Check whether fingerprint authentication is possible. The device must run Android 6.0 or higher (SDK 23+) and feature a fingerprint sensor. The user must have protected their lockscreen and registered at least one fingerprint on the device. If any of those checks failed, the option for fingerprint authentication should not be offered.
 
 When setting up fingerprint authentication, create a new AES key using the <code>KeyGenerator</code> class. Add <code>setUserAuthenticationRequired(true)</code> in <code>KeyGenParameterSpec.Builder</code>.
 
@@ -58,12 +55,11 @@ To perform encryption or decryption, create a <code>Cipher</code> object and ini
         cipher.init(mode, keyspec);
 ```
 
-Note that the key cannot be used right away - it has to be authenticated through <code>FingerprintManager</code> first. This involves wrapping <code>Cipher</code> into a <code>FingerprintManager.CryptoObject</code> which is passed to <code>FingerprintManager.authenticate()</code>.
+Note that the key cannot be used right away - it has to be authenticated through the <code>FingerprintManager</code> first. This involves wrapping <code>Cipher</code> into a <code>FingerprintManager.CryptoObject</code> which is passed to <code>FingerprintManager.authenticate()</code>.
 
 ```java
 	cryptoObject = new FingerprintManager.CryptoObject(cipher);
-	FingerprintHandler helper = new FingerprintHandler(this);
-	helper.startAuth(fingerprintManager, cryptoObject);
+	fingerprintManager.authenticate(cryptoObject, new CancellationSignal(), 0, this, null);
 ```
 
 If authentication succeeds, the callback method <code>onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result)</code> is called, and the authenticated CryptoObject can be retrieved from the authentication result.
