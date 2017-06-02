@@ -1,43 +1,68 @@
 ## Testing Cryptography
 
-The following chapter outlines cryptography requirements of the MASVS into technical test cases. Test cases listed in this chapter are focused on server side and therefore are not relying on a specific implementation on iOS or Android.
+The following chapter translates the cryptography requirements of the MASVS into technical test cases. Test cases listed in this chapter are based upon generic cryptographic concepts and are not relying on a specific implementation on iOS or Android.
 
-Proper cryptographic key management is a common pitfall when designing mobile applications.
+Proper design of a cryptographic system is a common pitfall for mobile application development. To achieve good security, a developer has to chose the right cryptographic directive (e.g., symmetric encryption), chose the right implementation for that directive (e.g., AES-GCM) and then configure that implementation correctly (e.g., key length, block modes, key management). While this chapter does not give an introduction into cryptography, its questions are designed to find common problems within the mentioned selection and implementation process.
 
-Cryptographic systems are comprised of different building blocks. It is important to use the building blocks in their intended manner (in addition to using the current secure building blocks as well as secure configuration).
+Throughout this chapter, multiple basic cryptographic building blocks are used. The following gives a rough introduction into commonly referred concepts:
 
-Typically encountered building blocks are:
+* Hashes are used to quickly calculate a fixed-length checksum based upon the original data. The same input data will produce the same output hash. Cryptographic hashes guarantee, that the generated hash will limit reasoning about the original data, that small changes within the original date will produce a completely different hash and that, given a hash, providing input data that leads to the same hash is not feasible. As no secret keys are used, an attacker can recalculate a new hash after data was modified.
+* Encryption converts the original plain-text data into encrypted text and subsequently allows to reconstruct the original data form the encrypted text (also known as cipher text). Thus it provides data confidentiality.
+* Symmetric Encryption utilizes a secret key. The data confidentiality of the encrypted data is solely dependent upon the confidentiality of the secret key. This implies, that the secret key should be secret and thus not be predictable.
+* Asymmetric Encryption utilizes two keys: a public key that can be used to encrypt plain-text and a secret private key that can be used to reconstruct the original data from the plain-text.
 
-* Hashes are used to quickly calculate a fixed-length checksum based upon the original data. The same input data will produce the same output hash. Cryptographic hashes guarantee, that the generated hash will limit reasoning about the original data, that small changes within the original date will produce a completely different hash and that it is hard that, given a hash, to provide for original data that leads to a pre-determined hash. As no secret keys are used, an attacker can recalculate a new hash after data was modified.
-* Encryption converts the original plain-text data into encrypted text and subsequently allows to reconstruct the original data form the encrypted text (also known as cipher text). Thus it provides data confidenciality. Please note that, encryption does not provide data integrity, i.e., if an attacker modifies the cipher text and a user decrypts the modified cipher text, the resulting plain-text will be garbage (but the decryption operation itself will perform successfully).
-* Symmetric Encryption utilizes a secret key. The data confidenciality of the encrypted data is solely dependent upon the confidenciality of the secret key.
-* Asymmetric Encryption uses two keys: a pbulic key that can be used to encrypt plain-text and a secret private key that can be used to reconstruct the original data from the plain-text.
+### Testing for Custom Implementations of Cryptography
+
+#### Overview
+
+The use of non-standard or custom built cryptographic algorithms is dangerous because a determined attacker may be able to break the algorithm and compromise data that has been protected. Implementing cryptographic functions is time consuming, difficult and very likely to fail. Instead well-known algorithms that were already proven to be secure should be used. All mature frameworks and libraries offer cryptographic functions that should also be used when implementing mobile apps.
+
+#### Static Analysis
+
+Carefully inspect all the cryptographic methods used within the source code, especially those which are directly applied to sensitive data. Pay close attention to seemingly standard but modified algorithms. Remember that encoding is not encryption! Any appearance of bit shift operators like exclusive OR operations might be a good sign to start digging deeper.
+
+#### Dynamic Analysis
+
+The recommended approach is be to decompile the APK and inspect the resulting source code for usage of custom encryption schemes (see "Static Analysis").
+
+#### Remediation
+
+Do not develop custom cryptographic algorithms, as it is likely they are prone to attacks that are already well-understood by cryptographers. Select a well-vetted algorithm that is currently considered to be strong by experts in the field, and use well-tested implementations.
+
+#### References
+
+##### OWASP Mobile Top 10 2016
+* M6 - Broken Cryptography
+
+##### OWASP MASVS
+- V3.2: "The app uses proven implementations of cryptographic primitives"
+
+##### CWE
+* CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+
+##### Info
+[1] Supported Ciphers in KeyStore - https://developer.android.com/training/articles/keystore.html#SupportedCiphers
 
 ### Testing for Insecure and/or Deprecated Cryptographic Algorithms
 
 #### Overview
 
-Many cryptographic algorithms and protocols should not be used because they have been shown to have significant weaknesses or are otherwise insufficient for modern security requirements. Previously thought secure algorithms may become insecure over time. It is therefore important to periodically check current best practices and adjust configurations accordingly.  
+Many cryptographic algorithms and protocols should not be used because they have been shown to have significant weaknesses or are otherwise insufficient for modern security requirements. Previously thought secure algorithms may become insecure over time. It is therefore important to periodically check current best practices and adjust configurations accordingly.
 
 #### Static Analysis
 
-The following list shows different checks to validate the usage of cryptographic algorithms in source code:
-
-* Cryptographic algorithms are up to date and in-line with industry standards. This includes, but is not limited to outdated block ciphers (e.g. DES), stream ciphers (e.g. RC4), as well as hash functions (e.g. MD5) and broken random number generators like Dual_EC_DRBG (even if they are NIST certified). All of these should be marked as insecure and should not be used and removed from the app and server code base.
-* Cryptographic parameters are well defined within reasonable range. This includes, but is not limited to: cryptographic salt, which should be at least the same length as hash function output, reasonable choice of password derivation function and iteration count (e.g. PBKDF2, scrypt or bcrypt), IVs being random and unique, fit-for-purpose block encryption modes (e.g. ECB should not be used, except specific cases), key management being done properly (e.g. 3DES should have three independent keys) and so on.
+The source code should be checked that cryptographic algorithms are up to date and in-line with industry standards. This includes, but is not limited to outdated block ciphers (e.g. DES), stream ciphers (e.g. RC4), as well as hash functions (e.g. MD5) and broken random number generators like Dual_EC_DRBG. Please note, that an algorithm that was certified, e.g., by the NIST, can also become insecure over time. A certification does not replace periodic verification of an algorithm's soundness. All of these should be marked as insecure and should not be used and removed from the application code base.
 
 Inspect the source code to identify the instances of cryptographic algorithms throughout the application, and look for known weak ones, such as:
 
-* DES
+* DES, 3DES<sup>[6]</sup>
 * RC2
 * RC4
-* BLOWFISH
+* BLOWFISH<sup>[6]</sup>
 * CRC32
 * MD4
 * MD5
 * SHA1 and others.
-
-See "Remediation" section for a basic list of recommended algorithms.
 
 Example initialization of DES algorithm, that is considered weak:
 ```Java
@@ -46,14 +71,16 @@ Cipher cipher = Cipher.getInstance("DES");
 
 #### Dynamic Analysis
 
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
+The recommended approach is be to decompile the APK and inspect the resulting source code for usage of custom encryption schemes (see "Static Analysis").
+
+If you encounter locally stored data during the test, try to identify the used algorithm and verify them against a list of known insecure algorithms.
 
 #### Remediation
 
 Periodically ensure that the cryptography has not become obsolete. Some older algorithms, once thought to require years of computing time, can now be broken in days or hours. This includes MD4, MD5, SHA1, DES, and other algorithms that were once considered as strong. Examples of currently recommended algorithms<sup>[1] [2]</sup>:
 
-* Confidentiality: AES-256
-* Integrity: SHA-256, SHA-384, SHA-512
+* Confidentiality: AES-GCM-256 or ChaCha20-Poly1305
+* Integrity: SHA-256, SHA-384, SHA-512, Blake2
 * Digital signature: RSA (3072 bits and higher), ECDSA with NIST P-384
 * Key establishment: RSA (3072 bits and higher), DH (3072 bits or higher), ECDH with NIST P-384
 
@@ -75,6 +102,7 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 - [2] NIST Special Publication 800-57 - http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r4.pdf
 - [4] NIST recommendations (2016) - https://www.keylength.com/en/4/
 - [5] BSI recommendations (2017) - https://www.keylength.com/en/8/
+- [6] Sweet32 attack -- https://sweet32.info/
 
 ##### Tools
 * QARK - https://github.com/linkedin/qark
@@ -83,26 +111,31 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
  
 
 
-### Testing for Insecure Cryptographic Algorihm Configuration
+### Testing for Insecure Cryptographic Algorithm Configuration
 
 #### Overview
 
-Choosing strong cryptographic algorithm alone is not enough. Often security of otherwise sound algorithms can be affected if misconfigured.
+Choosing strong cryptographic algorithm alone is not enough. Often security of otherwise sound algorithms can be affected through their configuration. Most prominent for cryptographic algorithms is the selection of their used key length.
 
 #### Static Analysis
 
-The following list shows different checks to validate the usage of cryptographic algorithms in source code:
+Through source code analysis the following non-exhausting configuration options should be checked:
 
-* Key lengths are in-line with industry standards and provide protection for sufficient amount of time. An online comparison of different key lengths and protection they provide taking into account Moore's law is available online<sup>[3]</sup>.
-* Cryptographic parameters are well defined within reasonable range. This includes, but is not limited to: cryptographic salt, which should be at least the same length as hash function output, reasonable choice of password derivation function and iteration count (e.g. PBKDF2, scrypt or bcrypt), IVs being random and unique, fit-for-purpose block encryption modes (e.g. ECB should not be used, except specific cases), key management being done properly (e.g. 3DES should have three independent keys) and so on.
+* cryptographic salt, which should be at least the same length as hash function output
+* * reasonable choice of iteration counts when using password derivation functions
+* IVs being random and unique
+* fit-for-purpose block encryption modes
+* key management being done properly
 
 #### Dynamic Analysis
 
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
+If hashes were extracted during the analysis, and they have been configured in an insecure manner, a brute-force password cracking tool, e.g. hashcat, can be used to extract the original plain-text passwords from the encrypted hashes. Hashcat's wiki contains examples of cracking speeds for different algorithms, this can be utilized to estimate the effort that an attacker would have to recover plain-text passwords.
+
+To utilize brute-force tools, the used hash algorithm (e.g., MD5 or SHA1) must be known. If this knowledge is not gathered during the Testing, tools like hashID can be used to automatically identify hash algorithms.
 
 #### Remediation
 
-Periodically ensure that used key length fulfill accepted industry standards.
+Periodically ensure that used key length fulfill accepted industry standards<sup>[6]</sup>.
 
 #### References
 
@@ -123,79 +156,43 @@ Periodically ensure that used key length fulfill accepted industry standards.
 - [3] Security "Crypto" provider deprecated in Android N -  https://android-developers.googleblog.com/2016/06/security-crypto-provider-deprecated-in.html
 - [4] NIST recommendations (2016) - https://www.keylength.com/en/4/
 - [5] BSI recommendations (2017) - https://www.keylength.com/en/8/
+- [6] ENISA Algorithms, key size and parameters report 2014 - https://www.enisa.europa.eu/publications/algorithms-key-size-and-parameters-report-2014
 
 ##### Tools
 * QARK - https://github.com/linkedin/qark
 * Mobile Security Framework - https://github.com/ajinabraham/Mobile-Security-Framework-MobSF
-
-
-
-### Testing for Custom Implementations of Cryptography
-
-#### Overview
-
-The use of a non-standard and custom build algorithm for cryptographic functionalities is dangerous because a determined attacker may be able to break the algorithm and compromise data that has been protected. Implementing cryptographic functions is time consuming, difficult and likely to fail. Instead well-known algorithms that were already proven to be secure should be used. All mature frameworks and libraries offer cryptographic functions that should also be used when implementing mobile apps.
-
-#### Static Analysis
-
-Carefully inspect all the cryptographic methods used within the source code, especially those which are directly applied to sensitive data. Pay close attention to seemingly standard but modified algorithms. Remember that encoding is not encryption! Any appearance of bit shift operators like exclusive OR operations might be a good sign to start digging deeper.
-
-#### Dynamic Analysis
-
-The recommended approach is be to decompile the APK and inspect the algorithm to see if custom encryption schemes is really the case (see "Static Analysis").
-
-#### Remediation
-
-Do not develop custom cryptographic algorithms, as it is likely they are prone to attacks that are already well-understood by cryptographers. Select a well-vetted algorithm that is currently considered to be strong by experts in the field, and use well-tested implementations.
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M6 - Broken Cryptography
-
-##### OWASP MASVS
-- V3.2: "The app uses proven implementations of cryptographic primitives"
-
-##### CWE
-* CWE-327: Use of a Broken or Risky Cryptographic Algorithm
-
-##### Info
-[1] Supported Ciphers in KeyStore - https://developer.android.com/training/articles/keystore.html#SupportedCiphers
-
-
-
+* hashcat - https://hashcat.net/hashcat/
+* hashID - https://pypi.python.org/pypi/hashID
 
 ### Testing for Usage of ECB Mode
 
 #### Overview
 
--- TODO: write Introduction --
+As the name implies, block-based encryption is performed upon discrete input blocks, e.g., 128 bit blocks when using AES. If the plain-text is larger than the block-size, it is internally split up into blocks of the given input size and encryption is performed upon each block. The so called block mode defines, if the result of one encrypted block has any impact upon subsequently encrypted blocks.
 
-ECB (Electronic Codebook) encryption mode should not be used, as it is basically a raw cipher. A message is divided into blocks of fixed size and each block is encrypted separately<sup>[6]</sup>.
+The ECB (Electronic Codebook) encryption mode should not be used, as it is basically divides the input into blocks of fixed size and each block is encrypted separately<sup>[6]</sup>. For example, if an image is encrypted utilizing the ECB block mode, then the input image is split up into multiple smaller blocks. Each block might represent a small area of the original image. Each of which is encrypted using the same secret input key. If input blocks are similar, e.g., each input block is just a white background, the resulting encrypted output block will also be the same. While each block of the resulting encrypted image is encrypted, the overall structure of the image will still be recognizable within the resulting encrypted image.
 
 ![Electronic Codebook (ECB mode encryption)](Images/Chapters/0x07c/ECB.png)
-
-The problem with this encryption method is that any resident properties of the plaintext might well show up in the cipher text, just possibly not as clearly. That's what blocks and key schedules are supposed to protect against, but analyzing the patterns you may be able to deduce properties that you otherwise thought were hidden.
 
 ![Difference of encryption modes](Images/Chapters/0x07c/EncryptionMode.png)
 
 #### Static Analysis
 
-The following list shows different checks to validate the usage of cryptographic algorithms in source code:
+Use the source code to verify the used blcok mode. Especially check for ECB mode, e.g.:
 
--- TODO --
-
-See "Remediation" section for a basic list of recommended algorithms.
+```
+Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+```
 
 #### Dynamic Analysis
 
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
+Test encrypted data for reoccuring patterns -- thse can be an indication of ECB mode being used.
 
 #### Remediation
 
--- TODO --
+Use an established block mode that provides a feedback mechanism for subsequent blocks, e.g. Counter Mode (CTR). For storing encrypted data it is often advisable to use a block mode that additionally protects the integrity of the stored data, e.g. Galois/Counter Mode (GCM). The latter has the additional benefit that the algorithm is mandatory for each TLSv1.2 implementation -- thus being available on all modern plattforms.
 
-Periodically ensure that the cryptography has not become obsolete. Some older algorithms, once thought to require years of computing time, can now be broken in days or hours. This includes MD4, MD5, SHA1, DES, and other algorithms that were once considered as strong. Examples of currently recommended algorithms<sup>[1] [2]</sup>:
+Consult the NIST guidelines on block mode selection<sup>[1]</sup>.
 
 #### References
 
@@ -204,15 +201,14 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 ##### OWASP MASVS
 - V3.3: "The app uses cryptographic primitives that are appropriate for the particular use-case, configured with parameters that adhere to industry best practices"
-- V3.4: "The app does not use cryptographic protocols or algorithms that are widely considered depreciated for security purposes"
 
 ##### CWE
 * CWE-326: Inadequate Encryption Strength
 * CWE-327: Use of a Broken or Risky Cryptographic Algorithm
 
 ##### Info
-- [1] Commercial National Security Algorithm Suite and Quantum Computing FAQ - https://cryptome.org/2016/01/CNSA-Suite-and-Quantum-Computing-FAQ.pdf
-- [2] NIST Special Publication 800-57 - http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r4.pdf
+
+- [1] NIST Modes Development, Proposed Modes - http://csrc.nist.gov/groups/ST/toolkit/BCM/modes_development.html
 - [6] Electronic Codebook (ECB) - https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_Codebook_.28ECB.29
 
 ##### Tools
@@ -225,12 +221,9 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 #### Overview
 
--- TODO: write Introduction --
+Normal hashes are optimized for speed, e.g., optimized to verify large media in short time. For password storage this property is not desirable as it implies that an attacker can crack retrieved password hashes (using rainbow tables or through brute-force attacks) in a short time. For example, when the insecure MD5 hash has been used, an attacker with access to eight high-level graphics cards can test 200.3 Giga-Hashes per Second<sup>[1]</sup>.
 
-* move text from generic description to this section
-* describe hashes vs key-derivation-function
-*
-* Key Derivation Functions (KDFs): normal hashes are optimized for speed, e.g., optimized to verify large media in short time. For password storage this property is not desirable as it implies that an attacker can crack retrieved password hashes (using rainbow tables or through brute-force attacks) in a short time. A solution this are Key-Derivation Functions (KDFs) that have a configurable calculation time. While this imposes a larger performance overhead this is neglectable during normal operation but prevents brute-force attacks.
+A solution this are Key-Derivation Functions (KDFs) that have a configurable calculation time. While this imposes a larger performance overhead this is negligible during normal operation but prevents brute-force attacks. Recently developed key derivation functions such as Argon2 or scrypt have been hardened against GPU-based password cracking.
 
 #### Static Analysis
 
@@ -240,25 +233,24 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 #### Dynamic Analysis
 
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
+If hashes were extracted and they have been configured in an insecure manner, a brute-force password cracking tool, e.g. hashcat, can be used to extract the original plain-text passwords from the encrypted hashes. Hashcat's wiki contains examples of cracking speeds for different algorithms, this can be utilized to estimate the effort that an attacker would have to recover plain-text passwords.
 
-* check extracted hashes with ocl hashcat
+To utilize brute-force tools, the used hash algorithm (e.g., MD5 or SHA1) must be known. If this knowledge is not gathered during the Testing, tools like hashID can be used to automatically identify hash algorithms.
 
 #### Remediation
 
--- TODO --
-
-* use bcrypt/scrypt
+Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup>), Argon2<sup>[4]</sup>, bcrypt<sup>[3]</sup> or scrypt (RFC 7914<sup>[2]</sup>).
 
 #### References
 
 ##### OWASP Mobile Top 10
 
--- TODO --
+* M6 - Broken Cryptography
 
 ##### OWASP MASVS
 
--- TODO --
+- V3.3: "The app uses cryptographic primitives that are appropriate for the particular use-case, configured with parameters that adhere to industry best practices"
+- V3.4: "The app does not use cryptographic protocols or algorithms that are widely considered depreciated for security purposes"
 
 ##### CWE
 
@@ -266,15 +258,16 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 ##### Info
 
--- TODO --
-
-* link to oclhashcat performance values
+[1] 8x Nvidia GTX 1080 Hashcat Benchmarks -- https://gist.github.com/epixoip/a83d38f412b4737e99bbef804a270c40
+[2] The scrypt Password-Based Key Derivation Function -- https://tools.ietf.org/html/rfc7914
+[3] A Future-Adaptable Password Scheme -- https://www.usenix.org/legacy/events/usenix99/provos/provos_html/node1.html
+[4] https://github.com/p-h-c/phc-winner-argon2
+[5] PKCS #5: Password-Based Cryptographic Specification Version 2.0 -- https://tools.ietf.org/html/rfc2898
 
 ##### Tools
 
--- TODO --
-
-* link to ocl hashcat
+* hashcat - https://hashcat.net/hashcat/
+* hashID - https://pypi.python.org/pypi/hashID
 
 
 
@@ -310,11 +303,11 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 ##### OWASP Mobile Top 10
 
--- TODO --
+* M6 - Broken Cryptography
 
 ##### OWASP MASVS
 
--- TODO --
+- V3.3: "The app uses cryptographic primitives that are appropriate for the particular use-case, configured with parameters that adhere to industry best practices"
 
 ##### CWE
 
@@ -361,7 +354,7 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 -- TODO --
 
 * use integrity-preserving encryption
-* use AEAD based encryption for data storage (provides confidenciality as well as integrity protection)
+* use AEAD based encryption for data storage (provides confidentiality as well as integrity protection)
 * use digital signatures
 
 #### References
@@ -393,7 +386,9 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 -- TODO: write Introduction --
 
-* encryption only protects data confidenciality, not integrity
+ Please note that, encryption does not provide data integrity, i.e., if an attacker modifies the cipher text and a user decrypts the modified cipher text, the resulting plain-text will be garbage (but the decryption operation itself will perform successfully).
+
+* encryption only protects data confidentiality, not integrity
 * e.g., bit-flip attacks are possible
 
 #### Static Analysis
@@ -412,7 +407,7 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 * use integrity-preserving encryption
 * maybe mention the whole mac-then-encrypt vs encrypt-then-mac problems
-* use AEAD based encryption for data storage (provides confidenciality as well as integrity protection)
+* use AEAD based encryption for data storage (provides confidentiality as well as integrity protection)
 
 #### References
 
@@ -447,11 +442,11 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 
 The following checks would be performed in the last two app categories:
 
-* Ensure that no keys/passwords are hardcoded and stored within the source code. Pay special attention to any 'administrative' or backdoor accounts enabled in the source code. Storing fixed salt within application or password hashes may cause problems too.
-* Ensure that no obfuscated keys or passwords are in the source code. Obfuscation is easily bypassed by dynamic instrumentation and in principle does not differ from hardcoded keys.
+* Ensure that no keys/passwords are hard coded and stored within the source code. Pay special attention to any 'administrative' or backdoor accounts enabled in the source code. Storing fixed salt within application or password hashes may cause problems too.
+* Ensure that no obfuscated keys or passwords are in the source code. Obfuscation is easily bypassed by dynamic instrumentation and in principle does not differ from hard coded keys.
 * If the application is using two-way SSL (i.e. there is both server and client certificate validated) check if:
    * the password to the client certificate is not stored locally, it should be in the Keychain
-   * the client certificate is not shared among all installations (e.g. hardcoded in the app)
+   * the client certificate is not shared among all installations (e.g. hard coded in the app)
 
 
 The following checks would be performed in the offline application:
