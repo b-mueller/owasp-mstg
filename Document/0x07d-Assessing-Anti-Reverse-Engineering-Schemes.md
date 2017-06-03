@@ -83,7 +83,7 @@ Complex obfuscation schemes, such as custom implementations of white-box cryptog
 
 ## Key Questions
 
-Any resiliency test should answer the following questions:
+Any resilience test should answer the following questions:
 
 **Does the protection scheme impede the threat(s) they are supposed to?**
 
@@ -161,7 +161,7 @@ To achieve this deterrant effect, one needs to combine a multitude of defenses, 
 
 --[ TODO ] --
 
-As a general rule of thumb, at least two to three defensive controls should be implemented for each category. These controls should operate independently of each other, i.e. use different techniques and APIs.
+As a general rule of thumb, at least two to three defensive controls should be implemented for each category. These controls should operate independently of each other, i.e. each control should be based on a different technique, operate on a different API Layer, and be located at a different location in the program (see also the criteria below). The adversary should not be given opportunities to kill multiple birds with the same stone - ideally, they should be forced to use multiple stones per bird.
 
 ```
 8.7 The app implements multiple mechanisms to fulfil requirements 8.1 to 8.6. Note that resilience scales with the amount, diversity of the originality of the mechanisms used.
@@ -189,13 +189,10 @@ Defenses can be roughly categorized into the following categories in terms of or
 
 ##### API Layer
 
-Lower-level calls are more difficult to defeat than higher level calls. 
+Generally speaking, the less your mechanisms relies on operating operating system APIs to work, the more difficult it is to discover and bypass. Also, lower-level calls are more difficult to defeat than higher level calls. To illustrate this, let's have a look at a few examples.
 
-- System library: The feature relies on public library functions or methods.
-- System call: The anti-reversing feature calls directly into the kernel. 
-- Self-contained: The feature does not require any library or system calls to work.
+As you have learned in the 
 
---[ TODO - add one example each ] --
 
 ```c
 #define PT_DENY_ATTACH 31
@@ -235,6 +232,11 @@ struct VT_JdwpAdbState *vtable = ( struct VT_JdwpAdbState *)dlsym(lib, "_ZTVN3ar
 
 	mprotect((void *)page, pagesize, PROT_READ);
 ```
+
+- System library: The feature relies on public library functions or methods.
+- System call: The anti-reversing feature calls directly into the kernel. 
+- Self-contained: The feature does not require any library or system calls to work.
+
 
 ##### Parallelism
 

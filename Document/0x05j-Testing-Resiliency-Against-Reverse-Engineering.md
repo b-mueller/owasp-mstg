@@ -1090,13 +1090,11 @@ catch(Exception e) {
 
 With ELF binaries, native function hooks can be installed by either overwriting function pointers in memory (e.g. GOT or PLT hooking), or patching parts of the function code itself (inline hooking). Checking the integrity of the respective memory regions is one technique to detect this kind of hooks.
 
-The Global Offset Table (GOT) is used to resolve library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. GOT hooks overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hook can be detected by enumarating the process memory mapp and verifying that each GOT entry points into a legitimately loaded library.
+The Global Offset Table (GOT) is used to resolve library functions. During runtime, the dynamic linker patches this table with the absolute addresses of global symbols. *GOT hooks* overwrite the stored function addresses and redirect legitimate function calls to adversary-controlled code. This type of hook can be detected by enumerating the process memory map and verifying that each GOT entry points into a legitimately loaded library.
 
-In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). Some hook detection methods therefore verify that all GOT entries to point to valid memory locations within the code sections of their respective libraries.
+In contrast to GNU <code>ld</code>, which resolves symbol addresses only once they are needed for the first time (lazy binding), the Android linker resolves all external function and writes the respective GOT entries immediately when a library is loaded (immediate binding). One can therefore expect all GOT entries to point valid memory locations within the code sections of their respective libraries during runtime. GOT hook detection methods usually walk the GOT and verify that this is indeed the case.
 
-**Detecting Inline Hooks**
-
--- TODO [Needs more research and code samples] --
+*Inline hooks* work by overwriting a few instructions at the beginning or end of the function code. During runtime, this so-called trampoline redirects execution to the injected code. Inline hooks can be detected by inspecting the prologues and epilogues of library functions for suspect instructions, such as far jumps to locations outside the library.
 
 #### Bypassing Runtime Integrity Checks
 
@@ -1106,7 +1104,7 @@ In contrast to GNU <code>ld</code>, which resolves symbol addresses only once th
 
 #### Effectiveness Assessment
 
--- TODO [Describe how to test for this issue by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
+Make sure that all file-based detection of reverse engineering tools is disabled. Then, inject code using Xposed, Frida and Substrate, and attempt to install native hooks and Java method hooks. The app should detect the "hostile" code in its memory and respond accordingly. For a more detailed assessment, identify and bypass the detection mechanisms employed and use the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### References
 
@@ -1275,9 +1273,9 @@ When the source-code is available, then there are a few codes you can look for, 
 
 Furthermore, to reassure that the identifiers can be used, the AndroidManifest.xml needs to be checked in case of using the IMEI and the Build.Serial. It should contain the following permission: `<uses-permission android:name="android.permission.READ_PHONE_STATE"/>`.
 
-There are a few ways to test the application binding:
+There are a few ways to test device binding dynamically:
 
-##### Dynamic Analysis using an Emulator
+##### Using an Emulator
 
 1. Run the application on an Emulator
 2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
@@ -1297,7 +1295,7 @@ There are a few ways to test the application binding:
 - copy the older contents of the sdcard to /dat/data/<your appid>/cache & shared-preferences
 6. Can you continue in an authenticated state? If so, then binding might not be working properly.
 
-##### Dynamic Analysis using two different rooted devices.
+##### Using two different rooted devices.
 
 1. Run the application on your rooted device
 2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
@@ -1348,50 +1346,27 @@ N/A
 
 #### Overview
 
--- TODO [Add content for overview on "Testing Obfuscation"] --
+Obfuscation is the process of transforming code and data to make it more difficult to comprehend. It is an integral part of every software protection scheme. What's important to understand is that obfuscation isn't something that can be simply turned on or off. Rather, there's a whole lot of different ways in which a program, or part of it, can be made incomprehensible, and it can be done to different grades.
 
-##### Simple Tricks
+In this test case, we describe a few basic obfuscation techniques that are commonly used on Android. For a more detailed discussion of obfuscation, refer to the "Assessing Software Protection Schemes" chapter.
 
-- Modifying the DEX file so static analysis tools can't load it;
-- Using dynamic class loading and reflection to obfuscated the control flow;
-- Pack or encrypt portions of the code and/or data;
-- Frequently jumping between Java and native code.
+##### General Obfuscation
+
+*Identifier renaming with ProGuard.*
 
 ![Identifier Renaming with ProGuard](Images/Chapters/0x05j/proguard.jpg)
-*Identifier renaming with ProGuard.*
+
+
 
 #### Effectiveness Assessment
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+Attempt to decompile the bytecode and disassemble any included libary files, and make a reasonable effort to perform static analysis. At the very least, you should not be able to easily discern the app's core functionality (i.e., the functionality meant to be obfuscated). Verify that: 
 
--- TODO [Confirm purpose of sentence "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>." ] --
+- Meaningful identifiers such as class names, method names and variable names have been discarded;
+- String resources and strings in binaries are encrypted;
+- Code and data related to the protected functionality is encrypted, packed, or otherwise concealed.
 
--- TODO [Add content on "Testing Obfuscation" without source code] --
-
--- TODO [Dumping process memory] --
-
-```python
-#! /usr/bin/env python
-import re
-import sys
-
-pid = sys.argv[1]
-startaddr = sys.argv[2]
-endaddr = sys.argv[3]
-
-mem_file = open("/proc/" + pid + "/mem", 'r', 0)
-out_file = open("./" + pid + "_" + startaddr + "-" + endaddr + ".dump", 'w')
-
-start = int(startaddr, 16)
-end = int(endaddr, 16)
-mem_file.seek(start)
-chunk = mem_file.read(end - start)
-
-out_file.write(chunk)
-
-mem_file.close()
-out_file.close()
-```
+For a more detailed assessment, refer to the "Assessing Obfuscation" section of the  "Assessing Software Protection Schemes" chapter.
 
 #### References
 
@@ -1411,8 +1386,7 @@ out_file.close()
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+- N/
 
 ##### Tools
 
