@@ -1350,14 +1350,6 @@ Obfuscation is the process of transforming code and data to make it more difficu
 
 In this test case, we describe a few basic obfuscation techniques that are commonly used on Android. For a more detailed discussion of obfuscation, refer to the "Assessing Software Protection Schemes" chapter.
 
-##### General Obfuscation
-
-*Identifier renaming with ProGuard.*
-
-![Identifier Renaming with ProGuard](Images/Chapters/0x05j/proguard.jpg)
-
-
-
 #### Effectiveness Assessment
 
 Attempt to decompile the bytecode and disassemble any included libary files, and make a reasonable effort to perform static analysis. At the very least, you should not be able to easily discern the app's core functionality (i.e., the functionality meant to be obfuscated). Verify that: 
@@ -1386,9 +1378,8 @@ For a more detailed assessment, refer to the "Assessing Obfuscation" section of 
 
 ##### Info
 
-- N/
+- N/A
 
 ##### Tools
 
--- TODO [Add links to relevant tools for "Testing Obfuscation"] --
-* Enjarify - https://github.com/google/enjarify
+- N/A
