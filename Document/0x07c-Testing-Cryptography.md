@@ -109,7 +109,62 @@ Periodically ensure that the cryptography has not become obsolete. Some older al
 * Mobile Security Framework - https://github.com/ajinabraham/Mobile-Security-Framework-MobSF
 
  
+### If symmetric encryption or MACs are used, test for hard coded secret keys
 
+#### Overview
+
+The security of symmetric encryption and keyed hashes (MACs) is highly dependent upon the secrecy of the used secret key. If the secret key is disclosed, the security gained by encryption/MACing is rendered naught.
+
+This mandates, that the secret key is protected and should not be stored together with the encrypted data.
+
+#### Static Analysis
+
+The following checks would be performed against the used source code:
+
+* Ensure that no keys/passwords are hard coded and stored within the source code. Pay special attention to any 'administrative' or backdoor accounts enabled in the source code. Storing fixed salt within application or password hashes may cause problems too.
+*
+* Ensure that no obfuscated keys or passwords are in the source code. Obfuscation is easily bypassed by dynamic instrumentation and in principle does not differ from hard coded keys.
+*
+* If the application is using two-way SSL (i.e. there is both server and client certificate validated) check if:
+   * the password to the client certificate is not stored locally, it should be in the Keychain
+   * the client certificate is not shared among all installations (e.g. hard coded in the app)
+* if the app relies on an additional encrypted container stored in app data, ensure how the encryption key is used;
+   * if key wrapping scheme is used, ensure that the master secret is initialized for each user, or container is re-encrypted with new key;
+   * check how password change is handled and specifically, if you can use master secret or previous password to decrypt the container.
+
+Mobile operating systems provide a specially protected storage area for secret keys, commonly named key stores or key chains. Those storage areas will not be part of normal backup routines and might even be protected by hardware means. The application should use this special storage locations/mechanisms for all secret keys.
+
+#### Dynamic Analysis
+
+The recommended approach is be to decompile the APK and inspect the resulting source code for usage of custom encryption schemes (see "Static Analysis").
+
+#### Remediation
+
+-- TODO --
+
+#### References
+
+##### OWASP Mobile Top 10
+
+* M6 - Broken Cryptography
+
+##### OWASP MASVS
+
+-- TODO --
+
+##### CWE
+
+-- TODO --
+
+##### Info
+
+* iOS: Managing Keys, Certificates, and Passwords -- https://developer.apple.com/library/content/documentation/Security/Conceptual/cryptoservices/KeyManagementAPIs/KeyManagementAPIs.html
+* Android: The Android Keystore System -- https://developer.android.com/training/articles/keystore.html
+* Android: Hardware-backed Keystore -- https://source.android.com/security/keystore/
+
+##### Tools
+
+-- TODO --
 
 ### Testing for Insecure Cryptographic Algorithm Configuration
 
@@ -186,7 +241,7 @@ Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
 #### Dynamic Analysis
 
-Test encrypted data for reoccuring patterns -- thse can be an indication of ECB mode being used.
+Test encrypted data for reoccuring patterns -- those can be an indication of ECB mode being used.
 
 #### Remediation
 
@@ -227,9 +282,13 @@ A solution this are Key-Derivation Functions (KDFs) that have a configurable cal
 
 #### Static Analysis
 
--- TODO --
+Use the source code to determine how the hash is calculated, an exmaple of an insecure instantiation would be:
 
-* check source code for used algorithm
+```
+MessageDigest md = MessageDigest.getInstance("MD5");
+md.updat("too many secrets");
+byte[] digest = md.digest();
+```
 
 #### Dynamic Analysis
 
@@ -269,16 +328,71 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 * hashcat - https://hashcat.net/hashcat/
 * hashID - https://pypi.python.org/pypi/hashID
 
-
-
 ### Test if user-supplied credentials are not directly used as key material
 
 #### Overview
 
--- TODO: write Introduction --
+Cryptographic algorithms -- such as symmetric encryption or MACs -- expect a secret input of a a given size, e.g. 128 or 256 bit. A naive implementation might use the use-supplied password directly as an input key. There are a couple of problems with this approach:
 
-* sometimes a password is directly used as key for cryptographic functions
-* sometimes it is even filled with spaces to achieve the cryptographic' algorithm's requirements
+* if the password is smaller than the key, then not the full key-space is used (the rest is padded, sometimes even with spaces)
+* A user-supplied password will realistically consist mostly of display- and pronounce-able characters. So instead of the full entropy, i.e. 2<sup>8</sup> when using ASCII, only a small subset is (approx. 2<sup>6</sup>) is used.
+* If two users select the same password an attacker can match the encrypted files. This opens up the possibility of rainbow table attacks.
+
+#### Static Analysis
+
+Use the source code to verify that no password is directly passed into an encryption function, e.g.:
+
+
+```
+String userKeyString = "trustno1"; // given by user
+byte[] userKeyByte = userKeyString.getBytes();
+byte[] validKey = new byte[16]; // needed input key, filled with 0
+
+System.arraycopy(userKeyByte, 0, validKey, 0, (userKeyByte.length > 16) ? 16 : userKeyByte.length));
+
+Key theAESKEy = new SecretKeySpec(validKey, "AES");
+```
+
+#### Dynamic Analysis
+
+Test extrated hashes as within "Testing if anything but a KDF (key-derivation function) is used for storing passwords". If no hash or KDF has been used, brute-force attacks or attacks using dictionaries will be more efficient due to the reduced key space.
+
+#### Remediation
+
+Pass the user-supplied password into a salted hash funcation or KDF; use its resuls as key for the cryptographic function.
+
+#### References
+
+##### OWASP Mobile Top 10
+
+* M6 - Broken Cryptography
+
+##### OWASP MASVS
+
+- V3.3: "The app uses cryptographic primitives that are appropriate for the particular use-case, configured with parameters that adhere to industry best practices"
+
+##### CWE
+
+-- TODO --
+
+##### Info
+
+* Wikipedia -- https://en.wikipedia.org/wiki/Key_stretching
+
+##### Tools
+
+* hashcat - https://hashcat.net/hashcat/
+* hashID - https://pypi.python.org/pypi/hashID
+
+### Test if sensitive data is integrity protected
+
+#### Overview
+
+The attack surface of an application is defined as the sum of all potential input paths. An often forgotten attack vector are files stored on insecure locations, e.g., cloud storage or local file storage.
+
+All data that is stored on potential insecure locations should be integrity protected, i.e., an attacker should not be able to change their content without the application detecting the change prior to the data being used.
+
+Most countermeasures work by calculating a checksum for the stored data, and then by comparing the checksum with the retrieved data prior to the data's import. If the checksum/hash is stored with the data on the insecure location, typical hash algorithms will not be sufficient. As they do not posess a secret key, an attacker that is able to change the stored data, can easily recalculate the hash and store the newly calculated hash.
 
 #### Static Analysis
 
@@ -288,16 +402,18 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 
 #### Dynamic Analysis
 
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
+-- TODO --
 
-* check extracted hashes with ocl hashcat
 
 #### Remediation
 
--- TODO --
+Two typical cryptographic counter-measures for integrity protection are:
 
-* use password as input data for a secure hashing function
-* this improves the keyspace of the selected cryptographic function
+* MACs (Message Authentication Codes, also known as keyed hashes) combine hashes with a secret key. The MAC can only be calculated or verified if the secret key is known. In contrast to hashes this means, that an attacker cannot easily calculate a MAC after the original data was modified. This is well suited, if the application can store the secret key within its own storage and no other party needs to verify the authenticity of the data.
+
+* Digital Signatures are a public key-based scheme where, instead of a single secret key, a combination of a secret private key and a a public key is sued. The signature is created utilizing the secret key and can be verified utilizing the public key. Similar to MACs, an attacker cannot easily create a new signature. In contrast to MACs, signatures allow verification without needed to disclose the secret key. Why is not everyone using Signatures instead of MACs? Mostly for performance reasons.
+
+* Another possibility is the usage of encryption using AEAD schemes (see "Test if encryption provides data integrity protection")
 
 #### References
 
@@ -317,64 +433,6 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 
 -- TODO --
 
-* link to oclhashcat performance values
-
-##### Tools
-
--- TODO --
-
-* link to ocl hashcat
-
-
-### Test if sensitive data is integrity protected
-
-#### Overview
-
--- TODO: write Introduction --
-
-
-* MACs (Message Authentication Codes, also known as keyed hashes) combine hashes with a secret key. The MAC can only be calculated or verified if the secret key is known. In contrast to hashes this means, that an attacker cannot easily calculate a MAC after the original data was modified.
-* Digital Signatures are a public key-based scheme where, instead of a single secret key, a combination of a secret private key and a a public key is sued. The signature is created utilizing the secret key and can be verified utilizing the public key. Similar to MACs, an attacker cannot easily create a new signature. In contrast to MACs, signatures allow verification without needed to disclose the secret key. Why is not everyone using Signatures instead of MACs? Mostly for performance reasons.
-
-* maybe mention the whole mac-then-encrypt vs encrypt-then-mac problems
-*
-#### Static Analysis
-
--- TODO --
-
-* check source code for used algorithm
-
-#### Dynamic Analysis
-
--- TODO --
-
-
-#### Remediation
-
--- TODO --
-
-* use integrity-preserving encryption
-* use AEAD based encryption for data storage (provides confidentiality as well as integrity protection)
-* use digital signatures
-
-#### References
-
-##### OWASP Mobile Top 10
-
--- TODO --
-
-##### OWASP MASVS
-
--- TODO --
-
-##### CWE
-
--- TODO --
-
-##### Info
-
--- TODO --
-
 ##### Tools
 
 -- TODO --
@@ -384,12 +442,11 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 
 #### Overview
 
--- TODO: write Introduction --
+Please note that, encryption does not provide data integrity, i.e., if an attacker modifies the cipher text and a user decrypts the modified cipher text, the resulting plain-text will be garbage (but the decryption operation itself will perform successfully).
 
- Please note that, encryption does not provide data integrity, i.e., if an attacker modifies the cipher text and a user decrypts the modified cipher text, the resulting plain-text will be garbage (but the decryption operation itself will perform successfully).
+A good example for an symmetric algorithm that does not protect integrity is One-Time-Pad. This algorithm XORs the input data with a secret input key. This leads to a cipher text which's data confidenciality is information theoretical secure -- i.e. even an attacker with unlimited processing power would not be able to crack the encryption. But data integrity is not protected.
 
-* encryption only protects data confidentiality, not integrity
-* e.g., bit-flip attacks are possible
+For example, image that you have a message with an amount of money to be transfered. Let the amount be 1000 Euro/Dollars, which would be `0x0011 1110 1000` the secret key that you are using is `0x0101 0101 0101` (not very random, I know). XORing those two leads to a transfered message of `0x0110 1011 1101`. The attacker has no idea of knowning the plain-text. But she imagines that normally a low amount of money is transfered and bit-flips the highest bit of the message, making it `0x1110 1011 1101`. The victim now retrieves the message, decrypts it through XORing it with the secret key and has retrieved the value of `0x1011 1110 1000` which amounts to 3048 Euro/Dollars. So while the attacker was not able to break the encryption, she was able to change the undelying message as the underlying message was not integrity protected.
 
 #### Static Analysis
 
@@ -403,21 +460,19 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 
 #### Remediation
 
--- TODO --
+The cryptographic method that secures encrypted data is unsurprisingly called Authenticated Encryption<sup>[1]</sup>. The basic primitive used for creating the checksum is a MAC (also known as keyed hash). The exact selection what data is MACed (plain-text or cipher-text) is highly complex<sup>[2]</sup>.
 
-* use integrity-preserving encryption
-* maybe mention the whole mac-then-encrypt vs encrypt-then-mac problems
-* use AEAD based encryption for data storage (provides confidentiality as well as integrity protection)
+It is recommended to use an AEAD scheme for integrity-protecting encryption such as AES-GCM.
 
 #### References
 
 ##### OWASP Mobile Top 10
 
--- TODO --
+* M6 - Broken Cryptography
 
 ##### OWASP MASVS
 
--- TODO --
+- V3.3: "The app uses cryptographic primitives that are appropriate for the particular use-case, configured with parameters that adhere to industry best practices"
 
 ##### CWE
 
@@ -425,77 +480,8 @@ Use an established key derivation function such as PBKDF2 (RFC 2898<sup>[5]</sup
 
 ##### Info
 
--- TODO --
-
-##### Tools
-
--- TODO --
-
-
-
-
-### if symmetric encryption or MACs are used, test for hard coded secret keys
-
-#### Overview
-
--- TODO: write Introduction --
-
-The following checks would be performed in the last two app categories:
-
-* Ensure that no keys/passwords are hard coded and stored within the source code. Pay special attention to any 'administrative' or backdoor accounts enabled in the source code. Storing fixed salt within application or password hashes may cause problems too.
-* Ensure that no obfuscated keys or passwords are in the source code. Obfuscation is easily bypassed by dynamic instrumentation and in principle does not differ from hard coded keys.
-* If the application is using two-way SSL (i.e. there is both server and client certificate validated) check if:
-   * the password to the client certificate is not stored locally, it should be in the Keychain
-   * the client certificate is not shared among all installations (e.g. hard coded in the app)
-
-
-The following checks would be performed in the offline application:
-
-* if the app relies on an additional encrypted container stored in app data, ensure how the encryption key is used;
-   * if key wrapping scheme is used, ensure that the master secret is initialized for each user, or container is re-encrypted with new key;
-   * check how password change is handled and specifically, if you can use master secret or previous password to decrypt the container.
-
-
-#### Static Analysis
-
--- TODO --
-
-* check source code for used key strings
-* check property files for used keys
-* check files for used keys
-
-A proper way would be to generate the client certificate upon user registration/first login and then store it in the Keychain.
-
-* Ensure that the keys/passwords/logins are not stored in application data. This can be included in the iTunes backup and increase attack surface. Keychain is the only appropriate place to store credentials of any type (password, certificate, etc.).
-* Ensure that keychain entries have appropriate protection class. The most rigorous being `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly` which translates to: entry unlocked only if passcode on the device is set and device is unlocked; the entry is not exportable in backups or by any other means.
-*
-#### Dynamic Analysis
-
--- TODO [Give examples of Dynamic Testing for "Testing for Insecure and/or Deprecated Cryptographic Algorithms"] --
-
-* reverse engineer source code, then do the same
-
-#### Remediation
-
--- TODO --
-
-#### References
-
-##### OWASP Mobile Top 10
-
--- TODO --
-
-##### OWASP MASVS
-
--- TODO --
-
-##### CWE
-
--- TODO --
-
-##### Info
-
--- TODO --
+* [1] Wikipedia: Authenticated Encryption -- https://en.wikipedia.org/wiki/Authenticated_encryption
+* [2] Luck Thirteen: Breaking the TLS and DTLS Record Protocols -- http://www.isg.rhul.ac.uk/tls/TLStiming.pdf
 
 ##### Tools
 
