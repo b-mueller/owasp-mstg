@@ -1,10 +1,6 @@
 ## iOS Platform Overview
 
-As with other platforms, Apple provides a Software Development Kit (SDK) for iOS that helps developers to develop, install, run and test native iOS Apps by offering different tools and interfaces. XCode Integrated Development Environment (IDE) is used for this purpose and iOS applications are implemented either by using Objective-C or Swift.
-
-Objective-C is an object-oriented programming language that adds Smalltalk-style messaging to the C programming language and is used on macOS and iOS to develop desktop and mobile applications respectively. Both macOS and iOS are implemented by using Objective-C.
-
-Swift is the successor of Objective-C and allows interoperability with the same and was introduced with Xcode 6 in 2014.
+-- [TODO - iOS Platform introduction --]
 
 ### The iOS Security Architecture
 
@@ -80,10 +76,20 @@ Thus, this makes the specific memory addresses of functions and libraries hard t
 ![iOS Security Architecture (iOS Security Guide)](http://bb-conservation.de/sven/iOS_Security_Architecture.png)
 *iOS Security Architecture (iOS Security Guide)*
 
+### Software Development on iOS 
+
+As with other platforms, Apple provides a Software Development Kit (SDK) for iOS that helps developers to develop, install, run and test native iOS Apps by offering different tools and interfaces. XCode Integrated Development Environment (IDE) is used for this purpose and iOS applications are implemented either by using Objective-C or Swift.
+
+Objective-C is an object-oriented programming language that adds Smalltalk-style messaging to the C programming language and is used on macOS and iOS to develop desktop and mobile applications respectively. Both macOS and iOS are implemented by using Objective-C.
+
+Swift is the successor of Objective-C and allows interoperability with the same and was introduced with Xcode 6 in 2014.
+
 ### Understanding iOS Apps
 
 iOS applications are distributed in IPA (iOS App Store Package) archives. This IPA file contains all the necessary (for ARM compiled) application code and resources required to execute the application. The container is in fact a ZIP compressed file, which can be easily decompressed.
+
 An IPA has a built-in structure for iTunes and App Store to recognize, The example below shows the high level structure of an IPA.
+
 * /Payload/ folder contains all the application data. We will come back to the content of this folder in more detail.
 * /Payload/Application.app contains the application data itself (ARM compiled code) and associated static resources
 * /iTunesArtwork is a 512x512 pixel PNG images used as the application’s icon
