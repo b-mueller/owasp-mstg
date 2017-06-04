@@ -1,6 +1,6 @@
 ## Testing Data Storage on Android
 
-The protection of sensitive data, such as user credentials and private information, is a key focus in mobile security. In this chapter, you will learn about the APIs iOS offers for local data storage, as well as best practices for using those APIs.
+The protection of sensitive data, such as user credentials and private information, is a key focus in mobile security. In this chapter, you will learn about the APIs Android offers for local data storage, as well as best practices for using those APIs.
 
 Note that "sensitive data" needs to be identified in the context of each specific app. Data classification is described in detail in the chapter "Testing Processes and Techniques".
 
