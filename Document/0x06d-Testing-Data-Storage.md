@@ -6,16 +6,28 @@ For all test cases it need to be known what sensitive information is, in context
 
 #### Overview
 
-Storing data is essential for many mobile applications, for example in order to keep track of user settings or data a user might has keyed in that needs to stored locally or offline. Data can be stored persistently by a mobile application in various ways. The following table shows mechanisms that are available on the iOS platform, that should usually not be considered to store sensitive data.
+Common wisdom suggest to save as little sensitive data as possible on permanent local storage. However, in most practical scenarios, a least some types user-related data need to be stored. For example, asking the user to enter a highly complex password every time the app is started isn't a great idea from a usability perspective. As a result, most apps must locally cache some kind of session token. Other types of sensitive data, such as personally identifyable information, might also be saved if the particular scenario calls for it.
+
+Fortunately, Apple's data storage APIs allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correclty, key data and files can be secured using hardware-backed 256 bit AES encryption.
+
+-- [TODO: Where data shouldn't be saved] -- 
 
 * CoreData/SQLite Databases
 * NSUserDefaults
 * Property List (Plist) files
 * Plain files
 
+#### Data Protection on iOS
+
+App developers can leverage the iOS *Data Protection* APIs to implement fine-grained access control for user data stored in flash memory. It is built on top of the iOS device security hardware and low-level file encryption APIs. 
+
+<img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
+
+*iOS Data Protection Key Hierarchy <sup>[3]</sup>*
+
 #### Static Analysis
 
-Ideally sensitive information should not be stored on the device at all. If there is a requirement to store sensitive information on the device itself, several functions/API calls are available to protect the data on IOS devices by using for example the Keychain.
+ If there is a requirement to store sensitive information on the device itself, several functions/API calls are available to protect the data on IOS devices by using for example the Keychain.
 
 During the static analysis it should be checked if sensitive data is stored permanently on the device. The following frameworks and functions should be checked when handling sensitive data.
 
