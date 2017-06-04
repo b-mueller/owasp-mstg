@@ -21,11 +21,16 @@ Fortunately, Apple's data storage APIs allow developers to make use of the crypt
 
 #### Data Protection on iOS
 
-App developers can leverage the iOS *Data Protection* APIs to implement fine-grained access control for user data stored in flash memory. It is built on top of the iOS device security hardware and low-level file encryption APIs. 
+App developers can leverage the iOS *Data Protection* APIs to implement fine-grained access control for user data stored in flash memory. The API is built on top of the Secure Enclave, a coprocessor that provides cryptographic operations for Data Protection key management. A device-specific hardware key is embedded into the secure enclave, ensuring the integrity of Data Protection even if the operating system kernel is compromised.
+
+The data protection architecture is based on a hierarchy of keys. The hardware key sits at the top of this hierarchy, and can be used to "unlock" so-called class keys which are associated with different device states (e.g. locked / unlocked).
+
+Every file stored in the iOS file system is encrypted with its own, individual per-file key, which is contained in the file metadata. The metadata is encrypted with the file system key and wrapped with one of the class keys, depending on the options set by the developers when creating the it.
 
 <img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
-
 *iOS Data Protection Key Hierarchy <sup>[3]</sup>*
+
+-- [TODO: Finish data protection overview] -- 
 
 #### Static Analysis
 
