@@ -12,13 +12,15 @@ The iOS SDK (Software Development Kit), formerly known as iPhone SDK, is a softw
 
 #### Utilities
 
-Class-dump by Steve Nygard<sup>[1]</sup> is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
 
-Class-dump-z<sup>[9]</sup> is written from scratch using C++ avoiding using dynamic calls, unlike class-dump and class-dump-x which are written in Objective-C. Removing these unnecessary calls makes class-dump-z near 10 times faster than the precedences.
 
-Class-dump-dyld by Elias Limneos<sup>[2]</sup> allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
+#### Reversing Frameworks
 
-MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries
+Radare2
+
+#### Commercial Disassemblers
+
+Hopper / IDA Pro.
 
 ### Jailbreaking iOS
 
@@ -27,8 +29,6 @@ In the iOS world, jailbreaking means disabling Apple's code code signing mechani
 Developing a jailbreak for any given version of iOS is not an easy endeavor. As a security tester, you'll most likely want to use publicly available jailbreak tools (don't worry, we're all script kiddies in some areas). Even so, we recommend studying the techniques used to jailbreak various versions of iOS in the past - you'll encounter many highly interesting exploits and learn a lot about the internals of the OS. For example, Pangu9 for iOS 9.x exploited at least five vulnerabilities, including a use-after-free bug in the kernel (CVE-2015-6794) and an arbitrary file system access vulnerability in the Photos app (CVE-2015-7037) <sup>[4]</sup>.
 
 In jailbreak lingo, we talk about tethered and untethered jailbreaking methods. In the "tethered" scenario, the jailbreak doesn't persist throughout reboots, so the device must be connected (tethered) to a computer during every reboot to re-apply it. "Untethered" jailbreaks need only be applied once, making them the most popular choice for end users.
-
-#### Why Jailbreak iOS?
 
 Some of the benefits of jailbreaking an iOS Device includes the following:
 
@@ -51,7 +51,7 @@ Some reliable resources to read about content regarding jailbreak iOS
 * Redmond Pie - http://www.redmondpie.com/
 * Reddit Jailbreak - https://www.reddit.com/r/jailbreak/
 
-#### The Dilemma of Jailbreak iOS
+#### Dealing with Jailbreak Detection
 
 Some apps attempt to detect whether the iOS device they're installed on is jailbroken. The reason for this jailbreaking deactivates some of iOS' default security mechanisms, leading to a less trustable environment.
 
@@ -65,7 +65,15 @@ We'll revisit this topic in the chapter "Testing Resilience Against Reverse Engi
 
 #### Static Analysis
 
--- TODO [Basic static analysis ] --
+Class-dump by Steve Nygard<sup>[1]</sup> is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
+
+Class-dump-z<sup>[9]</sup> is re-write of class-dump from scratch using C++, avoiding using dynamic calls. Removing these unnecessary calls makes class-dump-z near 10 times faster than the precedences.
+
+Class-dump-dyld by Elias Limneos<sup>[2]</sup> allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
+
+MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries.
+
+-- TODO [otool] --
 
 #### Debugging
 
@@ -76,8 +84,6 @@ Debugging on iOS is generally implemented via Mach IPC. To "attach" to a target 
 Even though the XNU kernel implements the <code>ptrace()</code> system call as well, some of its functionality has been removed, including the capability to read and write register states and memory contents. Even so, <code>ptrace()</code> is used in limited ways by standard debuggers such as <code>lldb</code> and <code>gdb</code>. Some debuggers, including Radare2's iOS debugger, don't invoke <code>ptrace</code> at all.
 
 ##### Using lldb
-
--- TODO [Complete lldb tutorial] --
 
 iOS ships with a console app, debugserver, that allows for remote debugging using gdb or lldb. By default however, debugserver cannot be used to attach to arbitrary processes (it is usually only used for debugging self-developed apps deployed with XCode). To enable debugging of third-part apps, the task_for_pid entitlement must be added to the debugserver executable. An easy way to do this is adding the entitlement to the debugserver binary shipped with XCode <sup>[5]</sup>.
 
@@ -127,6 +133,8 @@ debugserver-@(#)PROGRAM:debugserver  PROJECT:debugserver-320.2.89
  for armv7.
 Attaching to process 2670...
 ~~~
+
+-- TODO [Solving UnCrackable App with lldb] --
 
 ##### Using Radare2
 
