@@ -12,14 +12,33 @@ Common wisdom suggest to save as little sensitive data as possible on permanent 
 
 Fortunately, Apple's data storage APIs allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correclty, key data and files can be secured using hardware-backed 256 bit AES encryption.
 
--- [TODO: Where data shouldn't be saved] -- 
+-- [TODO: Where data shouldn't be saved:] -- 
 
 * CoreData/SQLite Databases
 * NSUserDefaults
 * Property List (Plist) files
 * Plain files
 
-#### Data Protection on iOS
+##### The Keychain
+
+The iOS Keychain is used to securely store short, sensitive bits of data, such as encryption keys and session tokens. It is implemented as an SQLite database that can be accessed only through Keychain APIs. The Keychain database is encrypted using the device Key and the user PIN/password (if one has been set by the user).
+
+By default, each app only can access Keychain created by itself. Access can however be shared between apps signed by the same developer by using the "access groups" feature. Access to the Keychain is managed by the securityd daemon, which grants access based on the app's <code>Keychain-access-groups</code>, <code>application-identifier</code> and <code>application-group</code> entitlements. 
+
+The KeyChain API consists of the following main operations with self-explaining names:
+
+- SecItemAdd
+- SecItemUpdate
+- SecItemCopyMatching
+- SecItemDelete
+
+Keychain data is protected using a class structure similar to the one used for file encryption (see also iOS platfom overview).
+
+Items added with the SecItemAdd call are encoded as a binary plist and encrypted with using an 128 bit AES per-item key. 
+
+Note that larger blobs of data are not to meant to be saved directly in the keychain. That's what the Data Protection API is for (which also makes use of the Keychain).
+
+##### The Data Protection API
 
 App developers can leverage the iOS *Data Protection* APIs to implement fine-grained access control for user data stored in flash memory. The API is built on top of the Secure Enclave, a coprocessor that provides cryptographic operations for Data Protection key management. A device-specific hardware key is embedded into the secure enclave, ensuring the integrity of Data Protection even if the operating system kernel is compromised.
 
