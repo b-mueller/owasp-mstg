@@ -44,10 +44,20 @@ App developers can leverage the iOS *Data Protection* APIs to implement fine-gra
 
 The data protection architecture is based on a hierarchy of keys. The hardware key sits at the top of this hierarchy, and can be used to "unlock" so-called class keys which are associated with different device states (e.g. locked / unlocked).
 
-Every file stored in the iOS file system is encrypted with its own, individual per-file key, which is contained in the file metadata. The metadata is encrypted with the file system key and wrapped with one of the class keys, depending on the options set by the developers when creating the it.
+Every file stored in the iOS file system is encrypted with its own, individual per-file key, which is contained in the file metadata. The metadata is encrypted with the file system key and wrapped with one of the class keys, depending on the protection class selected by the app when creating the the Keychain item.
 
 <img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
 *iOS Data Protection Key Hierarchy <sup>[3]</sup>*
+
+Files can be assigned one of four protection classes:
+
+- Complete Protection (NSFileProtectionComplete): This class key is protected with a key derived from the user passcode and the device UID. It is wiped from memory shortly after the device is locked, makimg the data inaccessible until the user unlocks the device.
+
+- Protected Unless Open (NSFileProtectionCompleteUnlessOpen): Behaves similar to Complete Protection, but if the file is opened when unlocked, the app can continue to access the file even if the user locks the device. This is implemented using asymmetric elliptic curve cryptography <sup>[3]</sip>.
+
+- Protected Until First User Authentication (NSFileProtectionCompleteUntilFirstUserAuthentication): The file can be accessed from the moment the user unlocks the device for the first time after booting. It can be accessed even if the user subsequently locks the device.
+
+- No Protection (NSFileProtectionNone): This class key is protected only with the UID and is kept in Effaceable Storage. This protection class exists to enable fast remote wipe: Deleting the class key immediately makes the data inacessible. 
 
 -- [TODO: Finish data protection overview] -- 
 
