@@ -169,7 +169,7 @@
 
 #### Overview
 
-The WebView object is used to embed a web browser in your iOS application. It is a convinient way to display a web page in your application without any interaction with your native mobile browser. WebView even allows you to interact with JavaScript code in pages it has loaded. This great opportunity however may expose your application for a big risk if no security controls are applied. One of such big risk is a possibility to execute a malicious JavaScript code in your application via WebView object.
+The WebView object is used to embed a web browser in your iOS application. It is a convenient way to display a web page in your application without any interaction with your native mobile browser. WebView even allows you to interact with JavaScript code in pages it has loaded. This great opportunity however may expose your application for a big risk if no security controls are applied. One of such big risk is a possibility to execute a malicious JavaScript code in your application via WebView object.
 
 #### Static Analysis
 
