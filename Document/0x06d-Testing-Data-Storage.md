@@ -1,6 +1,8 @@
 ## Testing Data Storage on iOS
 
-For all test cases it need to be known what sensitive information is, in context of the app. Please have a look at "Classification of data" for further details.
+The protection of sensitive data, such as user credentials and private information, is a key focus in mobile security. In this chapter, you will learn about the APIs iOS offers for local data storage, as well as best practices for using those APIs.
+
+Note that "sensitive data" needs to be identified in the context of each specific app. Data classification is described in detail in the chapter "Testing Processes and Techniques".
 
 ### Testing Local Data Storage
 
@@ -27,7 +29,7 @@ App developers can leverage the iOS *Data Protection* APIs to implement fine-gra
 
 #### Static Analysis
 
- If there is a requirement to store sensitive information on the device itself, several functions/API calls are available to protect the data on IOS devices by using for example the Keychain.
+If there is a requirement to store sensitive information on the device itself, several functions/API calls are available to protect the data on IOS devices by using for example the Keychain.
 
 During the static analysis it should be checked if sensitive data is stored permanently on the device. The following frameworks and functions should be checked when handling sensitive data.
 
