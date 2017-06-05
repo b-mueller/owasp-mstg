@@ -10,8 +10,6 @@
 
 -- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
 
--- TODO [Confirm purpose of remark "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
-
 -- TODO [Add content on "Testing Endpoint Identity Verification" with source code] --
 
 #### Dynamic Analysis
@@ -94,16 +92,13 @@ Starting from January 1 2017, Apple App Store review and requires justification 
 
 -- TODO: Describe ATS exceptions --
 
-
 #### Static Analysis
 
 — TODO —
 
 #### Dynamic Analysis
 
-
 — TODO —
-
 
 #### Remediation
 
@@ -127,6 +122,7 @@ Starting from January 1 2017, Apple App Store review and requires justification 
 — TODO —
 
 ##### Info
+
 * [1] Information Property List Key Reference: Cocoa Keys - https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html
 * [2] API Reference NSURLConnection - https://developer.apple.com/reference/foundation/nsurlconnection
 * [3] API Reference NSURLSession - https://developer.apple.com/reference/foundation/urlsession
@@ -183,6 +179,7 @@ Our test approach is to gradually relax security of SSL handshake negotiation an
 Some applications use two-way SSL handshake, meaning that application verifies server's certificate and server verifies client's certificate. You can notice this if there is an error in Burp 'Alerts' tab indicating that client failed to negotiate connection.
 
 There is a couple of things worth noting:
+
 1. client certificate contains private key that will be used in key exchange
 2. usually certificate would also need a password to use (decrypt) it
 3. certificate itself can be stored in the binary itself, data directory or the keychain
@@ -198,6 +195,7 @@ Once you have extracted the certificate from the application (e.g. using Cycript
 #### Remediation
 
 As a best practice, the certificate should be pinned. This can be done in several ways, where most common include:
+
 1. Including server's certificate in the application bundle and performing verification on each connection. This requires an update mechanisms whenever the certificate on the server is updated
 2. Limiting certificate issuer to e.g. one entity and bundling the root CA's public key into the application. In this way we limit the attack surface and have a valid certificate.
 3. Owning and managing your own PKI. The application would contain the root CA's public key. This avoids updating the application every time you change the certificate on the server, due to e.g. expiration. Note that using your own CA would cause the certificate to be self-singed.
