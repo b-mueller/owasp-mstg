@@ -8,9 +8,7 @@ Note that "sensitive data" needs to be identified in the context of each specifi
 
 #### Overview
 
-Common wisdom suggest to save as little sensitive data as possible on permanent local storage. However, in most practical scenarios, a least some types user-related data need to be stored. For example, asking the user to enter a highly complex password every time the app is started isn't a great idea from a usability perspective. As a result, most apps must locally cache some kind of session token. Other types of sensitive data, such as personally identifyable information, might also be saved if the particular scenario calls for it.
-
-Fortunately, iOS offers secure storage APIs allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
+As already mentioned many times in this guide, as little sensitive data as possible should be saved on permanent local storage. However, in most practical scenarios, a least some types user-related data needs to be stored. Fortunately, iOS offers secure storage APIs allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
 
 ##### Data Protection API
 
@@ -68,7 +66,7 @@ The keychain file is located at:
 
 #### Static Analysis
 
-Identify sensitive data saved throughout the app. This includes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults. 
+Identify sensitive data saved throughout the app. This includes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults without additional encryption. In any case, the encryption must be implemented such that the secret key is stored in the Keychain using secure settings, ideally <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code>.
 
 When looking for instances of insecure data storage in an iOS app you should consider the following data storage mechanisms.
 
@@ -101,13 +99,9 @@ The following steps can be used to identify how the application stores data loca
 3. Perform a grep command of the data that you have stored, such as: `grep -irn "USERID"`.
 4. If the sensitive data is being stored in plaintext, it fails this test.
 
-##### Inspecting the Keychain
+For a more detailed analysis, uses an API monitoring tool such as IntroSpy to instrument the app.
 
--- TODO [Introduce Keychain-Dumper] --
-
-Manual dynamic analysis such as debugging can also be leveraged to verify how specific system credentials are stored and processed on the device. As this approach is more time consuming and is likely conducted manually, it might be only feasible for specific use cases.
-
--- TODO [Add content on Dynamic Testing of "Testing Local Data Storage "] --
+To dump the Keychain data, use keychain dumper <sup>[9]</sup> as described in the chapter "Basic Security Testing on iOS".
 
 #### Remediation
 
@@ -151,7 +145,7 @@ The following example shows how to create a securely encrypted file using the <c
 [6] NSFileManager - https://developer.apple.com/reference/foundation/nsfilemanager
 [7] NSUserDefaults - https://developer.apple.com/reference/foundation/userdefaults
 [8] Keychain Item Accessibility -  https://developer.apple.com/reference/security/1658642-keychain_services/1663541-keychain_item_accessibility_cons
-[9] Keychain Dumper 
+[9] Keychain Dumper - https://github.com/ptoomey3/Keychain-Dumper/
 
 
 ### Testing for Sensitive Data in Logs
