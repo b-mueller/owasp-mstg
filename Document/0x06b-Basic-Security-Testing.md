@@ -542,5 +542,5 @@ To get more information on testing transport security, please refer to section '
 * [28] EFF's Observatory - https://www.eff.org/pl/observatory
 * [29] Map of the 650-odd organizations that function as Certificate Authorities trusted (directly or indirectly) by Mozilla or Microsoft - https://www.eff.org/files/colour_map_of_CAs.pdf
 * [30] IPSW Downloads - https://ipsw.me
-* [31] IntroSpy - https://github.com/integrity-sa/Introspy-iOS
+* [31] IntroSpy - http://isecpartners.github.io/Introspy-iOS/
 * [32] IntroSpy Analyzer - https://github.com/iSECPartners/Introspy-Analyzer

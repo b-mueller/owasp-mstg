@@ -25,12 +25,15 @@
 #### References
 
 #### OWASP Mobile Top 10 2016
+
 * M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
 
 ##### OWASP MASVS
+
 * V5.3: "The app verifies the X.509 certificate of the remote endpoint when the secure channel is established. Only certificates signed by a valid CA are accepted."
 
 ##### CWE
+
 * CWE-296 - Improper Following of a Certificate's Chain of Trust - https://cwe.mitre.org/data/definitions/296.html
 * CWE-297 - Improper Validation of Certificate with Host Mismatch - https://cwe.mitre.org/data/definitions/297.html
 * CWE-298 - Improper Validation of Certificate Expiration - https://cwe.mitre.org/data/definitions/298.html
@@ -49,39 +52,39 @@
 ### Testing App Transport Security
 
 #### Overview
+
 App Transport Security (ATS)<sup>[1]</sup> is a set of security checks that the operating system enforces when making connections with NSURLConnection <sup>[2]</sup>, NSURLSession and CFURL<sup>[3]</sup> to public hostnames. ATS is enabled by default for applications build on iOS SDK 9 and above.
 
 ATS is enforced only when making connections to public hostnames. Therefore any connection made to an IP address, unqualified domain names or TLD of .local is  not protected with ATS.
 
 The following is a summarised list of App Transport Security Requirements<sup>[1]</sup>:
+
 - No HTTP connections are allowed
-- Transport Layer Security (TLS) version must be 1.2 or above and it must,
-    - support Perfect Forward Secrecy (PFS) through Elliptic Curve Diffie-Hellman Ephemeral (ECDHE) key exchange and,
-    - AES-128 or AES-256 symmetric ciphers
-    - The cipher suit must be one of the following:
-        * TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 
-        * TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 
-        * TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 
-        * TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA 
-        * TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 
-        * TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA 
-        * TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 
-        * TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 
-        * TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 
-        * TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 
-        * TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+- The X.509 Certificate has a SHA256 fingerprint and must be signed with at least 2048-bit RSA key or a 256-bit Elliptic-Curve Cryptography (ECC) key.
+- Transport Layer Security (TLS) version must be 1.2 or above and must support Perfect Forward Secrecy (PFS) through Elliptic Curve Diffie-Hellman Ephemeral (ECDHE) key exchange and AES-128 or AES-256 symmetric ciphers.
 
-- The Certificate has a SHA256 fingerprint and must be signed with at least 2048-bit RSA key or a 256-bit Elliptic-Curve Cryptography (ECC) key.
+The cipher suit must be one of the following:
 
+* TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 
+* TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 
+* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 
+* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA 
+* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 
+* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA 
+* TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 
+* TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 
+* TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 
+* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 
+* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
 
 ##### ATS Exceptions
 
-ATS restrictions can be disabled by configuring exceptions in the Info.plist file under the NSAppTransportSecurity key. These exceptions can be applied to
+ATS restrictions can be disabled by configuring exceptions in the Info.plist file under the NSAppTransportSecurity key. These exceptions can be applied to:
+
 * allow insecure connections (HTTP),
 * lower the minimum TLS version,
 * disable PFS and 
 * allow connections to local domains
-
 
 Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating “To give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed”<sup>[5]</sup>
 
@@ -133,9 +136,6 @@ Starting from January 1 2017, Apple App Store review and requires justification 
 ##### Tools
 
 — TODO —
-
-
-
 
 ### Testing Custom Certificate Stores and SSL Pinning
 
@@ -205,12 +205,15 @@ As a best practice, the certificate should be pinned. This can be done in severa
 #### References
 
 ##### OWASP Mobile Top 10 2016
+
 * M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
 
 ##### OWASP MASVS
+
 * V5.4 "The app either uses its own certificate store, or pins the endpoint certificate or public key, and subsequently does not establish connections with endpoints that offer a different certificate or key, even if signed by a trusted CA."
 
 ##### CWE
+
 * CWE-295 - Improper Certificate Validation
 
 ##### Info
