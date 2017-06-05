@@ -44,8 +44,6 @@
 ##### Tools
 
 -- TODO [Add relevant tools for "Testing Endpoint Identity Verification"] --
-* Enjarify - https://github.com/google/enjarify
-
 
 ### Testing App Transport Security
 
@@ -84,7 +82,7 @@ ATS restrictions can be disabled by configuring exceptions in the Info.plist fil
 * disable PFS and 
 * allow connections to local domains
 
-Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating “To give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed”<sup>[5]</sup>
+Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating "to give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed"<sup>[5]</sup>
 
 * NSAllowsArbitraryLoads - disables ATS globally for all the domains
 * NSExceptionAllowsInsecureHTTPLoads - disables ATS for a single domain
@@ -167,8 +165,7 @@ else {
 
 ##### Server certificate validation
 
-We start our analysis by testing the application's behaviour while establishing secure connection.
-Our test approach is to gradually relax security of SSL handshake negotiation and check which security mechanisms are enabled.
+We start our analysis by testing the application's behaviour while establishing secure connection. Our test approach is to gradually relax security of SSL handshake negotiation and check which security mechanisms are enabled.
 
 1. Having burp set up as a proxy in wifi settings, make sure that there is no certificate added to trust store (Settings -> General -> Profiles) and that tools like SSL Kill Switch are deactivated. Launch your application and check if you can see the traffic in Burp. Any failures will be reported under 'Alerts' tabl. If you can see the traffic, it means that there is no certificate validation performed at all! This effectively means that an active attacker can silently do MiTM against your application. If however, you can't see any traffic and you have an information about SSL handshake failure, follow the next point.
 2. Now, install Burp certificate, as explained in [Basic Security Testing section](./0x06b-Basic-Security-Testing.md). If the handshake is successful and you can see the traffic in Burp, it means that certificate is validated against device's trust store, but the pinning is not performed. The risk is less significant than in previous scenario, as two main attack scenarios at this point are misbehaving CAs and phishing attacks, as discussed in [Basic Security Testing section](./0x06b-Basic-Security-Testing.md).
