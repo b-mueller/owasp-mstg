@@ -97,14 +97,15 @@ See also iphonedevwiki <sup>[24]</sup>.
 ### Typical iOS Application Test Workflow
 
 Typical workflow for iOS Application test is following:
-* Obtain IPA file
-* Bypass jailbreak detection (if present)
-* Bypass certificate pinning (if present)
-* Inspect HTTP(S) traffic - usual web app test
-* Abuse application logic by runtime manipulation
-* Check for local data storage (caches, binary cookies, plists, databases)
-* Check for client-specific bugs, e.g. SQLi, XSS
-* Other checks like: logging to ASL with NSLog, application compile options, application screenshots, no app backgrounding
+
+1. Obtain IPA file
+2. Bypass jailbreak detection (if present)
+3. Bypass certificate pinning (if present)
+4. Inspect HTTP(S) traffic - usual web app test
+5. Abuse application logic by runtime manipulation
+6. Check for local data storage (caches, binary cookies, plists, databases)
+7. Check for client-specific bugs, e.g. SQLi, XSS
+8. Other checks like: logging to ASL with NSLog, application compile options, application screenshots, no app backgrounding
 
 ### Static Analysis
 
@@ -321,7 +322,9 @@ Note however that this binary is signed with a self-signed certificate with a "w
 
 ##### Security Profiling with Introspy
 
-Intospy is an open-source security profiler for iOS released by iSecPartners. Built on top of substrate, it can be used to log security-sensitive API calls on a jailbroken device.
+Intospy <sup>[31]</sup> is an open-source security profiler for iOS released by iSecPartners. Built on top of substrate, it can be used to log security-sensitive API calls on a jailbroken device.  The recorded API calls sent to the console and written to a database file, which can then be converted into an HTML report using Introspy-Analyzer <code>[32]</code>.
+
+-- TODO [Write an IntroSpy howto] --
 
 #### Dynamic Analysis on Non-Jailbroken Devices
 
@@ -539,3 +542,5 @@ To get more information on testing transport security, please refer to section '
 * [28] EFF's Observatory - https://www.eff.org/pl/observatory
 * [29] Map of the 650-odd organizations that function as Certificate Authorities trusted (directly or indirectly) by Mozilla or Microsoft - https://www.eff.org/files/colour_map_of_CAs.pdf
 * [30] IPSW Downloads - https://ipsw.me
+* [31] IntroSpy - https://github.com/integrity-sa/Introspy-iOS
+* [32] IntroSpy Analyzer - https://github.com/iSECPartners/Introspy-Analyzer
