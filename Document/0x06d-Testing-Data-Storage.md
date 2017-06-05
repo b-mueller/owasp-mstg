@@ -68,9 +68,7 @@ The keychain file is located at:
 
 #### Static Analysis
 
-Identify sensitive data saved throughout the app. This incudes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults. 
-
- always stored in encrypted form using the <code>NSFileProtectionComplete</code> or <code>
+Identify sensitive data saved throughout the app. This includes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults. 
 
 When looking for instances of insecure data storage in an iOS app you should consider the following data storage mechanisms.
 
@@ -113,13 +111,20 @@ Manual dynamic analysis such as debugging can also be leveraged to verify how sp
 
 #### Remediation
 
-If sensitive information (credentials, keys, PII, etc.) is needed locally on the device, several best practices are offered by iOS that should be used to store data securely instead of reinventing the wheel or leave it unencrypted on the device.
+Hardware-backed storage mechanisms must be used for storing sensitive data. Permitted options for storing sensitive data are:
 
-The following is a list of best practices used for secure storage of certificates and keys and sensitive data in general:
+- Storing the data in the keychain with the <code>kSecAttrAccessibleWhenUnlocked</code> attribute.
+- Encrypting the data using standard crypto APIs before storing it, and storing the encryption key in the keychain.
+- Creating a file with the <code>NSFileProtectionComplete</code> attribute.
 
-* For small amounts of sensitive data such as credentials or keys use the Keychain Services<sup>[1]</sup> to securely store it locally on the device. Keychain data is protected using a class structure similar to the one used in file Data Protection. These classes have behaviors equivalent to file Data Protection classes, but use distinct keys and are part of APIs that are named differently. The the default behaviour is `kSecAttrAccessibleWhenUnlocked`. For more information have a look at the available modes Keychain Item Accessibility<sup>[8]</sup>.
+The following example shows how to create a securely encrypted file using the <code>createFileAtPath</code> method:
 
-* Cryptographic functions that have been self implemented to encrypt or decrypt local files should be avoided.  
+```objective-c
+[[NSFileManager defaultManager] createFileAtPath:[self filePath]
+  contents:[@"secret text" dataUsingEncoding:NSUTF8StringEncoding]
+  attributes:[NSDictionary dictionaryWithObject:NSFileProtectionComplete
+  forKey:NSFileProtectionKey]];
+```
 
 #### References
 
