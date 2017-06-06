@@ -496,7 +496,14 @@ UIPasteboard *pb = [UIPasteboard generalPasteboard];
 
 #### Overview
 
-Like other modern mobile operating systems iOS offers auto-backup features. The backups usually include copies of the data and settings of all apps installed on the the device. An obvious concern is whether sensitive user data stored by the app might unintentionally leak to those data backups. 
+Like other modern mobile operating systems iOS offers auto-backup features that create copies of the data on the device, including the data and settings of installed apps. An obvious concern is whether sensitive user data stored by the app might unintentionally leak to those data backups. 
+
+
+##### How the Keychain is Backed Up
+
+When a user backs up their iPhone, the keychain data is backed up as well, but the secrets in the keychain remain encrypted. The class keys needed to decrypt they keychain data are not included in the backup. To restore the keychain data, the backup must be restored to a device, and the device must be unlocked with the same passcode. 
+
+Note that keychain items with the <code>kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly</code> attribute set can be decrypted only if the backup is restored to the same device. If the backup is restored to a new device, these items are missing. 
 
 -- [TODO complete the backups overview] --
 
