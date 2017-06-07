@@ -8,7 +8,7 @@ Note that "sensitive data" needs to be identified in the context of each specifi
 
 #### Overview
 
-As already mentioned many times in this guide, as little sensitive data as possible should be saved on permanent local storage. However, in most practical scenarios, a least some types user-related data needs to be stored. Fortunately, iOS offers secure storage APIs allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
+As already mentioned many times in this guide, as little sensitive data as possible should be saved on permanent local storage. However, in most practical scenarios, at least some type of user-related data needs to be stored. Fortunately, iOS offers secure storage APIs which allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
 
 ##### Data Protection API
 
@@ -16,7 +16,7 @@ App developers can leverage the iOS *Data Protection* APIs to implement fine-gra
 
 The data protection architecture is based on a hierarchy of keys. The hardware key sits at the top of this hierarchy, and can be used to "unlock" so-called class keys which are associated with different device states (e.g. locked / unlocked).
 
-Every file stored in the iOS file system is encrypted with its own, individual per-file key, which is contained in the file metadata. The metadata is encrypted with the file system key and wrapped with one of the class keys, depending on the protection class selected by the app when creating the file.
+Every file stored in the iOS file system is encrypted with its own individual per-file key, which is contained in the file metadata. The metadata is encrypted with the file system key and wrapped with one of the class keys, depending on the protection class selected by the app when creating the file.
 
 <img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
 *iOS Data Protection Key Hierarchy <sup>[3]</sup>*
@@ -37,9 +37,9 @@ Since iOS 7, the default data protection class is "Protected Until First User Au
 
 ##### The Keychain
 
-The iOS Keychain is used to securely store short, sensitive bits of data, such as encryption keys and session tokens. It is implemented as an SQLite database that can be accessed only through Keychain APIs. The Keychain database is encrypted using the device Key and the user PIN/password (if one has been set by the user).
+The iOS Keychain is used to securely store short, sensitive bits of data, such as encryption keys and session tokens. It is implemented as a SQLite database that can be accessed only through Keychain APIs. The Keychain database is encrypted using the device Key and the user PIN/password (if one has been set by the user).
 
-By default, each app only can access Keychain created by itself. Access can however be shared between apps signed by the same developer by using the "access groups" feature. Access to the Keychain is managed by the <code>securityd</code> daemon, which grants access based on the app's <code>Keychain-access-groups</code>, <code>application-identifier</code> and <code>application-group</code> entitlements. 
+By default, each app can only access the Keychain created by itself. Access can however be shared between apps signed by the same developer by using the "access groups" feature. Access to the Keychain is managed by the <code>securityd</code> daemon, which grants access based on the app's <code>Keychain-access-groups</code>, <code>application-identifier</code> and <code>application-group</code> entitlements.
 
 The KeyChain API consists of the following main operations with self-explanatory names:
 
@@ -48,15 +48,15 @@ The KeyChain API consists of the following main operations with self-explanatory
 - SecItemCopyMatching
 - SecItemDelete
 
-Keychain data is protected using a class structure similar to the one used for file encryption. Items added to the Keychain are encoded as a binary plist and encrypted with using an 128 bit AES per-item key. Note that larger blobs of data are not to meant to be saved directly in the keychain - that's what the Data Protection API is for.
+Keychain data is protected using a class structure similar to the one used for file encryption. Items added to the Keychain are encoded as a binary plist and encrypted using a 128 bit AES per-item key. Note that larger blobs of data are not meant to be saved directly in the keychain - that's what the Data Protection API is for.
 
 - kSecAttrAccessibleAfterFirstUnlock: The data in the keychain item cannot be accessed after a restart until the device has been unlocked once by the user.
-- kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly: The data in the keychain item cannot be accessed after a restart until the device has been unlocked once by the user.
+- kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly: The data in the keychain item cannot be accessed after a restart until the device has been unlocked once by the user. The data will not be included in an iCloud or iTunes backup.
 - kSecAttrAccessibleAlways: The data in the keychain item can always be accessed regardless of whether the device is locked.
-- kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly: The data in the keychain can only be accessed when the device is unlocked. Only available if a passcode is set on the device.
-- kSecAttrAccessibleAlwaysThisDeviceOnly: The data in the keychain item can always be accessed regardless of whether the device is locked.
+- kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly: The data in the keychain can only be accessed when the device is unlocked. Only available if a passcode is set on the device. The data will not be included in an iCloud or iTunes backup.
+- kSecAttrAccessibleAlwaysThisDeviceOnly: The data in the keychain item can always be accessed regardless of whether the device is locked. The data will not be included in an iCloud or iTunes backup.
 - kSecAttrAccessibleWhenUnlocked: The data in the keychain item can be accessed only while the device is unlocked by the user.
-- kSecAttrAccessibleWhenUnlockedThisDeviceOnly: The data in the keychain item can be accessed only while the device is unlocked by the user.
+- kSecAttrAccessibleWhenUnlockedThisDeviceOnly: The data in the keychain item can be accessed only while the device is unlocked by the user. The data will not be included in an iCloud or iTunes backup.
 
 The keychain file is located at:
 
@@ -68,7 +68,7 @@ If necessary during dynamic analysis, the contents of the Keychain can be dumped
 
 #### Static Analysis
 
-Identify sensitive data saved throughout the app. This includes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults without additional encryption. In any case, the encryption must be implemented such that the secret key is stored in the Keychain using secure settings, ideally <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code>.
+Identify sensitive data saved throughout the app. This includes passwords, secret keys, and personally identifyable information, as well as other data identified as sensitive by the client. Look for instances where this data is saved using any of the local storage APIs listed below. Make sure that sensitive data is never stored without appropriate protection. For example, usernames and passwords should not be saved in NSUserDefaults without additional encryption. In any case, the encryption must be implemented such that the secret key is stored in the Keychain using secure settings, ideally <code>kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly</code>.
 
 When looking for instances of insecure data storage in an iOS app you should consider the following possible means of storing data.
 
