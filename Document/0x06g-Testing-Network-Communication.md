@@ -61,46 +61,140 @@ The following is a summarised list of App Transport Security Requirements<sup>[1
 
 The cipher suit must be one of the following:
 
-* TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-* TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
-* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
-* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
-* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
-* TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-* TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-* TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
-* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+* `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA`
+* `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384`
+* `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256`
+* `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
 
 ##### ATS Exceptions
 
-ATS restrictions can be disabled by configuring exceptions in the Info.plist file under the NSAppTransportSecurity key. These exceptions can be applied to:
-
+ATS restrictions can be disabled by configuring exceptions in the Info.plist file under the `NSAppTransportSecurity` key. These exceptions can be applied to:
 * allow insecure connections (HTTP),
 * lower the minimum TLS version,
-* disable PFS and 
+* disable PFS or
 * allow connections to local domains
 
-Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating "to give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed"<sup>[5]</sup>
+ATS exceptions can be applied globally or per domain basis. The application can globally disable ATS, but opt in for individual domains. The following listing from Apple Developer documentation shows the structure of the `NSAppTransportSecurity` dictionary<sup>[1]</sup>.
 
-* NSAllowsArbitraryLoads - disables ATS globally for all the domains
-* NSExceptionAllowsInsecureHTTPLoads - disables ATS for a single domain
-* NSExceptionMinimumTLSVersion - enable support for TLS versions less than 1.2
+```
+NSAppTransportSecurity : Dictionary {
+    NSAllowsArbitraryLoads : Boolean
+    NSAllowsArbitraryLoadsForMedia : Boolean
+    NSAllowsArbitraryLoadsInWebContent : Boolean
+    NSAllowsLocalNetworking : Boolean
+    NSExceptionDomains : Dictionary {
+        <domain-name-string> : Dictionary {
+            NSIncludesSubdomains : Boolean
+            NSExceptionAllowsInsecureHTTPLoads : Boolean
+            NSExceptionMinimumTLSVersion : String
+            NSExceptionRequiresForwardSecrecy : Boolean   // Default value is YES
+            NSRequiresCertificateTransparency : Boolean
+        }
+    }
+}
+```
+Source: Apple Developer Documentation<sup>[1]</sup>.
 
--- TODO: Describe ATS exceptions --
+The following table summarises the global ATS exceptions. For more information about these exceptions, please refer to Table 2 in reference [1].
+
+|  Key | Description |
+| -----| ------------|
+| `NSAllowsArbitraryLoads` | Disable ATS restrictions globally excepts for individual domains specified under `NSExceptionDomains` |
+| `NSAllowsArbitraryLoadsInWebContent` | Disable ATS restrictions for all the connections made from web views |
+| `NSAllowsLocalNetworking` | Allow connection to unqualified domain names and .local domains |
+| `NSAllowsArbitraryLoadsForMedia` | Disable all ATS restrictions for media loaded through the AV Foundations framework |
+
+
+The following table summarises the per-domain ATS exceptions. For more information about these exceptions, please refer to Table 3 in reference [1].
+
+|  Key | Description |
+| -----| ------------|
+| `NSIncludesSubdomains` | Indicates whether ATS exceptions should apply to subdomains of the named domain |
+| `NSExceptionAllowsInsecureHTTPLoads` | Allows HTTP connections to the named domain, but does not affect TLS requirements |
+| `NSExceptionMinimumTLSVersion` | Allows connections to servers with TLS versions less than 1.2 |
+| `NSExceptionRequiresForwardSecrecy` | Disable perfect forward secrecy (PFS) |
+
+
+Starting from January 1 2017, Apple App Store review and requires justification if one of the following ATS exceptions are defined. However this decline is extended later by Apple stating “To give you additional time to prepare, this deadline has been extended and we will provide another update when a new deadline is confirmed”<sup>[5]</sup>
+
+* `NSAllowsArbitraryLoads`
+* `NSAllowsArbitraryLoadsForMedia`
+* `NSAllowsArbitraryLoadsInWebContent`
+* `NSExceptionAllowsInsecureHTTPLoads`
+* `NSExceptionMinimumTLSVersion`
 
 #### Static Analysis
 
-— TODO —
+If the source code is available, open then `Info.plist` file in the application bundle directory using a text editor and look for any exceptions that the application developer has configured. This file should be examined taking the applications context into consideration. 
+
+The following listing is an example of an exception configured to disable ATS restrictions globally. 
+
+```
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+```
+
+If the source code is not available, then the `Info.plist` file should be either can be obtained from a jailbroken device or by extracting the application IPA file.
+
+Since IPA files are ZIP archives, they can be extracted using any zip utility.
+
+```
+$ unzip app-name.ipa
+```
+
+`Info.plist` file can be found in the `Payload/BundleName.app/` directory of the extract. It’s a binary encoded file and has to be converted to a human readable format for the analysis. 
+
+`plutil`<sup>[6]</sup> is a tool that’s designed for this purpose. It comes natively with Mac OS 10.2 and above versions.
+
+The following command shows how to convert the Info.plist file into XML format.
+```
+$ plutil -convert xml1 Info.plist
+```
+
+Once the file is converted to a human readable format, the exceptions can analysed. The application may have ATS exceptions defined to allow it’s normal functionality. For an example, the Firefox iOS application has ATS disabled globally. This exception is acceptable because otherwise the application would not be able to connect to any HTTP web sites or website that do not have the ATS requirements.
+
 
 #### Dynamic Analysis
 
-— TODO —
+--TODO
 
 #### Remediation
+* ATS should always be activated and only be deactivated under certain circumstances.
+* If the application connects to a defined number of domains that the application owner controls, then configure the servers to support the ATS requirements and opt-in for the ATS requirements within the app. In the following example, `example.com` is owned by the applicaiton owner and ATS is enabled for that domain.
+```
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+    <key>NSExceptionDomains</key>
+    <dict>
+        <key>example.com</key>
+        <dict>
+            <key>NSIncludesSubdomains</key>
+            <true/>
+            <key>NSExceptionMinimumTLSVersion</key>
+            <string>TLSv1.2</string>
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <false/>
+            <key>NSExceptionRequiresForwardSecrecy</key>
+            <true/>
+        </dict>
+    </dict>
+</dict>
+```
 
-— TODO —
+* If connections to 3rd party domains are made (that are not under control of the app owner) it should be evaluated what ATS settings are not supported by the 3rd party domain and deactivated.
+* If the application opens third party web sites in web views, then from iOS 10 onwards NSAllowsArbitraryLoadsInWebContent can be used to disable ATS restrictions for the content loaded in web views 
 
 #### References
 
@@ -125,7 +219,8 @@ Starting from January 1 2017, Apple App Store review and requires justification 
 * [2] API Reference NSURLConnection - https://developer.apple.com/reference/foundation/nsurlconnection
 * [3] API Reference NSURLSession - https://developer.apple.com/reference/foundation/urlsession
 * [4] API Reference CFURL - https://developer.apple.com/reference/corefoundation/cfurl-rd7
-* [5] Supporting App Transport Security - https://developer.apple.com/news/?id=12212016b
+* [5] Apple Developer Portal Announcement - Supporting App Transport Security - https://developer.apple.com/news/?id=12212016b
+* [6] OS X Man Pages - Plutil - https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/plutil.1.html
 
 ##### Tools
 
