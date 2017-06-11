@@ -182,6 +182,71 @@ Encryption operations should rely on solid and tested functions provided by the 
 * Check if keys are created or used without taking advantage of the Android onboard features like the KeyStore<sup>[8]</sup>.
 * Check if keys are disclosed.
 
+###### Typical Misuse: Hardcoded Cryptographic Keys
+
+The use of a hard-coded or world-readable cryptographic key significantly increases the possibility that encrypted data may be recovered. Once it is obtained by an attacker, the task to decrypt the sensitive data becomes trivial, and the initial idea to protect confidentiality fails.
+
+When using symmetric cryptography, the key needs to be stored within the device and it is just a matter of time and effort from the attacker to identify it.
+
+Consider the following scenario: An application is reading and writing to an encrypted database but the decryption is done based on a hardcoded key:
+
+```Java
+this.db = localUserSecretStore.getWritableDatabase("SuperPassword123");
+```
+
+Since the key is the same for all App installations it is trivial to obtain it. The advantages of having sensitive data encrypted are gone, and there is effectively no benefit in using encryption in this way. Similarly, look for hardcoded API keys / private keys and other valuable pieces. Encoded/encrypted keys is just another attempt to make it harder but not impossible to get the crown jewels.
+
+Let's consider this piece of code:
+
+```Java
+//A more complicated effort to store the XOR'ed halves of a key (instead of the key itself)
+private static final String[] myCompositeKey = new String[]{
+  "oNQavjbaNNSgEqoCkT9Em4imeQQ=","3o8eFOX4ri/F8fgHgiy/BS47"
+};
+```
+
+Algorithm to decode the original key in this case might look like this<sup>[1]</sup>:
+
+```Java
+public void useXorStringHiding(String myHiddenMessage) {
+  byte[] xorParts0 = Base64.decode(myCompositeKey[0],0);
+  byte[] xorParts1 = Base64.decode(myCompositeKey[1],0);
+
+  byte[] xorKey = new byte[xorParts0.length];
+  for(int i = 0; i < xorParts1.length; i++){
+    xorKey[i] = (byte) (xorParts0[i] ^ xorParts1[i]);
+  }
+  HidingUtil.doHiding(myHiddenMessage.getBytes(), xorKey, false);
+}
+```
+
+Verify common places where secrets are usually hidden:
+* resources (typically at res/values/strings.xml)
+
+Example:
+```xml
+<resources>
+    <string name="app_name">SuperApp</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="secret_key">My_S3cr3t_K3Y</string>
+  </resources>
+```
+
+* build configs, such as in local.properties or gradle.properties
+
+Example:
+```
+buildTypes {
+  debug {
+    minifyEnabled true
+    buildConfigField "String", "hiddenPassword", "\"${hiddenPassword}\""
+  }
+}
+```
+
+* shared preferences, typically at /data/data/package_name/shared_prefs
+
 ##### KeyChain and KeyStore
 
 When going through the source code it should be analyzed if native mechanisms that are offered by Android are applied to the identified sensitive information. Sensitive information must not be stored in clear text but should be encrypted. If sensitive information needs to be stored on the device itself, several API calls are available to protect the data on the Android device by using the **KeyChain<sup>[10]</sup>** and **Keystore<sup>[8]</sup>**. The following controls should therefore be used:
@@ -198,7 +263,6 @@ Install and use the app as it is intended and execute all functions at least onc
 * Check if SQLite databases are available and if they contain sensitive information (usernames, passwords, keys etc.). SQLite databases are stored in `/data/data/<package_name>/databases`.
 * Check Shared Preferences that are stored as XML files in the shared_prefs directory of the app for sensitive information, which is in `/data/data/<package_nam>/shared_prefs`.
 * Check the file system permissions of the files in `/data/data/<package_name>`. Only the user and group created when installing the app (e.g. u0_a82) should have the user rights read, write, execute (rwx). Others should have no permissions to files, but may have the executable flag to directories.
-
 
 #### Remediation
 

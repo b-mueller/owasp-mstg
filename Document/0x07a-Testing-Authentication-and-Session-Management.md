@@ -13,33 +13,36 @@ Cookie-Based Authentication is the traditional authentication mechanism used in 
 
 #### Overview
 
-Applications often have different areas with, on the one hand public and non-privileged information and functions, and on the other hand sensitive and privileged information and functions. Users can legitimately access the first ones without any restriction; however, in order to make sure sensitive and privileged information and functions are protected and accessible only to legitimate users, proper authentication has to take place.  
+Applications often have different areas with, on the one hand public and non-privileged information and functions, and on the other hand sensitive and privileged information and functions. Users can legitimately access the first ones without any restriction; however, in order to make sure sensitive and privileged information and functions are protected and accessible only to legitimate users, proper authentication has to be in place.  
+
+Authentication always need to be handled in the server side code and should never rely on client-side controls. Client-side controls can be used to improve the user workflow and only allow specific actions, but there always need to be the server-side counterpart that defines what a user is allowed to access.
+
+In case Token-Based authentication with JWT is used, please also look at the test case "Testing JSON Web Token (JWT)".
 
 #### Static Analysis
 
-When server source code is available, first identify which authentication mechanisms (Token or Cookie based) is used and enforced on server side. Afterwards locate all sections with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the section. Look for keywords in the server source code that are used to authenticate a user or to retrieve and check an existing session token.
+When server-side source code is available, first identify which authentication mechanism (Token or Cookie based) is used and enforced on server side. Afterwards locate all endpoints with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the endpoint. Look for keywords in the server source code that are used to authenticate a user or to retrieve and check an existing session token.
 
-Authentication mechanisms shouldn't be implemented from scratch, instead they should be build on top of frameworks that offer this functionality. The framework used on the server side should be identified and the usage of the available APIs should be verified if they are used accordingly to best practices. Sample frameworks on server side are:
+Authentication mechanisms shouldn't be implemented from scratch, instead they should be build on top of frameworks that offer this functionality. The framework used on the server side should be identified and the usage of the available authentication APIs/functions should be verified if they are used accordingly to best practices. Widely used frameworks on server side are for example:
 
 - Spring (Java) - https://projects.spring.io/spring-security/
-- PHP - http://php.net/manual/en/features.http-auth.php
+- Struts (Java) - https://struts.apache.org/docs/
+- Laravel (PHP) - https://laravel.com/docs/5.4/authentication
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
-
-JWT is also available for all major programming languages, like PHP<sup>[3]</sup> or Java Spring<sup>[4]</sup>. Please also follow the test cases in the OWASP JWT Cheat Sheet<sup>[1]</sup> if JWT is used. Also the OWASP Testing Guide<sup>[2]</sup> should be consulted for more authentication test cases.
 
 #### Dynamic Analysis
 
-To verify authentication, first all privileged sections a user can access within an app should be explored. For all requests sent to an endpoint, an interception proxy can be used to capture network traffic while being authenticated. Then, try to replay requests while removing authentication information. If the endpoint is still sending back the requested data, that should only be available for authenticated users, authentication checks are not implemented properly on the endpoint.
+To verify authentication, first all privileged endpoints a user can access within an app should be explored. For all requests sent to an endpoint, an interception proxy can be used to capture network traffic while being authenticated. Then, try to replay requests while removing the authentication information. If the endpoint is still sending back the requested data, that should only be available for authenticated users, authentication checks are not implemented properly on the endpoint.
 
-Further attacks methods can be found in the OWASP Testing Guide V4 (OTG-AUTHN-004)<sup>[5]</sup>.
+Further attacks methods can be found in the OWASP Testing Guide V4 (OTG-AUTHN-004)<sup>[3]</sup> and also the OWASP Testing Guide<sup>[2]</sup> should be consulted for more authentication test cases.
 
 #### Remediation
 
-For every section that needs to be protected, implement a mechanism that checks the session token of the user:
-- if there is no session token, the user may not have authenticated before;
-- if a token exists, make sure this token is valid and that it grants the user with sufficient privileges to allow the user to access the section.
+For every endpoint that needs to be protected, implement a mechanism that checks the session token of the user:
+- if there is no session token, the user may not have been authenticated before;
+- if a token exists, make sure this token is valid and that it grants the user with sufficient privileges to allow the user to access the endpoint.
 
-If any of these two conditions raise an issue, reject the request and do not allow the user to start the Activity.
+If any of these two conditions raise an issue, reject the request and do not allow the user to access the endpoint.
 
 #### References
 
@@ -59,9 +62,84 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 [1] OWASP JWT Cheat Sheet for Java: `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
 [2] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
-[3] PHP JWT - https://github.com/firebase/php-jwt
-[4] Java Spring with JWT - http://projects.spring.io/spring-security-oauth/docs/oauth2.html
-[5] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema
+[3] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema_(OTG-AUTHN-004)
+
+
+### Testing JSON Web Token (JWT)
+
+#### Overview
+
+The standard RFC 7519 is defining JSON Web Token (JWT). JWT ensures the integrity and secure transmission of information within a JSON object between two parties. For mobile apps it's more and more used to authenticate both, the message sender and receiver.
+
+An example of an encoded JSON Web Token can be found below<sup>[5]</sup>.
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+```
+
+JWTs are Base-64 encoded and are divided into three parts:
+
+* **Header** Algorith and Token Type (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9):
+```JSON
+{"alg":"HS256","typ":"JWT"}
+```
+* **Payload** Data  (eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9):
+```JSON
+{"sub":"1234567890","name":"John Doe","admin":true}
+```
+* **Verify Signature** (TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ):
+```JSON
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret
+)
+```
+
+JWT implementations are available for all major programming languages, like PHP<sup>[1]</sup> or Java Spring<sup>[2]</sup>.
+
+#### Static Analysis
+
+[Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.]
+
+[Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>.]
+
+
+#### Dynamic Analysis
+
+Several known vulnerabilities can be checked while executing a dynamic analysis:
+* NONE hashing algorithm:
+  *
+* Token Storage on client side:
+  * When using a mobile app that uses JWT it should be verified where the token is stored locally on the device<sup>[5]</sup>.
+
+
+#### Remediation
+
+Store the JWT using the browser sessionStorage container and add it as a Bearer with JavaScript when calling service.
+Please also follow the test cases in the OWASP JWT Cheat Sheet<sup>[1]</sup> if JWT is used.
+
+#### References
+
+##### OWASP Mobile Top 10 2016
+
+* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
+
+##### OWASP MASVS
+
+- 4.1: "If the app provides users with access to a remote service, an acceptable form of authentication such as username/password authentication is performed at the remote endpoint."
+
+##### CWE
+
+- CWE-287: Improper Authentication - https://cwe.mitre.org/data/definitions/287.html
+
+##### Info
+
+* [1] RFC 7519 JSON Web Token (JWT) - https://tools.ietf.org/html/rfc7519
+* [2] PHP JWT - https://github.com/firebase/php-jwt
+* [3] Java Spring with JWT - http://projects.spring.io/spring-security-oauth/docs/oauth2.html
+* [4] OWASP JWT Cheat Sheet - `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
+* [5] Sample of JWT Token - https://jwt.io/#debugger
 
 
 ### Testing Session Management

@@ -1,113 +1,12 @@
 ## Testing Cryptography in Android Apps
 
-### Testing for Hardcoded Cryptographic Keys
-
-#### Overview
-
--- REVIEW --
-The use of a hard-coded or world-readable cryptographic key significantly increases the possibility that encrypted data may be recovered. Once it is obtained by an attacker, the task to decrypt the sensitive data becomes trivial, and the initial idea to protect confidentiality fails.
-
-When using symmetric cryptography, the key needs to be stored within the device and it is just a matter of time and effort from the attacker to identify it.
-
-#### Static Analysis
-
-Consider the following scenario: An application is reading and writing to an encrypted database but the decryption is done based on a hardcoded key:
-
-```Java
-this.db = localUserSecretStore.getWritableDatabase("SuperPassword123");
-```
-
-Since the key is the same for all App installations it is trivial to obtain it. The advantages of having sensitive data encrypted are gone, and there is effectively no benefit in using encryption in this way. Similarly, look for hardcoded API keys / private keys and other valuable pieces. Encoded/encrypted keys is just another attempt to make it harder but not impossible to get the crown jewels.
-
-Let's consider this piece of code:
-
-```Java
-//A more complicated effort to store the XOR'ed halves of a key (instead of the key itself)
-private static final String[] myCompositeKey = new String[]{
-  "oNQavjbaNNSgEqoCkT9Em4imeQQ=","3o8eFOX4ri/F8fgHgiy/BS47"
-};
-```
-
-Algorithm to decode the original key in this case might look like this<sup>[1]</sup>:
-
-```Java
-public void useXorStringHiding(String myHiddenMessage) {
-  byte[] xorParts0 = Base64.decode(myCompositeKey[0],0);
-  byte[] xorParts1 = Base64.decode(myCompositeKey[1],0);
-
-  byte[] xorKey = new byte[xorParts0.length];
-  for(int i = 0; i < xorParts1.length; i++){
-    xorKey[i] = (byte) (xorParts0[i] ^ xorParts1[i]);
-  }
-  HidingUtil.doHiding(myHiddenMessage.getBytes(), xorKey, false);
-}
-```
-
-#### Dynamic Analysis
-
-Verify common places where secrets are usually hidden:
-* resources (typically at res/values/strings.xml)
-
-Example:
-```xml
-<resources>
-    <string name="app_name">SuperApp</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="secret_key">My_S3cr3t_K3Y</string>
-  </resources>
-```
-
-* build configs, such as in local.properties or gradle.properties
-
-Example:
-```
-buildTypes {
-  debug {
-    minifyEnabled true
-    buildConfigField "String", "hiddenPassword", "\"${hiddenPassword}\""
-  }
-}
-```
-
-* shared preferences, typically at /data/data/package_name/shared_prefs
-
-#### Remediation
-
-If you need to store a key for repeated use, use a mechanism, such as KeyStore<sup>[2]</sup>, that provides a mechanism for long term storage and retrieval of cryptographic keys.
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M6 - Broken Cryptography
-
-##### OWASP MASVS
-- V3.1: "The app does not rely on symmetric cryptography with hardcoded keys as a sole method of encryption"
-- V3.5: "The app doesn't re-use the same cryptographic key for multiple purposes"
-
-##### CWE
-* CWE-320: Key Management Errors
-* CWE-321: Use of Hard-coded Cryptographic Key
-
-##### Info
-
-[1] Hiding Passwords in Android - https://github.com/pillfill/hiding-passwords-android/
-[2] KeyStore - https://developer.android.com/reference/java/security/KeyStore.html
-[3] Hiding Secrets in Android - https://rammic.github.io/2015/07/28/hiding-secrets-in-android-apps/
-[4] Securely storing secrets in Android - https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3#.7z5yruotu
-
-##### Tools
-* [QARK](https://github.com/linkedin/qark)
-* [Mobile Security Framework](https://github.com/ajinabraham/Mobile-Security-Framework-MobSF)
-
-
-
 ### Verifying the Configuration of Cryptographic Standard Algorithms
 
 #### Overview
 
--- REVIEW --
-Choosing good cryptographic algorithm alone is not enough. Often security of otherwise sound algorithms can be affected if misconfigured. Many previously strong algorithms and their configurations are now considered vulnerable or non-compliant with best practices. It is therefore important to periodically check current best practices and adjust configurations accordingly.  
+A general rule in app development is that one should never attempt to invent their own cryptography. In mobile apps in particular, any form of crypto should be implemented using existing, robust implementations. In 99% of cases, this simply means using the data storage APIs and cryptographic libraries that come with the mobile OS.
+
+Android developers don't need to bother much with the intricate details of cryptography most of the time. However, even when using standard algorithms can be affected if misconfigured. 
 
 #### Static Analysis
 
@@ -154,7 +53,6 @@ Use cryptographic algorithm configurations that are currently considered strong,
 
 -- TODO [Add relevant tools for "Verifying the Configuration of Cryptographic Standard Algorithms"] --
 * Enjarify - https://github.com/google/enjarify
-
 
 
 ### Testing Random Number Generation

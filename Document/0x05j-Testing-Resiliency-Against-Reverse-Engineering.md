@@ -10,7 +10,7 @@ On Android, we define the term "root detection" a bit more broadly to include de
 
 ##### Common Root Detection Methods
 
-In the following section, we list some of the root detection methods you'll commonly encounter. You'll find some of those checks implemented in the Crackme examples that accompany the OWASP Mobile Testing Guide <sup>[1]</sup>.
+In the following section, we list some of the root detection methods you'll commonly encounter. You'll find some of those checks implemented in the crackme examples that accompany the OWASP Mobile Testing Guide <sup>[1]</sup>.
 
 ###### SafetyNet
 
@@ -905,7 +905,7 @@ To experiment with the detection methods above, you can download and build the A
 
 ##### Bypassing Detection of Reverse Engineering Tools
 
-1. Patch out the anti-debugging functionality. Disable the unwanted behaviour by simply overwriting the respective bytecode or native code it with NOP instructions.
+1. Patch out the anti-debugging functionality. Disable the unwanted behaviour by simply overwriting the respective bytecode or native code with NOP instructions.
 2. Use Frida or Xposed to hook APIs to hook file system APIs on the Java and native layers. Return a handle to the original file instead of the modified file.
 3. Use Kernel module to intercept file-related system calls. When the process attempts to open the modified file, return a file descriptor for the unmodified version of the file instead.
 
@@ -962,7 +962,7 @@ In the context of anti-reversing, the goal of emulator detection is to make it a
 
 #### Emulator Detection Examples
 
-There are several static indicators that indicate the device in question is being emulated. While all of these API calls could be hooked, this provides a modest first line of defense.
+There are several indicators that indicate the device in question is being emulated. While all of these API calls could be hooked, this provides a modest first line of defense.
 
 The first set of indicaters stem from the build.prop file
 
@@ -1007,14 +1007,25 @@ TelephonyManager.getVoiceMailNumber()                   15552175049             
 
 Keep in mind that a hooking framework such as Xposed or Frida could hook this API to provide false data.
 
--- TODO [Dynamic Detection Techniques] --
-
-
 #### Bypassing Emulator Detection
 
+1. Patch out the emulator detection functionality. Disable the unwanted behaviour by simply overwriting the respective bytecode or native code with NOP instructions.
+2. Use Frida or Xposed to hook APIs to hook file system APIs on the Java and native layers. Return innocent looking values (preferably taken from a real device) instead of the tell-tale emulator values. For example, you can override the <code>TelephonyManager.getDeviceID()</code> method to return an IMEI value.
+
+Refer to the "Tampering and Reverse Engineering section" for examples of patching, code injection and kernel modules.
 
 #### Effectiveness Assessment
 
+Install and run the app in the emulator. The app should detect this and terminate, or refuse to run the functionality that is meant to be protected. 
+
+Work on bypassing the defenses and answer the following questions:
+
+- How difficult is it to identify the emulator detection code using static and dynamic analysis?
+- Can the detection mechanisms be bypassed using trivial methods (e.g. hooking a single API function)?
+- Did you need to write custom code to disable the anti-emulation feature(s)? How much time did you need to invest?
+- What is your subjective assessment of difficulty?
+
+For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
 #### References
 
@@ -1036,8 +1047,7 @@ N/A
 
 ##### Tools
 
--- TODO [Add links to tools for "Testing Emulator Detection"] --
-* Enjarify - https://github.com/google/enjarify
+N/A
 
 ### Testing Runtime Integrity Checks
 
@@ -1052,7 +1062,7 @@ There is some overlap with the category "detecting reverse engineering tools and
 
 ##### Runtime Integrity Check Examples
 
-**Checking the Java stack trace for suspicous method calls**
+**Detecting tampering with the Java Runtime**
 
 Detection code from the dead && end blog <sup>[3]</sup>.
 
@@ -1086,7 +1096,7 @@ catch(Exception e) {
 }
 ```
 
-**Native Hook Detection**
+**Detecting Native Hooks**
 
 With ELF binaries, native function hooks can be installed by either overwriting function pointers in memory (e.g. GOT or PLT hooking), or patching parts of the function code itself (inline hooking). Checking the integrity of the respective memory regions is one technique to detect this kind of hooks.
 
@@ -1096,15 +1106,20 @@ In contrast to GNU <code>ld</code>, which resolves symbol addresses only once th
 
 *Inline hooks* work by overwriting a few instructions at the beginning or end of the function code. During runtime, this so-called trampoline redirects execution to the injected code. Inline hooks can be detected by inspecting the prologues and epilogues of library functions for suspect instructions, such as far jumps to locations outside the library.
 
-#### Bypassing Runtime Integrity Checks
+#### Bypass and Effectiveness Assessment
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+Make sure that all file-based detection of reverse engineering tools is disabled. Then, inject code using Xposed, Frida and Substrate, and attempt to install native hooks and Java method hooks. The app should detect the "hostile" code in its memory and respond accordingly. For a more detailed assessment, identify and bypass the detection mechanisms employed and use the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
 
--- TODO [Confirm purpose of sentence "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+Work on bypassing the checks using the following techniques:
+
+1. Patch out the integrity checks. Disable the unwanted behaviour by overwriting the respective bytecode or native code with NOP instructions.
+2. Use Frida or Xposed to hook APIs to hook the APIs used for detection and return fake values. 
+
+Refer to the "Tampering and Reverse Engineering section" for examples of patching, code injection and kernel modules.
 
 #### Effectiveness Assessment
 
-Make sure that all file-based detection of reverse engineering tools is disabled. Then, inject code using Xposed, Frida and Substrate, and attempt to install native hooks and Java method hooks. The app should detect the "hostile" code in its memory and respond accordingly. For a more detailed assessment, identify and bypass the detection mechanisms employed and use the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
+
 
 #### References
 
@@ -1358,7 +1373,7 @@ Attempt to decompile the bytecode and disassemble any included libary files, and
 - String resources and strings in binaries are encrypted;
 - Code and data related to the protected functionality is encrypted, packed, or otherwise concealed.
 
-For a more detailed assessment, refer to the "Assessing Obfuscation" section of the  "Assessing Software Protection Schemes" chapter.
+For a more detailed assessment, you need to have a detailed understanding of the threats defended against and the obfuscation methods used. Refer to the "Assessing Obfuscation" section of the  "Assessing Software Protection Schemes" chapter for more information.
 
 #### References
 

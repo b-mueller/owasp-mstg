@@ -75,6 +75,7 @@ Static analysis should be used to verify the APK signature.
 #### Remediation
 
 Developers need to make sure that release builds are signed with the appropriate certificate from the release keystore. In Android Studio, this can be done manually or by configuring creating a signing configuration and assigning it to the release build type<sup>[2]</sup>.
+
 The signing configuration can be managed through the Android Studio GUI or the <code>signingConfigs {}</code> block in <code>build.gradle</code>. The following values need to be set to activate both v1 and v2 scheme:
 
 ```
@@ -99,7 +100,6 @@ N/A
 
 ##### Tools
 - jarsigner - http://docs.oracle.com/javase/7/docs/technotes/tools/windows/jarsigner.html
-
 
 
 ### Testing If the App is Debuggable
