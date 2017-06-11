@@ -25,6 +25,7 @@ As a result only requirement "4.6	Biometric authentication, if any, is not event
 
 #### Remediation
 
+Example: https://www.raywenderlich.com/92667/securing-ios-data-keychain-touch-id-1password
 -- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Biometric Authentication".] --
 
 #### References
