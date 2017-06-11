@@ -8,15 +8,15 @@ Using TLS for transporting sensitive information over the network is essential f
 
 #### Static Analysis
 
-There are 2 main issues related with validating TLS connection: the first one is verification if a certificate comes from trusted source and the second one is a check whether the endpoint server presents the right certificate [3].
+There are 2 main issues related with validating TLS connection: the first one is verification if a certificate comes from trusted source and the second one is a check whether the endpoint server presents the right certificate <sup>[3]</sup>.
 
 ##### Verifying the Server Certificate
 
-A mechanism responsible for verifying conditions to establish a trusted connection in Android is called `TrustedManager`. Conditions to be checked at this point, are the following:
+A mechanism responsible for verifying conditions to establish a trusted connection in Android is called "TrustManager". Conditions to be checked at this point, are the following:
 
 * is the certificate signed by a "trusted" CA?
 * is the certificate expired?
-* Is the certificate self-sgined?
+* Is the certificate self-signed?
 
 You should look in a code if there are control checks of aforementioned conditions. For example, the following code will accept any certificate:
 

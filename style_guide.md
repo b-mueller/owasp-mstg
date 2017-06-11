@@ -48,6 +48,15 @@ Books:
 
 For references to other chapters in the MSTG, simply name the chapter, e.g.: 'See also the chapter "Basic Security Testing"', etc. The MSTG should be convenenient to read as a printed book, so use internal references sparingly.
 
+## Insert pictures
+
+Pictures should be uploaded to the Images/Chapters directory. Afterwards they should be embedded by using the image tag, a width of 500px should be specified. For example:
+
+```HTML
+<img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
+*iOS Data Protection Key Hierarchy <sup>[3]</sup>*
+```
+
 ## Code and Shell Commands
 
 Use code tags when including sample code and shell commands. In Markdown, code blocks are denoted by triple backticks. GitHub also supports syntax highlighting for a variety of languages. For example, a Java code block should be annotated as follows:
