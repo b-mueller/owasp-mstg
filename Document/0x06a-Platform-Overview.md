@@ -1,6 +1,8 @@
 ## iOS Platform Overview
 
--- [TODO - iOS Platform introduction --]
+iOS is the operating system that powers all of Apple's iDevices, including the iPhone, iPad, and iPod Touch. It is a derivate of Mac OS (formerly OS X), and as such runs a modified version version of the XNU kernel. Compared to their Desktop relatives however, iOS apps run in a more restricted environment: They are isolated from each other on the file system level, and are significantly limited in terms of system API access. Apple also keeps tight control over which apps are allowed to run on iOS devices.
+
+In many ways, iOS is more "closed" than Android. Sideloading is only possible with jailbreak or complicated workarounds. There is hardly any IPC functionality to speak of.
 
 ### The iOS Security Architecture
 
@@ -35,6 +37,7 @@ The sandbox is an access control technology that was provided for iOS and it is 
 
 The iOS Sandbox is derived from TrustedBSD MAC framework implemented as kernel extension 'Seatbelt'. 
 iPhone Dev Wiki (http://iphonedevwiki.net/index.php/Seatbelt) provides some (a bit outdated) information about the sandbox. 
+
 As a principle, all user applications run under the same user `mobile`, with only a few system applications and services running as `root`. Access to all resources, like files, network sockets, IPCs, shared memory, etc. will be then controlled by the sandbox.
 
 #### Code Signing

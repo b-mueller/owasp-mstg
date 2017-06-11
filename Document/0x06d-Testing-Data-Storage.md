@@ -428,11 +428,19 @@ UIPasteboard *pb = [UIPasteboard generalPasteboard];
 
 #### Overview
 
--- TODO [Add content on overview of "Testing Whether Sensitive Data Is Exposed via IPC Mechanisms"] --
+Inter Process Communication (IPC) is a method that allows processes to send each other messages and data<sup>[1]</sup>. Due to security reasons each process get's it's own memory assigned. Through this design feature it's not possible by process A to modify any content in the memory of process B. In case two processes need to communicate with each other, different methods are available to implement IPC on iOS<sup>[2]</sup>:
+
+* XPC
+* (Distributed) Notifications
+* (Distributed) Objects
+* libobjcipc
+* LightMessaging
+* Pasteboard
+* AppleEvents & AppleScript
 
 #### Static Testing
 
--- TODO [Add content on white-box testing of "Testing Whether Sensitive Data Is Exposed via IPC Mechanisms"] --
+
 
 #### Dynamic Testing
 
@@ -455,8 +463,8 @@ UIPasteboard *pb = [UIPasteboard generalPasteboard];
 - CWE
 
 #### Info
--- TODO --
-
+[1] iPhoneDevWiki IPC - http://iphonedevwiki.net/index.php/IPC
+[2] Inter-Process Communication - http://nshipster.com/inter-process-communication/
 
 ### Testing for Sensitive Data Disclosure Through the User Interface
 
