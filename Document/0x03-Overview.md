@@ -64,26 +64,11 @@ All requirements specified in the MASVS are described in technical detail in the
 
 The guide is organized as follows: 
 
-- This introduction describes the layout of the Mobile Security Testing Guide, and explains what makes mobile security testing unique. 
+- In the Testing Processes and Techniques Section, we present the mobile app security testing methodology, vulnerability analysis techniques, security testing in the SDLC, and vulnerability analysis techniques. 
 
-- The Testing Processes and Techniques Section presents the mobile app security testing methodology, vulnerability analysis techniques, security testing in the SDLC, and vulnerability analysis techniques. 
+- The Android Testing Guide covers the everything specific to the Android platform, including security basics, security test cases, and reverse engineering and tampering techniques and preventions.
 
-- The Android Testing Guide covers the android platform, security basics, security test cases, and reverse engineering and tampering techniques and preventions.
+- The iOS Testing Guide Testing Guide covers everything specific to iOS, including an overview of the iOS OS, security testing, reverse engineering and anti-reversing.
 
-- The iOS Testing Guide Testing Guide covers everything the Android Testing Guide covers but on iOS devices. 
+- The appendix presents technical test cases that apply independent of mobile OS, such as authentication and session management endpoint, network communications, and cryptography. We also include a methodology for assessing software protection schemes.
 
-- The appendix presents some technical test cases such as authentication and session management endpoint, network communications, and cryptography that are not Android or iOS specific followed by a set of testing tools. 
-
-## References
-
-* [1] M1 - Improper Platform Usage - https://www.owasp.org/index.php/Mobile_Top_10_2016-M1-Improper_Platform_Usage
-* [2] M2 - Insecure Data Storage - https://www.owasp.org/index.php/Mobile_Top_10_2016-M2-Insecure_Data_Storage
-* [3] M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
-* [4] M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
-* [5] M5 - Insufficient Cryptography - https://www.owasp.org/index.php/Mobile_Top_10_2016-M5-Insufficient_Cryptography
-* [6] M6 - Insecure Authorization - https://www.owasp.org/index.php/Mobile_Top_10_2016-M6-Insecure_Authorization
-* [7] M7 - Poor Code Quality - https://www.owasp.org/index.php/Mobile_Top_10_2016-M7-Poor_Code_Quality
-* [8] M8 - Code Tampering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M8-Code_Tampering
-* [9] M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
-* [10] M10 - Extraneous Functionality - https://www.owasp.org/index.php/Mobile_Top_10_2016-M10-Extraneous_Functionality
-* [11] OWASP Mobile Top 2016 Project Page - https://www.owasp.org/index.php/Mobile_Top_10_2016-Top_10
