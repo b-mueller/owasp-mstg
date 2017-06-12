@@ -86,6 +86,9 @@
 
 #### Overview
 
+
+Check: https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/Inter-AppCommunication/Inter-AppCommunication.html
+https://labs.mwrinfosecurity.com/blog/needle-how-to/ (dynamic/ipc/open_uri: Test IPC attacks by launching URI Handlers)
 -- TODO [Provide a general description of the issue "Testing Custom URL Schemes".]
 
 #### Static Analysis
@@ -173,7 +176,7 @@ The WebView object is used to embed a web browser in your iOS application. It is
 
 #### Static Analysis
 
-Depending on your iOS version a WebView object can be implemented using UIWebView (for iOS versions 7.1.2 and older)<sup>[1]</sup> or WKWebView (for iOS in version 8.0 and later)<sup>[2]</sup>. WKWebView is recommended to be used. 
+Depending on your iOS version a WebView object can be implemented using UIWebView (for iOS versions 7.1.2 and older)<sup>[1]</sup> or WKWebView (for iOS in version 8.0 and later)<sup>[2]</sup>. WKWebView is recommended to be used.
 
 The WKWebView object allows for JavaScript execution by default. That may raise a serious risk of running arbitrary code on user's device via WebView object. If your WebView does not require executing JavaScript as it's just display a static web page, you should definitely disable it. You can do it using preferences of an object WKPreferences<sup>[3]</sup>, like in the following example:
 
@@ -187,21 +190,21 @@ The WKWebView object allows for JavaScript execution by default. That may raise 
 @implementation ViewController
 
 - (void)viewDidLoad {
-    
+
     NSURL *url = [NSURL URLWithString:@"http://www.example.com/"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     WKPreferences *pref = [[WKPreferences alloc] init];
-    
+
     //Disable javascript execution:
     [pref setJavaScriptEnabled:NO];
     [pref setJavaScriptCanOpenWindowsAutomatically:NO];
-    
+
     WKWebViewConfiguration *conf = [[WKWebViewConfiguration alloc] init];
     [conf setPreferences:pref];
     _webView = [[WKWebView alloc]initWithFrame:CGRectMake(self.view.frame.origin.x,85, self.view.frame.size.width, self.view.frame.size.height-85) configuration:conf] ;
     [_webView loadRequest:request];
     [self.view addSubview:_webView];
-    
+
 }
 
 ```
@@ -218,12 +221,12 @@ A Dynamic Analysis depends on different surrounding conditions, as there are dif
 
 #### Remediation
 
-The UIWebView should be avoided and WKWebView used instead. JavaScript is enabled by default in a WKWebView and should be disabled if not needed. This reduces the attack surface and potential threats to the application. 
+The UIWebView should be avoided and WKWebView used instead. JavaScript is enabled by default in a WKWebView and should be disabled if not needed. This reduces the attack surface and potential threats to the application.
 
 In order to address these attack vectors, the outcome of the following checks should be verified:
 
 * that all functions offered by the endpoint need to be free of XSS vulnerabilities<sup>[4]</sup>.
- 
+
 * that the HTTPS communication need to be implemented according to the best practices to avoid MITM attacks (see "Testing Network Communication").
 
 

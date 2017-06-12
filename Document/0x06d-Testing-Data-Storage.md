@@ -428,27 +428,62 @@ UIPasteboard *pb = [UIPasteboard generalPasteboard];
 
 #### Overview
 
-Inter Process Communication (IPC) is a method that allows processes to send each other messages and data<sup>[1]</sup>. Due to security reasons each process get's it's own memory assigned. Through this design feature it's not possible by process A to modify any content in the memory of process B. In case two processes need to communicate with each other, different methods are available to implement IPC on iOS<sup>[2]</sup>:
+Inter Process Communication (IPC) is a method that allows processes to send each other messages and data<sup>[1]</sup>. In case two processes need to communicate with each other, different methods are available to implement IPC on iOS:
 
-* XPC
-* (Distributed) Notifications
-* (Distributed) Objects
-* libobjcipc
-* LightMessaging
-* Pasteboard
-* AppleEvents & AppleScript
+* **XPC Services**<sup>[3]</sup>: XPC is a structured, asynchronous interprocess communication library which provides basic interprocess communication and is managed by `launchd`. It runs with the most restricted environment possible: sandboxed with minimal file system access, network access, and no root privilege escalation. There are two different APIs, when working with XPC Services:
+  * NSXPCConnection API and
+  * XPC Services API
+* **Mach Ports**<sup>[5]</sup>: All IPC communication ultimately relies on the Mach Kernel API. Mach Ports allow for local communication (on the same device) only. They can either be implemented natively or by using Core Foundation (CFMachPort) and Foundation (NSMachPort) wrappers.
+* **NSFileCoordinator**: The class NSFileCoordinator can be used to manage and exchange data between apps through files that are accessible on the local file system for different processes.
+
 
 #### Static Testing
 
+The following section summarizes different keywords that you should look for in order to identify IPC implementations within iOS source code.
 
+##### XPC Services
+
+Several classes might be used when implementing the NSXPCConnection API:
+
+* NSXPCConnection
+* NSXPCInterface
+* NSXPCListener
+* NSXPCListenerEndpoint
+
+Several security attributes for the connection can be set and should be verified<sup>[7]</sup>.
+
+For the XPC Services API, which are C-based, the availability of the following two files in the Xcode project should be checked:
+
+* xpc.h<sup>[4]</sup>
+* connection.h
+
+##### Mach Ports
+
+Keywords to look for in low-level implementations:
+* mach_port_t
+* mach_msg_*
+
+Keywords to look for in high-level implementations (Core Foundation and Foundation wrappers):
+* CFMachPort
+* CFMessagePort
+* NSMachPort
+* NSMessagePort
+
+
+##### NSFileCoordinator
+
+Keywords to look for:
+* NSFileCoordinator
 
 #### Dynamic Testing
 
--- TODO [Add content on black-box testing of "Testing Whether Sensitive Data Is Exposed via IPC Mechanisms"] --
+IPC mechanisms should be verified via static analysis in the iOS source code. At this point of time no tool is availalbe on iOS to verify IPC usage.
 
 #### Remediation
 
--- TODO [Add remediation on "Testing Whether Sensitive Data Is Exposed via IPC Mechanisms"] --
+XPC services is the most secure and flexible way when implementing IPC on iOS and should be used primarily. 
+
+NSFileCoordinator<sup>[6]</sup> methods run synchronously, so your code will block until they complete. That's convenient since you don't have to wait for an asynchronous block callback. But it also means that they block the current thread.
 
 #### References
 
@@ -460,11 +495,17 @@ Inter Process Communication (IPC) is a method that allows processes to send each
 - V2.6: "No sensitive data is exposed via IPC mechanisms."
 
 ##### CWE
-- CWE
+- CWE-634 - Weaknesses that Affect System Processes
 
 #### Info
 [1] iPhoneDevWiki IPC - http://iphonedevwiki.net/index.php/IPC
 [2] Inter-Process Communication - http://nshipster.com/inter-process-communication/
+[3] XPC Services - https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingXPCServices.html
+[4] xpc.h - https://developer.apple.com/documentation/xpc/xpc_services_xpc.h
+[5] NSMachPort - https://developer.apple.com/documentation/foundation/nsmachport
+[6] NSFileCoordinator - http://www.atomicbird.com/blog/sharing-with-app-extensions
+[7] Security Attributes of NSXPCConnection -  https://www.objc.io/issues/14-mac/xpc/#security-attributes-of-the-connection
+
 
 ### Testing for Sensitive Data Disclosure Through the User Interface
 

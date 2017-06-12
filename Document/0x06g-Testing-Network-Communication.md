@@ -1,49 +1,8 @@
 ## Testing Network Communication in iOS Apps
 
-### Testing Endpoint Identity Verification
+Almost every every iOS app acts as a client to one or more remote services. As this network communcation usually takes place of the public Internet, and often over unstrusted networks such as public Wifi, classical, network based-attacks become a potential issue.
 
-#### Overview
-
--- TODO [Provide a general description of the issue "Testing Endpoint Identity Verification".]
-
-#### Static Analysis
-
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
-
--- TODO [Add content on "Testing Endpoint Identity Verification" with source code] --
-
-#### Dynamic Analysis
-
--- TODO [Describe how to test for this issue "Testing Endpoint Identity Verification" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
-
-#### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Endpoint Identity Verification".] --
-
-#### References
-
-#### OWASP Mobile Top 10 2016
-
-* M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
-
-##### OWASP MASVS
-
-* V5.3: "The app verifies the X.509 certificate of the remote endpoint when the secure channel is established. Only certificates signed by a valid CA are accepted."
-
-##### CWE
-
-* CWE-296 - Improper Following of a Certificate's Chain of Trust - https://cwe.mitre.org/data/definitions/296.html
-* CWE-297 - Improper Validation of Certificate with Host Mismatch - https://cwe.mitre.org/data/definitions/297.html
-* CWE-298 - Improper Validation of Certificate Expiration - https://cwe.mitre.org/data/definitions/298.html
-
-##### Info
-
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
-
-##### Tools
-
--- TODO [Add relevant tools for "Testing Endpoint Identity Verification"] --
+Most modern mobile apps use variants of http-based (web-)services, as these protocols are well-documented and supported. On iOS, the The <code>NSURLConnection</code> class provides convenience class methods to load URL requests asynchronously and synchronously.
 
 ### Testing App Transport Security
 
@@ -225,6 +184,52 @@ Once the file is converted to a human readable format, the exceptions can analys
 ##### Tools
 
 — TODO —
+
+### Testing Endpoint Identity Verification
+
+#### Overview
+
+-- TODO [Provide a general description of the issue "Testing Endpoint Identity Verification".]
+
+#### Static Analysis
+
+-- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+
+-- TODO [Add content on "Testing Endpoint Identity Verification" with source code] --
+
+#### Dynamic Analysis
+
+-- TODO [Describe how to test for this issue "Testing Endpoint Identity Verification" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
+
+#### Remediation
+
+-- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Endpoint Identity Verification".] --
+
+#### References
+
+#### OWASP Mobile Top 10 2016
+
+* M3 - Insecure Communication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M3-Insecure_Communication
+
+##### OWASP MASVS
+
+* V5.3: "The app verifies the X.509 certificate of the remote endpoint when the secure channel is established. Only certificates signed by a valid CA are accepted."
+
+##### CWE
+
+* CWE-296 - Improper Following of a Certificate's Chain of Trust - https://cwe.mitre.org/data/definitions/296.html
+* CWE-297 - Improper Validation of Certificate with Host Mismatch - https://cwe.mitre.org/data/definitions/297.html
+* CWE-298 - Improper Validation of Certificate Expiration - https://cwe.mitre.org/data/definitions/298.html
+
+##### Info
+
+- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
+- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+
+##### Tools
+
+-- TODO [Add relevant tools for "Testing Endpoint Identity Verification"] --
+
 
 ### Testing Custom Certificate Stores and SSL Pinning
 
