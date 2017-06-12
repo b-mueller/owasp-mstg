@@ -19,9 +19,10 @@ The [OWASP Summit 2017](http://owaspsummit.org) will have a whole 5-days track d
 
 ### General Testing Guide
 
-- [Mobile App Taxnonomy](Document/0x04-Testing-Processes-and-Techniques.md#user-content-mobile-app-taxonomy)
-- [Mobile App Security Testing](Document/0x04-Testing-Processes-and-Techniques.md#user-content-mobile-app-security-testing)
-- [Security Testing in the Software Development Lifecycle](Document/0x04-Testing-Processes-and-Techniques.md#user-content-security-testing-in-the-software-development-lifecycle)
+- [Mobile App Taxonomy](Document/0x04a-Mobile-App-Taxonomy.md)
+- [Mobile App Security Testing](Document/0x04b-Mobile-App-Security-Testing.md)
+- [Tampering and Reverse Engineering](Document/0x04c-Tampering-and-Reverse-Engineering.md)
+- [Security Testing in the Software Development Lifecycle](Document/0x04d-Security-Testing-SDLC.md)
 
 ### Android Testing Guide
 
