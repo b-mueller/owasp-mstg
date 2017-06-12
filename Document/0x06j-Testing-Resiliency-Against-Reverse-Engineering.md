@@ -1,4 +1,5 @@
-## Testing Anti-Reversing Defenses on iOS
+Testing Anti-Reversing Defenses on iOS
+--------------------------------------
 
 ### Testing Jailbreak Detection
 
@@ -10,7 +11,7 @@ In the context of reverse engineering defense, jailbreak detection mechansism ar
 
 Checking for the existence of files and directories typically associated with jailbreaks, such as:
 
-~~~
+```
 /Applications/Cydia.app
 /Applications/FakeCarrier.app
 /Applications/Icy.app
@@ -43,13 +44,13 @@ Checking for the existence of files and directories typically associated with ja
 /var/lib/cydia
 /var/log/syslog
 /var/tmp/cydia.log
-~~~
+```
 
 ##### Checking File Permissions
 
 Attempting to write a file to the /private/ directory. This should only be successful on jailbroken devices.
 
-~~~
+```
 
 NSError *error;
 NSString *stringToBeWritten = @"This is a test.";
@@ -63,17 +64,17 @@ if(error==nil){
    [[NSFileManager defaultManager] removeItemAtPath:@"/private/jailbreak.txt" error:nil];
  }
 
-~~~
+```
 
 ##### Checking Protocol Handlers
 
-Attempting to open a Cydia URL. The Cydia app store, which is installed by default by practically every jailbreaking tool, installs the cydia:// protocol handler. 
+Attempting to open a Cydia URL. The Cydia app store, which is installed by default by practically every jailbreaking tool, installs the cydia:// protocol handler.
 
-~~~
+```
 if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://package/com.example.package"]]){
-~~~
+```
 
-##### Calling System APIs 
+##### Calling System APIs
 
 -- TODO [Fork-based check] --
 
@@ -91,21 +92,18 @@ Executing privileged actions. Calling the system() function with a NULL argument
 
 Once you start the application, which has jailbreak detection enabled on a jailbroken device, you will notice one of the following:
 
-1. The application closes immediately without any notification
-2. There is a popup window indicating that the application won't run on a jailbroken device
+1.	The application closes immediately without any notification
+2.	There is a popup window indicating that the application won't run on a jailbroken device
 
 In the first case, it's worth checking if the application is fully functional on non-jailbroken device. It might be that the application is in reality crashing or has a bug that causes exiting. This might happen when you're testing a preproduction version of the application.
 
-Let's look on how to bypass jailbreak detection using once again Damn Vulnerable iOS application as an example. 
-After loading the binary into Hopper, you need to wait until the application is fully disassembled (look at the top bar). Then we can look for 'jail' string in the search box. We see two different classes, which are `SFAntiPiracy` and `JailbreakDetectionVC`.
-You might also want to decompile the functions to see what they are doing and especially what do they return.
+Let's look on how to bypass jailbreak detection using once again Damn Vulnerable iOS application as an example. After loading the binary into Hopper, you need to wait until the application is fully disassembled (look at the top bar). Then we can look for 'jail' string in the search box. We see two different classes, which are `SFAntiPiracy` and `JailbreakDetectionVC`. You might also want to decompile the functions to see what they are doing and especially what do they return.
 
-![Disassembling with Hopper](Images/Chapters/0x06b/HopperDisassembling.png "Disassembling with Hopper")
-![Decompiling with Hopper](Images/Chapters/0x06b/HopperDecompile.png "Decompiling with Hopper")
+![Disassembling with Hopper](Images/Chapters/0x06b/HopperDisassembling.png) ![Decompiling with Hopper](Images/Chapters/0x06b/HopperDecompile.png)
 
-As you can see, there is a class method `+[SFAntiPiracy isTheDeviceJailbroken]` and instance method `-[JailbreakDetectionVC isJailbroken]`. The main difference for us is that we can inject cycript and call class method directly, whereas when it comes to instance method, we must first look for instances of target class. The function `choose` will look for the memory heap for known signature of a given class and return an array of instances that were found. It's important to put an application into a desired state, so that the class is indeed instantiated. 
+As you can see, there is a class method `+[SFAntiPiracy isTheDeviceJailbroken]` and instance method `-[JailbreakDetectionVC isJailbroken]`. The main difference for us is that we can inject cycript and call class method directly, whereas when it comes to instance method, we must first look for instances of target class. The function `choose` will look for the memory heap for known signature of a given class and return an array of instances that were found. It's important to put an application into a desired state, so that the class is indeed instantiated.
 
-Let's inject cycript into our process (look for your PID with `top`):
+Let's inject cycript into our process (look for your PID with `top`\):
 
 ```
 iOS8-jailbreak:~ root# cycript -p 12345
@@ -113,7 +111,7 @@ cy# [SFAntiPiracy isTheDeviceJailbroken]
 true
 ```
 
-As you can see our class method was called directly and returned true. Now, let's call `-[JailbreakDetectionVC isJailbroken]` instance method. First, we have to call `choose` function to look for instances of `JailbreakDetectionVC` class. 
+As you can see our class method was called directly and returned true. Now, let's call `-[JailbreakDetectionVC isJailbroken]` instance method. First, we have to call `choose` function to look for instances of `JailbreakDetectionVC` class.
 
 ```
 cy# a=choose(JailbreakDetectionVC)
@@ -129,10 +127,9 @@ cy# [a[0] isJailbroken]
 True
 ```
 
-![The device is jailbroken](Images/Chapters/0x06j/deviceISjailbroken.png "The device is jailbroken")
+![The device is jailbroken](Images/Chapters/0x06j/deviceISjailbroken.png)
 
-Hence you now understand why it's important to have your application in a desired state. 
-Now bypassing jailbreak detection in this case with cycript is trivial. We can see that the function returns Boolean and we just need to replace the return value. We can do it by replacing function implementation with cycript. Please note that this will actually replace function under given name, so beware of side effects in case if the function modifies anything in the application:
+Hence you now understand why it's important to have your application in a desired state. Now bypassing jailbreak detection in this case with cycript is trivial. We can see that the function returns Boolean and we just need to replace the return value. We can do it by replacing function implementation with cycript. Please note that this will actually replace function under given name, so beware of side effects in case if the function modifies anything in the application:
 
 ```
 cy# JailbreakDetectionVC.prototype.isJailbroken=function(){return false}
@@ -140,16 +137,15 @@ cy# [a[0] isJailbroken]
 false
 ```
 
-![The device is NOT jailbroken](Images/Chapters/0x06j/deviceisNOTjailbroken.png "The device is NOT jailbroken")
-In this case we have bypassed Jailbreak detection of the application!
+![The device is NOT jailbroken](Images/Chapters/0x06j/deviceisNOTjailbroken.png) In this case we have bypassed Jailbreak detection of the application!
 
 Now, imagine that the application is closing immediately upon detecting that the device is jailbroken. In this case you have no chance (time) to launch cycript and replace function implementation. Instead, you would have to use CydiaSubstrate, use proper hooking function, like `MSHookMessageEx` and compile the tweak. There are good sources on how to perform this [15-16], however, we will provide possibly faster and more flexible approach.
 
 **Frida** is a dynamic instrumentation framework, which allows you to use among other a JavaScript API to instrument the apps. One feature that we will use in bypassing jailbreak detection is to perform so-called early instrumentation, i.e. replace function implementation on startup.
 
-1. First, ensure that `frida-server` is running on your iDevice
-2. iDevice must be connected via USB cable
-3. Use `frida-trace` on your workstation:
+1.	First, ensure that `frida-server` is running on your iDevice
+2.	iDevice must be connected via USB cable
+3.	Use `frida-trace` on your workstation:
 
 ```
 $ frida-trace -U -f /Applications/DamnVulnerableIOSApp.app/DamnVulnerableIOSApp  -m "-[JailbreakDetectionVC isJailbroken]"
@@ -180,17 +176,17 @@ Changing the return value to:0x0
 Function [JailbreakDetectionVC isJailbroken] originally returned:0x1
 Changing the return value to:0x0
  22475 ms  -[JailbreakDetectionVC isJailbroken]
- ```
- 
+```
+
 Please note that there were two calls to `-[JailbreakDetectionVC isJailbroken]`, which corresponds to two physical taps on the app GUI.
- 
+
 Frida is a very powerful and versatile tool. Refer to the documentation [3] to get more details.
 
 -- TODO [a generic Frida script that catches many JB detection methods] --
 
 Hooking Objective-C methods and native functions:
 
-~~~~python
+```python
 import frida
 import sys
 
@@ -278,8 +274,7 @@ def on_message(message, data):
 script.on('message', on_message)
 script.load()
 sys.stdin.read()
-~~~~
-
+```
 
 #### Static Analysis
 
@@ -307,28 +302,25 @@ sys.stdin.read()
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference to "VX.Y" below for "Testing Jailbreak Detection"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference to "VX.Y" below for "Testing Jailbreak Detection"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Jailbreak Detection"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing Jailbreak Detection"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
 
-- [1] - Jailbreak Detection Methods on the Trustware Spiderlabs Blog - https://www.trustwave.com/Resources/SpiderLabs-Blog/Jailbreak-Detection-Methods/
-- [2] - Dana Geist, Marat Nigmatullin: Jailbreak/Root Detection Evasion Study on iOS and Android - http://delaat.net/rp/2015-2016/p51/report.pdf
-- [3] - http://frida.re/
+-	[1] - Jailbreak Detection Methods on the Trustware Spiderlabs Blog - https://www.trustwave.com/Resources/SpiderLabs-Blog/Jailbreak-Detection-Methods/
+-	[2] - Dana Geist, Marat Nigmatullin: Jailbreak/Root Detection Evasion Study on iOS and Android - http://delaat.net/rp/2015-2016/p51/report.pdf
+-	[3] - http://frida.re/
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Jailbreak Detection"] --
-* Enjarify - https://github.com/google/enjarify
+-- TODO [Add relevant tools for "Testing Jailbreak Detection"] --* Enjarify - https://github.com/google/enjarify
 
 ### Testing Anti-Debugging
 
@@ -338,10 +330,9 @@ Debugging is a highly effective way of analyzing the runtime behaviour of an app
 
 -- TODO [Typical debugging defenses] --
 
-
 Detecting Mach Exception Ports <sup>[1]</sup>:
 
-~~~c
+```c
 #include <mach/task.h>
 #include <mach/mach_init.h>
 #include <stdbool.h>
@@ -368,12 +359,11 @@ static bool amIAnInferior(void)
 	}
 	return false;
 }
-~~~
-
+```
 
 Disabling <code>ptrace()</code>.
 
-~~~c
+```c
 typedef int (*ptrace_ptr_t)(int _request, pid_t _pid, caddr_t _addr, int _data);
 
 #define PT_DENY_ATTACH 31
@@ -384,9 +374,9 @@ void disable_ptrace() {
     ptrace_ptr(PT_DENY_ATTACH, 0, 0, 0);
     dlclose(handle);
 }
-~~~
+```
 
-~~~c
+```c
 void disable_ptrace() {
 
 	asm(
@@ -397,44 +387,43 @@ void disable_ptrace() {
 		"svc    0\n"
 	);
 }
-~~~
+```
 
-
-~~~c
+```c
 - (void)protectAgainstPtrace {
     int                 junk;
     int                 mib[4];
     struct kinfo_proc   info;
     size_t              size;
-    
+
     info.kp_proc.p_flag = 0;
-    
+
     // Initialize mib, which tells sysctl the info we want, in this case
     // we're looking for information about a specific process ID.
-    
+
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC;
     mib[2] = KERN_PROC_PID;
     mib[3] = getpid();
-    
+
 
     while(1) {
-     
+
         size = sizeof(info);
         junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
         assert(junk == 0);
 
         // We're being debugged if the P_TRACED flag is set.
-        
+
         if ((info.kp_proc.p_flag & P_TRACED) != 0) {
             exit(0);
         }
-        
+
         sleep(1);
-        
+
     }
 }
-~~~
+```
 
 The app should either actively prevent debuggers from attaching, or terminate when a debugger is detected.
 
@@ -442,7 +431,7 @@ The app should either actively prevent debuggers from attaching, or terminate wh
 
 -- TODO [Bypass techniques] --
 
-~~~c
+```c
 #import <substrate.h>
 
 #define PT_DENY_ATTACH 31
@@ -460,7 +449,7 @@ static int $_my_ptrace(int request, pid_t pid, caddr_t addr, int data) {
 %ctor {
 	MSHookFunction((void *)MSFindSymbol(NULL,"_ptrace"), (void *)$ptraceHook, (void **)&_ptraceHook);
 }
-~~~
+```
 
 #### White-box Testing
 
@@ -470,7 +459,7 @@ static int $_my_ptrace(int request, pid_t pid, caddr_t addr, int data) {
 
 -- TODO [Needs more detail] --
 
-Attach a debugger to the running process. This  should either fail, or the app should terminate or misbehave when the debugger has been detected. For example, if ptrace(PT_DENY_ATTACH) has been called, gdb will crash with a segmentation fault:
+Attach a debugger to the running process. This should either fail, or the app should terminate or misbehave when the debugger has been detected. For example, if ptrace(PT_DENY_ATTACH) has been called, gdb will crash with a segmentation fault:
 
 Note that some anti-debugging implementations respond in a stealthy way so that changes in behaviour are not immediately apparent. For example, a soft token app might not visibly respond when a debugger is detected, but instead secretly alter the state of an internal variable so that an incorrect OTP is generated at a later point. Make sure to run through the complete workflow to determine if attaching the debugger causes a crash or malfunction.
 
@@ -486,7 +475,7 @@ Note that some anti-debugging implementations respond in a stealthy way so that 
 
 ##### OWASP MASVS
 
-- V...: ""
+-	V...: ""
 
 ##### CWE
 
@@ -494,12 +483,11 @@ Note that some anti-debugging implementations respond in a stealthy way so that 
 
 ##### Info
 
-- [1] Detecting the Debugger on OS X - https://zgcoder.net/ramblings/osx-debugger-detection
+-	[1] Detecting the Debugger on OS X - https://zgcoder.net/ramblings/osx-debugger-detection
 
 ##### Tools
 
 -- TODO [Add tools for "Testing Anti-Debugging"] --
-
 
 ### Testing File Integrity Checks
 
@@ -518,7 +506,7 @@ int xyz(char *dst) {
     }
 
     while(1) {
-    
+
         header = dlinfo.dli_fbase;  // Pointer on the Mach-O header
         struct load_command * cmd = (struct load_command *)(header + 1); // First load command
         // Now iterate through load command
@@ -550,16 +538,16 @@ int xyz(char *dst) {
                     CC_MD5(textSectionPtr, textSectionSize, digest);     // calculate the signature
                     for (int i = 0; i < sizeof(digest); i++)             // fill signature
                         sprintf(dst + (2 * i), "%02x", digest[i]);
-                
+
                     // return strcmp(originalSignature, signature) == 0;    // verify signatures match
-                    
+
                     return 0;
                 }
             }
             cmd = (struct load_command *)((uint8_t *)cmd + cmd->cmdsize);
         }
     }
-    
+
 }
 ```
 
@@ -591,27 +579,24 @@ int xyz(char *dst) {
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference below "VX.Y" for "Testing File Integrity Checks"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference below "VX.Y" for "Testing File Integrity Checks"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing File Integrity Checks"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing File Integrity Checks"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
 
-- [1] Android Cracking Blog - http://androidcracking.blogspot.com/2011/06/anti-tampering-with-crc-check.html
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+-	[1] Android Cracking Blog - http://androidcracking.blogspot.com/2011/06/anti-tampering-with-crc-check.html
+-	[2] Another Informational Article - http://www.securityfans.com/informational_article.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing File Integrity Checks"] --
-* Enjarify - https://github.com/google/enjarify
+-- TODO [Add relevant tools for "Testing File Integrity Checks"] --* Enjarify - https://github.com/google/enjarify
 
 ### Testing Detection of Reverse Engineering Tools
 
@@ -645,27 +630,24 @@ int xyz(char *dst) {
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference below "VX.Y" for "Testing Detection of Reverse Engineering Tools"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference below "VX.Y" for "Testing Detection of Reverse Engineering Tools"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Detection of Reverse Engineering Tools"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing Detection of Reverse Engineering Tools"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+-	[1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
+-	[2] Another Informational Article - http://www.securityfans.com/informational_article.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Detection of Reverse Engineering Tools"] --
-* Enjarify - https://github.com/google/enjarify
+-- TODO [Add relevant tools for "Testing Detection of Reverse Engineering Tools"] --* Enjarify - https://github.com/google/enjarify
 
 ### Testing Runtime Integrity Checks
 
@@ -675,24 +657,24 @@ int xyz(char *dst) {
 
 #### Examples
 
-**Detecting Substrate Inline Hooks***
+**Detecting Substrate Inline Hooks**\*
 
-Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code. They can be detected by scanning the function prologue of each function for unusual and telling instructions. For example, substrate 
+Inline hooks are implemented by overwriting the first few bytes of a function with a trampoline that redirects control flow to adversary-controlled code. They can be detected by scanning the function prologue of each function for unusual and telling instructions. For example, substrate
 
+inline int checkSubstrateTrampoline() attribute((always_inline)); int checkSubstrateTrampoline(void * funcptr) {
 
-inline int checkSubstrateTrampoline() attribute((always_inline));
-int checkSubstrateTrampoline(void * funcptr) {
- 
-    unsigned int *funcaddr = (unsigned int *)funcptr;
- 
-    if(funcptr)
-        // assuming the first word is the trampoline 
-        if (funcaddr[0] == 0xe51ff004) // 0xe51ff004 = ldr pc, [pc-4]
-            return 1; // bad
- 
-    return 0; // good
-}
-Example code from the Netitude blog <code>[2]</code>.
+```
+unsigned int *funcaddr = (unsigned int *)funcptr;
+
+if(funcptr)
+    // assuming the first word is the trampoline
+    if (funcaddr[0] == 0xe51ff004) // 0xe51ff004 = ldr pc, [pc-4]
+        return 1; // bad
+
+return 0; // good
+```
+
+\} Example code from the Netitude blog <code>[2]</code>.
 
 #### Effectiveness Assessment
 
@@ -706,43 +688,43 @@ Example code from the Netitude blog <code>[2]</code>.
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference below "VX.Y" for "Testing Memory Integrity Checks"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference below "VX.Y" for "Testing Memory Integrity Checks"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Memory Integrity Checks"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing Memory Integrity Checks"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+-	[1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
+-	[2] Another Informational Article - http://www.securityfans.com/informational_article.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Memory Integrity Checks"] --
-* Enjarify - https://github.com/google/enjarify
+-- TODO [Add relevant tools for "Testing Memory Integrity Checks"] --* Enjarify - https://github.com/google/enjarify
 
 ### Testing Device Binding
 
 #### Overview
 
--- TODO [Provide a general description of the issue "Testing Device Binding".] --
+The goal of device binding is to impede an attacker when he tries to copy an app and its state from device A to device B and continue the execution of the app on device B. When device A has been deemed trusted, it might have more privileges than device B, which should not change when an app is copied from device A to device B.
+
+Please note that since iOS 7.0 hardware identifiers, such as the MAC addresses are off-limits [1]. The possible ways to bind an application to a device are based on using `identifierForVendor`, storing something in the keychain or using Google its InstanceID for iOS [2]. See Remediation for more details.
 
 #### Static Analysis
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
-
--- TODO [Confirm purpose of remark "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
-
 ##### With Source Code
 
--- TODO [Add content for static analysis of "Testing Device Binding" with source code] --
+When the source-code is available, then there are a few codes you can look for which are bad practices, such as: 
+
+- MAC addresses: there are various ways to find the MAC address: when using the `CTL_NET` (network subystem), the `NET_RT_IFLIST` (getting the configured interfaces) or when the mac-address gets formatted, you often see formatting code for printing, in terms of `"%x:%x:%x:%x:%x:%x"`.
+- using the UDID: `[[[UIDevice currentDevice] identifierForVendor] UUIDString];` and in Swift3: `UIDevice.current.identifierForVendor?.uuidString
+`
+- Any keychain or filesystem based binding which are unprotected by any `SecAccessControlCreateFlags` or use protectionclasses such as `kSecAttrAccessibleAlways` or `kSecAttrAccessibleAlwaysThisDeviceOnly`.
 
 ##### Without Source Code
 
@@ -750,37 +732,75 @@ Example code from the Netitude blog <code>[2]</code>.
 
 #### Dynamic Analysis
 
--- TODO [Describe how to test for this issue "Testing Device Binding" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
+There are a few ways to test the application binding:
+
+##### Dynamic Analysis using a simulator
+
+Take the following steps when you want to verify app-binding at a simulator:
+
+1.	Run the application on a simulator
+2.	Make sure you can raise the trust in the instance of the application (e.g. authenticate)
+3.	Retrieve the data from the Simulator This has a few steps: 
+  - As simulators use UUIDs to identify themselves, you could make it easer to locate the storage by creating a debug point and on that point execute `po NSHomeDirectory()`, which will reveal the location of where the simulator stores its contents. Otherwise you can do a `find | grep` for the suspected plist file.
+  - go to the directory printed with the given command
+  - copy all 3 folders found (Documents, Library, tmp)
+  - Copy the contents of the keychain, these can be found, since iOS 8, in `~/Library/Developer/CoreSimulator/Devices/<Simulator Device ID>/data/Library/Keychains`. 
+4.	Start the application on another simulator & find its data location as described in step 3.
+5.	Stop the application on the second simulator, now overwrite the existing data with the data copied in step 3.
+6.	Can you continue in an authenticated state? If so, then binding might not be working properly.
+
+Please note that we are saying that the binding "might" not be working as not everything is unique in simulators.
+
+##### Dynamic Analysis using 2 jailbroken devices
+
+Take the following steps when you want to verify app-binding by using 2 jailbroken devices:
+
+1.	Run the app on your jailbroken device
+2.	Make sure you can raise the trust in the instance of the application (e.g. authenticate)
+3.	Retrieve the data from the jailbroken device:
+   - you can ssh to your device and then extract the data (just as with a similator, either use debugging or a `find|grep`. The directory is in `/private/var/mobile/Containers/Data/Application/<Application uuid>`
+  - go to the directory printed with the given command using SSH or copy the folders in there using SCP. You can use an FTP client like Filezilla as well.
+  - Copy the contents of the keychain which can be found in `/private/var/Keychains/keychain-2.db` using 
+4. retrieve the data from the keychain, which is stored `/private/var/Keychains/keychain-2.db`, which you can retrieve using the keychain dumper[3].
+4.	Install the application on the second jailbroken device
+5.	Overwrite the data of the application extracted from step 3.
+6.	Can you continue in an authenticated state? If so, then binding might not be working properly.
 
 #### Remediation
 
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Device Binding".] --
+Before we describe the usable identifiers, let's quickly discuss how they can be used for binding. There are 3 methods which allow for device binding in iOS: 
+
+- You can use `[[UIDevice currentDevice] identifierForVendor]` (in Objective-C) or `UIDevice.current.identifierForVendor?.uuidString` (in swift3) and `UIDevice.currentDevice().identifierForVendor?.UUIDString` (in swift2). Which might change upon reinstalling the application when no other applications from the same vendor are installed. 
+- You can store something in the keychain to identify the application its instance. One needs to make sure that this data is not backed up by using `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly` (if you want to secure it and properly enforce having a passcode or touch-id) or by using `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, or `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`. 
+- You can use Google its instanceID for iOS [2].
+
+Any scheme based on these variants will be more secure the moment passcode and/or touch-id has been enabled and the materials stored in the Keychain or filesystem have been protected with protectionclasses such as  `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` and `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` and the the `SecAccessControlCreateFlags` is set with `kSecAccessControlDevicePasscode` (for passcodes), `kSecAccessControlUserPresence` (passcode or touchid), `kSecAccessControlTouchIDAny` (touchID), `kSecAccessControlTouchIDCurrentSet` (touchID: but current fingerprints only). 
+
 
 #### References
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference "VX.Y" below for "Testing Device Binding"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference "VX.Y" below for "Testing Device Binding"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Device Binding"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing Device Binding"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
+- [1] iOS 7 release notes - https://developer.apple.com/library/content/releasenotes/General/RN-iOSSDK-7.0/index.html
+- [2] iOS implementation instance-ID - https://developers.google.com/instance-id/guides/ios-implementation
+- [3] Keychain Dumper - https://github.com/ptoomey3/Keychain-Dumper
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Device Binding"] --
-* Enjarify - https://github.com/google/enjarify
+- Keychain Dumper - https://github.com/ptoomey3/Keychain-Dumper
+- Appsync Unified - https://cydia.angelxwind.net/?page/net.angelxwind.appsyncunified
 
 ### Testing Obfuscation
 
@@ -814,26 +834,21 @@ Example code from the Netitude blog <code>[2]</code>.
 
 ##### OWASP Mobile Top 10 2016
 
-* M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
+-	M9 - Reverse Engineering - https://www.owasp.org/index.php/Mobile_Top_10_2016-M9-Reverse_Engineering
 
 ##### OWASP MASVS
 
--- TODO [Update reference "VX.Y" below for "Testing Obfuscation"] --
-- VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
+-- TODO [Update reference "VX.Y" below for "Testing Obfuscation"] -- - VX.Y: "Requirement text, e.g. 'the keyboard cache is disabled on text inputs that process sensitive data'."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Obfuscation"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+-- TODO [Add relevant CWE for "Testing Obfuscation"] -- - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+-	[1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
+-	[2] Another Informational Article - http://www.securityfans.com/informational_article.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Obfuscation"] --
-* Enjarify - https://github.com/google/enjarify
-
-
+-- TODO [Add relevant tools for "Testing Obfuscation"] --* Enjarify - https://github.com/google/enjarify

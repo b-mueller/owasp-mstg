@@ -1079,15 +1079,15 @@ catch(Exception e) {
         Log.wtf("HookDetection", "Substrate is active on the device.");
       }
     }
-    if(stackTraceElement.getClassName().equals("com.saurik.substrate.MS$2") && 
+    if(stackTraceElement.getClassName().equals("com.saurik.substrate.MS$2") &&
         stackTraceElement.getMethodName().equals("invoked")) {
       Log.wtf("HookDetection", "A method on the stack trace has been hooked using Substrate.");
     }
-    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") && 
+    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") &&
         stackTraceElement.getMethodName().equals("main")) {
       Log.wtf("HookDetection", "Xposed is active on the device.");
     }
-    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") && 
+    if(stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge") &&
         stackTraceElement.getMethodName().equals("handleHookedMethod")) {
       Log.wtf("HookDetection", "A method on the stack trace has been hooked using Xposed.");
     }
@@ -1153,7 +1153,50 @@ Refer to the "Tampering and Reverse Engineering section" for examples of patchin
 
 The goal of device binding is to impede an attacker when he tries to copy an app and its state from device A to device B and continue the execution of the app on device B. When device A has been deemend trusted, it might have more privileges than device B, which should not change when an app is copied from device A to device B.
 
+#### Static Analysis
+
 In the past, Android developers often relied on the Secure ANDROID_ID (SSAID) and MAC addresses. However, the behavior of the SSAID has changed since Android O and the behavior of MAC addresses have changed in Android N <sup>[1]</sup>. Google has set a new set of recommendations in their SDK documentation regarding identifiers as well <sup>[2]</sup>.
+When the source-code is available, then there are a few codes you can look for, such as:
+- The presence of unique identifiers that no longer work in the future
+  - `Build.SERIAL` without the presence of `Build.getSerial()`
+  - `htc.camera.sensor.front_SN` for HTC devices
+  - `persist.service.bdroid.bdadd`
+  - `Settings.Secure.bluetooth_address`, unless the system permission LOCAL_MAC_ADDRESS is enabled in the manifest.
+
+- The presence of using the ANDROID_ID only as an identifier. This will influence the possible binding quality over time given older devices.
+- The absence of both InstanceID, the `Build.SERIAL` and the IMEI.
+
+```java
+  TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+  String IMEI = tm.getDeviceId();
+```
+
+
+Furthermore, to reassure that the identifiers can be used, the AndroidManifest.xml needs to be checked in case of using the IMEI and the Build.Serial. It should contain the following permission: `<uses-permission android:name="android.permission.READ_PHONE_STATE"/>`.
+
+#### Dynamic Analysis
+
+There are a few ways to test the application binding:
+
+##### Dynamic Analysis using an Emulator
+
+1. Run the application on an Emulator
+2. Make sure you can raise the trust in the instance of the application (e.g. authenticate)
+3. Retrieve the data from the Emulator This has a few steps:
+- ssh to your simulator using ADB shell
+- run-as <your app-id (which is the package as described in the AndroidManifest.xml)>
+- chmod 777 the contents of cache and shared-preferences
+- exit the current user
+- copy the contents of /dat/data/<your appid>/cache & shared-preferences to the sdcard
+- use ADB or the DDMS to pull the contents
+4. Install the application on another Emulator
+5. Overwrite the data from step 3 in the data folder of the application.
+- copy the contents of step 3 to the sdcard of the second emulator.
+- ssh to your simulator using ADB shell
+- run-as <your app-id (which is the pacakge as described in the AndroidManifest.xml)>
+- chmod 777 the folders cache and shared-preferences
+- copy the older contents of the sdcard to /dat/data/<your appid>/cache & shared-preferences
+6. Can you continue in an authenticated state? If so, then binding might not be working properly.
 
 ##### Google InstanceID
 
