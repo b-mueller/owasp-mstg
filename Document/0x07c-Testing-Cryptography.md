@@ -1,4 +1,4 @@
-## Testing Cryptography
+## Cryptography for Mobile Apps
 
 The following chapter translates the cryptography requirements of the MASVS into technical test cases. Test cases listed in this chapter are based upon generic cryptographic concepts and are not relying on a specific implementation on iOS or Android.
 

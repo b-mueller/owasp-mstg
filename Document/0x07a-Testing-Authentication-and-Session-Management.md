@@ -1,4 +1,4 @@
-## Testing Authentication and Session Management on the Endpoint
+## Remote Authentication and Authorization
 
 The following chapter outlines authentication and session management requirements of the MASVS into technical test cases. Test cases listed in this chapter are focused on server side and therefore are not relying on a specific implementation on iOS or Android.  
 
