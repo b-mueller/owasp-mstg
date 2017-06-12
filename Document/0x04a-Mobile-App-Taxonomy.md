@@ -1,19 +1,15 @@
 
 ## Mobile App Taxonomy
 
-The following section is a brief introduction to the 3 different types of mobile applications, namely the (1) Native App, (2) Hybrid App and (3) Web App. Before we dive into them, it is essential to first understand what a mobile app is.
+The term "mobile app" refers to applications (self-contained computer programs) that are designed to execute on mobile devices. In this guide, we focus on mobile apps designed to run on the Android and iOS operating systems, which cumulatively take more than 99% of the mobile OS market share<sup>[1]</sup>. As mobile operating systems are increasingly used on other device types, such as smart watches, TVs, cars, and other embedded systems, these apps don't necessarily always run only on mobile devices. In this guide, we'll be using the term "app" to refer to any kinds of apps running on popular mobile OSes.
 
-### Mobile App
-
-The term `mobile app` refers to applications (self-contained computer programs), designed to execute and enhance the functionality of a mobile device. In this guide we will focus on the mobile apps designed to run on Android and iOS operating systems, as cumulatively they take more than 99% of the market share<sup>[12]</sup>. Due to the expansion of these operating systems to other device types, like smart watches, TVs, cars, etc. a more general term `app` is more appropriate. Nevertheless, for historic reasons, both terms are used interchangeably to refer to an application that can run on some of these systems, regardless of the exact device type.
-
-Today, mobile internet usage has surpassed desktop usage for the first time in history and mobile apps are the most widespread kind of applications<sup>[10]</sup>.
+Today, mobile Internet usage has surpassed desktop usage for the first time in history, and mobile apps are the most widespread kind of applications<sup>[2]</sup>.
 
 ### Native App
 
 Most operating systems, including Android and iOS, come with set of high-level APIs that can be used to develop applications specifically for that system. Such applications are called `native` for the system for which they have been developed. Usually, when discussing about `mobile app`, the assumption is that it is a `native app`, that is implemented in a particular programming language for either iOS (Objective-C or Swift) or Android (Java).
 
-Native mobile apps provide fast performance and a high degree of reliability. They usually adhere to the design principles (e.g. Android Design Principles<sup>[13]</sup>), providing a more consistent UI, compared to `hybrid` and `web` apps. Due to their close integration with the operating system, native apps have access to almost every component of the device (camera, sensors, hardware backed key stores, etc.)
+Native mobile apps provide fast performance and a high degree of reliability. They usually adhere to the design principles (e.g. Android Design Principles<sup>[3]</sup>), providing a more consistent UI, compared to `hybrid` and `web` apps. Due to their close integration with the operating system, native apps have access to almost every component of the device (camera, sensors, hardware backed key stores, etc.)
 
 Please note that there is a little ambiguity when discussion `native` apps for Android. Namely, Android provides two sets of APIs to develop against, Android SDK and Android NDK. The SDK (or Software Development Kit) is a Java API and is the default API against which applications are built. The NDK (or Native Development Kit) is a C/C++ based API used for developing only parts of the application that require specific optimization, or can otherwise benefit from lower level API. Normally, you can only distribute apps build with the SDK, which potentially can have parts implemented against NDK. Therefore we say that Android `native **apps**` (build against SDK) can have `native **code**` (build against NDK).
 
@@ -41,3 +37,9 @@ Following is a non-exhaustive list of more popular frameworks for developing Hyb
 * Onsen UI - https://onsen.io/
 * React Native - http://www.reactnative.com/
 * Sencha Touch - https://www.sencha.com/products/touch/
+
+### References
+
+* [1] Mobile internet usage surpasses desktop usage for the first time in history - http://bgr.com/2016/11/02/internet-usage-desktop-vs-mobile
+* [2] Worldwide Smartphone OS Market Share - http://www.idc.com/promo/smartphone-market-share/os
+* [3] Android Design Principles - https://developer.android.com/design/get-started/principles.html
