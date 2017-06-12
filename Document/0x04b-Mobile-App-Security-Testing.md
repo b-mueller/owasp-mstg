@@ -1,11 +1,13 @@
 ## Mobile App Security Testing
 
-The context of mobile security testing is a conjunction of multiple different tier of components: **app**, **system**, **communication** and **back-end server**. These four high-level components will be the main attack surface for a mobile security test.   
+Mobile app testing involves evaluating the security of four different attack surfaces: the **app**, the **operating system**, any **remote services** consumed by the app, and the **network** used to communicate with them.  
+
+Examples of attacks against these surfaces include:
 
 * **App:**  Insecure data storage, poor resiliency against reverse engineering etc.
-* **System:** Any system API to which sensitive info is sent. E.g. Tampering with the system HTTP client might give access to the whole communication, even when SSL with certificate pinning is used.
-* **Communication:** Usage of insecure or unencrypted communication channel, missing SSL certificate pinning etc.
-* **Back-end Servers:** Flawed authentication and session management, vulnerable server side functions etc.
+* **Operating System:** Any native API to which sensitive info is sent. E.g. Tampering with the system HTTP client might give access to the all SSL/TLS traffic from and to the phone, even when SSL with certificate pinning is used.
+* **Network:** Usage of insecure or unencrypted communication channel, missing SSL certificate pinning etc.
+* **Remote Services:** Flawed authentication and session management, vulnerable server side functions etc.
 
 -- TODO --
 
@@ -13,37 +15,39 @@ The following sections will show how to use the OWASP mobile application securit
 
 ### Preparation - Defining The Baseline
 
-First of all, you need to decide what security level of the MASVS to test against. The security requirements should ideally have been decided at the beginning of the SDLC - but unfortunately we are not living in an ideal world. At the very least, it is a good idea to walk through the checklist, ideally with an IT security representative of the enterprise, the app stakeholders of the project and make a reasonable selection of Level 2 (L2) controls to cover during the test.
+First of all, you need to decide what security level of the [MASVS](https://github.com/OWASP/owasp-masvs) to test against. The security requirements should ideally have been decided at the beginning of the SDLC - but unfortunately we do not live in an ideal world. 
 
-The controls in MASVS Level 1 (L1) are appropriate for all mobile apps - the rest depends on the threat model and risk assessment for the particular app. Discuss with the app stakeholders to understand what are the requirements that are applicable and which are the ones that should be deemed out of scope for the scope of testing, perhaps due to business decisions or company policies. Also consider whether some L2 requirements may be needed due to industry regulations or local laws - for example, 2-factor-authentation (2FA) may be obligatory for a financial app, as enforced by the respective country's central bank and/or financial regulatory authority.
+Different organizations have different security needs, and different amounts of resources to invest in test activity. While the controls in MASVS Level 1 (L1) are applicable to all mobile apps, it is a good idea to walk through the entire checklist of L1 and Level 2 (L2) MASVS controls with technical and business stakeholders to agree an appropriate level of test coverage.
 
-If security requirements were already defined during the SDLC, even better! Ask for this information and document it on the front page of the Excel sheet ("dashboard"). More guidance on the verification levels and guidance on the certification can be found in the [MASVS](https://github.com/OWASP/owasp-masvs).
+Organizations/applications may have different regulatory and legal obligations in certain territories. Even if an app does not handle sensitive data, it may be important to consider whether some L2 requirements may be relevant due to industry regulations or local laws. For example, 2-factor-authentation (2FA) may be obligatory for a financial app, as enforced by the respective country's central bank and/or financial regulatory authority.
+
+Security goals/controls defined earlier in the SDLC may also be reviewed during the stakeholder discussion. Some controls may conform to MASVS controls, but others may be specific to the organization or application. 
 
 ![Preparation](Images/Chapters/0x03/mstg-preparation.png)
 
-All involved parties need to agree on the decisions made and on the scope in the checklist, as this will present the baseline for all security testing, regardless if done manually or automatically.
+All involved parties need to agree on the decisions made and on the scope in the checklist, as this will define the baseline for all security testing, regardless if done manually or automatically.
 
 #### Identifying Sensitive Data
 
-Classification of sensitive information can vary between different industries and countries. Therefore laws and regulations that are applicable to the app need to be known. This will become the basis of what sensitive information actually is in the context of the app.
+Classification of sensitive information can vary between different industries and countries. Beyond legal and civic obligations, organizations may take a more restrictive view of what counts as sensitive data, and may have a data classification policy that clearly defines what counts as sensitive information. 
 
-Ideally the customer can share a data classification policy that is already considering all different requirements and clearly defines sensitive information. This will become then the baseline during testing. The data classification should be applicable to:
+There are three general states in which data may be accessible:
 
-* Data at rest,
-* Data in use and
-* Data in transit
+* At rest - when the data is sitting in a file or data store
+* In use - when an application has load the data into its address space
+* In transit - when data has been sent between consuming process - e.g. during IPC.
 
-For example, regulations in Singapore for financial institutions has imposed a requirement to encrypt passwords and PINs explicitly, even though they are already transmitted via HTTPS. Even though this might not be a vulnerability from the point of view of a tester, it is mandatory to raise this finding as a compliance issue.
+The degree of scrutiny to apply to each state may depend on the criticality of the data, and liklihood of access. For example, because the likelihood of malicious actors gaining physical access to mobile devices is greater, data held in application memory may be more at risk of being accessed via core dumps than that on a web-server.
 
-If no data classification policy is available, the following should be considered as sensitive information:
+If no data classification policy is available, the following kinds of information are generally considered to be sensitive:
 
-* User authentication information (credentials, PINs etc.),
-* Personal Identifiable Information (PII) that can be abused for identity theft: Social security numbers, credit card numbers, bank account numbers, health information,
-* Highly sensitive data that would lead to reputational harm and/or financial costs if compromised,
+* User authentication information (credentials, PINs etc.).
+* Personal Identifiable Information (PII) that can be abused for identity theft: Social security numbers, credit card numbers, bank account numbers, health information.
+* Highly sensitive data that would lead to reputational harm and/or financial costs if compromised.
 * Any data that must be protected by law or for compliance reasons.
 * Finally any technical data, generated by the application or it's related systems, that is used to protect other data or the system, should also be considered as sensitive information (e.g. encryption keys).
 
-Defining sensitive information before the test is important for almost all data storage test cases in Android and iOS, as otherwise the tester has no clear basis on what he might need to look for.
+It may be impossible to detect leakage of sensitive data without a firm definition of what counts as such, so such a definition must be agreed upon in advance of testing.
 
 ### Vulnerability Analysis
 
@@ -51,11 +55,11 @@ Defining sensitive information before the test is important for almost all data 
 
 When executing a static analysis, the source code of the mobile App(s) will be analyzed to ensure sufficient and correct implementation of security controls, specifically on crucial components such as cryptographic and data storage mechanisms. Due to the amount of code a tester will be confronted with, the ideal approach for static analysis should be a mixture of using tools that scan the code automatically and manual code review.
 
-Through this approach you can get the best out of both worlds. You can get the so called "low hanging fruits" through the automatic scan, as the scanning engine and the (predefined) rules can easily pick up vulnerable patterns in the code. The manual code review can proficiently make a deep dive into the various code paths to check for logical errors and flaws in the mobile application's design and architecture where automated analysis tools are not able to identify it properly as they mostly do not understand the big picture.
+Through this approach you can get the best out of both worlds. You can get the so called "low hanging fruits" through the automatic scan, as the scanning engine and the (predefined) rules can detect many common vulnerabilities in the code. A manual code review can explore the code base with specific business and usage contexts in mind, providing enhanced relevance and coverage.
 
 #### Automatic Code Analysis
 
-During an automatic static analysis, a tool will check the source code for compliance with a predefined set of rules or industry's best practices. It has been a standard development practice to use analytical methods to review and inspect the mobile application's source code to detect bugs and implementation errors.
+During automatic static analysis, a tool will check the source code for compliance with a predefined set of rules or industry's best practices. It has been a standard development practice to use analytical methods to review and inspect the mobile application's source code to detect bugs and implementation errors.
 
 The automatic static analysis tools will provide assistance with the manual code review and inspection process. The tool will typically display a list of findings or warnings and then flag all the instances which contains any forms of violations in terms of their programming standards. Automatic static tools come in different variations, some are only running when you can actually build the app, some just need to be feed with the source code and some are running as plugin in an Integrated Development Environments (IDE)<sup>[7] [8]</sup>. The latter one provides assistance within your IDE in improving the security mechanisms in the mobile application code through a programmer-assisted way to correct the issues found. Ideally these tools should be used during the development process, but can also be useful during a source code review.
 

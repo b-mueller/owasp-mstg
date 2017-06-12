@@ -741,7 +741,7 @@ Take the following steps when you want to verify app-binding at a simulator:
 1.	Run the application on a simulator
 2.	Make sure you can raise the trust in the instance of the application (e.g. authenticate)
 3.	Retrieve the data from the Simulator This has a few steps: 
-  - As simulators use UUIDs to identify themselves, you could make it easer to locate the storage by creating a debug point and on that point execute `po NSHomeDirectory()`, which will reveal the location of where the simulator stores its contents. Otherwise you can do a `find | grep` for the suspected plist file.
+  - As simulators use UUIDs to identify themselves, you could make it easer to locate the storage by creating a debug point and on that point execute `po NSHomeDirectory()`, which will reveal the location of where the simulator stores its contents. Otherwise you can do a `find ~/Library/Developer/CoreSimulator/Devices/ | grep <appname>` for the suspected plist file.
   - go to the directory printed with the given command
   - copy all 3 folders found (Documents, Library, tmp)
   - Copy the contents of the keychain, these can be found, since iOS 8, in `~/Library/Developer/CoreSimulator/Devices/<Simulator Device ID>/data/Library/Keychains`. 
@@ -758,12 +758,11 @@ Take the following steps when you want to verify app-binding by using 2 jailbrok
 1.	Run the app on your jailbroken device
 2.	Make sure you can raise the trust in the instance of the application (e.g. authenticate)
 3.	Retrieve the data from the jailbroken device:
-   - you can ssh to your device and then extract the data (just as with a similator, either use debugging or a `find|grep`. The directory is in `/private/var/mobile/Containers/Data/Application/<Application uuid>`
-  - go to the directory printed with the given command using SSH or copy the folders in there using SCP. You can use an FTP client like Filezilla as well.
-  - Copy the contents of the keychain which can be found in `/private/var/Keychains/keychain-2.db` using 
-4. retrieve the data from the keychain, which is stored `/private/var/Keychains/keychain-2.db`, which you can retrieve using the keychain dumper[3].
-4.	Install the application on the second jailbroken device
-5.	Overwrite the data of the application extracted from step 3.
+   - you can ssh to your device and then extract the data (just as with a similator, either use debugging or a `find /private/var/mobile/Containers/Data/Application/ |grep <name of app>`. The directory is in `/private/var/mobile/Containers/Data/Application/<Application uuid>`
+  - go to the directory printed with the given command using SSH or copy the folders in there using SCP (`scp <ipaddress>:/<folder_found_in_previous_step> targetfolder`. You can use an FTP client like Filezilla as well.
+  - retrieve the data from the keychain, which is stored `/private/var/Keychains/keychain-2.db`, which you can retrieve using the keychain dumper[3]. For that you first need to make it world readable `chmod +r /private/var/Keychains/keychain-2.db` and then execute `./keychain_dumper -a`
+4.	Install the application on the second jailbroken device.
+5.	Overwrite the data of the application extracted from step 3. They keychain data will have to be manually added.
 6.	Can you continue in an authenticated state? If so, then binding might not be working properly.
 
 #### Remediation
