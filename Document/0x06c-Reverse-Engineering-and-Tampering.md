@@ -24,11 +24,11 @@ MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows
 
 #### Reversing Frameworks
 
-Radare2
+Radare2 is a complete framework for reverse-engineering and analyzing. It is built around the Capstone disassembler, Keystone assembler, and Unicorn CPU emulation engine. Radare2 has support for iOS binaries and many useful iOS-specific features, such as a native Objective-C parser, and an iOS debugger.
 
 #### Commercial Disassemblers
 
-Hopper / IDA Pro.
+IDA Pro can deal with iOS binaries and has a built-in iOS debugger. IDA is widely seen as the gold standard for GUI-based, interactive static analysis, but it isn't cheap. For the more budget-minded reverse engineer, Hopper offers similar static analysis features.
 
 ### Jailbreaking iOS
 

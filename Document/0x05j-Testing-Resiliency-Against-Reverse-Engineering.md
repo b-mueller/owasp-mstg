@@ -641,10 +641,12 @@ If anti-debugging is missing or too easily bypassed, make suggestions in line wi
 ### Testing File Integrity Checks
 
 #### Overview
+There are two file-integrity related topics:
 
-In the "Tampering and Reverse Engineering" chapter, we discussed Android's APK code signature check. We also saw that determined reverse engineers can easily bypass this check by re-packaging and re-signing an app. To make this process more involved, a protection scheme can be augmented with CRC checks on the app bytecode and native libraries as well as important data files. These checks can be implemented both on the Java and native layer. The idea is to have additional controls in place so that the only runs correctly in its unmodified state, even if the code signature is valid.
+ 1. _The application-source related integrity checks:_ In the "Tampering and Reverse Engineering" chapter, we discussed Android's APK code signature check. We also saw that determined reverse engineers can easily bypass this check by re-packaging and re-signing an app. To make this process more involved, a protection scheme can be augmented with CRC checks on the app bytecode and native libraries as well as important data files. These checks can be implemented both on the Java and native layer. The idea is to have additional controls in place so that the only runs correctly in its unmodified state, even if the code signature is valid.
+ 2. _The file storage related integrity checks:_ When files are stored by the application using the SD-card or public storage or the `SharedPreferences`, then the file integrity should be protected.
 
-##### Sample Implementation
+##### Sample Implementation - application-source
 
 Integrity checks often calculate a checksum or hash over selected files. Files that are commonly protected include:
 
@@ -675,8 +677,110 @@ private void crcTest() throws IOException {
  }
 }
 ```
+##### Sample Implementation - Storage
+
+When providing integrity on the file-storage itself. You can either create an HMAC over a given key-value pair as for the Android `SharedPreferences` or you can create an HMAC over a complete file provided by the filesystem.
+When using an HMAC, you can either use a bouncy castle implementation to HMAC the given content or the AndroidKeyStore and then verify the HMAC later on. There are a few steps to take care of.
+In case of the need for encryptionl. Please make sure that you encrypt and then HMAC as described in [2].
+
+When generating an HMAC with BC:
+
+1. Make sure BounceyCastle or SpongeyCastle are registered as a security provider.
+2. Initialize the HMAC with a key, which can be stored in a keystore.
+3. Get the bytearray of the content that needs an HMAC.
+4. Call `doFinal` on the HMAC with the bytecode.
+5. Append the HMAC to the bytearray of step 3.
+6. Store the result of step 5.
+
+When verifying the HMAC with BC:
+
+1. Make sure BounceyCastle or SpongeyCastle are registered as a security provider.
+2. Extract the message and the hmacbytes as separate arrays.
+3. repeate step 1-4 of generating an hmac on the message.
+4. now compare the extracted hamcbytes to the result of step 3.
+
+When generating the HMAC based on the Android keystore, then it is best to only do this for Android 6 and higher. In that case you generate the key for hmacking as described in [3].
+A convinient HMAC implementation without the `AndroidKeyStore` can be found below:
+
+```java
+public enum HMACWrapper {
+    HMAC_512("HMac-SHA512"), //please note that this is the spec for the BC provider
+    HMAC_256("HMac-SHA256");
+
+    private final String algorithm;
+
+    private HMACWrapper(final String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public Mac createHMAC(final SecretKey key) {
+        try {
+            Mac e = Mac.getInstance(this.algorithm, "BC");
+            SecretKeySpec secret = new SecretKeySpec(key.getKey().getEncoded(), this.algorithm);
+            e.init(secret);
+            return e;
+        } catch (NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException e) {
+            //handle them
+        }
+    }
+
+    public byte[] hmac(byte[] message, SecretKey key) {
+        Mac mac = this.createHMAC(key);
+        return mac.doFinal(message);
+    }
+
+    public boolean verify(byte[] messageWithHMAC, SecretKey key) {
+        Mac mac = this.createHMAC(key);
+        byte[] checksum = extractChecksum(messageWithHMAC, mac.getMacLength());
+        byte[] message = extractMessage(messageWithHMAC, mac.getMacLength());
+        byte[] calculatedChecksum = this.hmac(message, key);
+        int diff = checksum.length ^ calculatedChecksum.length;
+
+        for (int i = 0; i < checksum.length && i < calculatedChecksum.length; ++i) {
+            diff |= checksum[i] ^ calculatedChecksum[i];
+        }
+
+        return diff == 0;
+    }
+
+    public byte[] extractMessage(byte[] messageWithHMAC) {
+        Mac hmac = this.createHMAC(SecretKey.newKey());
+        return extractMessage(messageWithHMAC, hmac.getMacLength());
+    }
+
+    private static byte[] extractMessage(byte[] body, int checksumLength) {
+        if (body.length >= checksumLength) {
+            byte[] message = new byte[body.length - checksumLength];
+            System.arraycopy(body, 0, message, 0, message.length);
+            return message;
+        } else {
+            return new byte[0];
+        }
+    }
+
+    private static byte[] extractChecksum(byte[] body, int checksumLength) {
+        if (body.length >= checksumLength) {
+            byte[] checksum = new byte[checksumLength];
+            System.arraycopy(body, body.length - checksumLength, checksum, 0, checksumLength);
+            return checksum;
+        } else {
+            return new byte[0];
+        }
+    }
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+}
+
+
+```
+
+Another way of providing integrity, is by signing the obtained byte-array. Please check [3] on how to generate a signature. Do not forget to add the signature to the original byte-array.
 
 ##### Bypassing File Integrity Checks
+
+*When trying to bypass the application-source integrity checks* 
 
 1. Patch out the anti-debugging functionality. Disable the unwanted behaviour by simply overwriting the respective bytecode or native code it with NOP instructions.
 2. Use Frida or Xposed to hook APIs to hook file system APIs on the Java and native layers. Return a handle to the original file instead of the modified file.
@@ -684,8 +788,14 @@ private void crcTest() throws IOException {
 
 Refer to the "Tampering and Reverse Engineering section" for examples of patching, code injection and kernel modules.
 
+*When trying to bypass the storage integrity checks*
+
+1. Retrieve the data from the device, as described at the secion for device binding.
+2. Alter the data retrieved and then put it back in the storage
+
 #### Effectiveness Assessment
 
+*For the application source integrity checks*
 Run the app on the device in an unmodified state and make sure that everything works. Then, apply simple patches to the classes.dex and any .so libraries contained in the app package. Re-package and re-sign the app as described in the chapter "Basic Security Testing" and run it. The app should detect the modification and respond in some way. At the very least, the app should alert the user and/or terminate the app. Work on bypassing the defenses and answer the following questions:
 
 - Can the mechanisms be bypassed using trivial methods (e.g. hooking a single API function)?
@@ -694,6 +804,13 @@ Run the app on the device in an unmodified state and make sure that everything w
 - What is your subjective assessment of difficulty?
 
 For a more detailed assessment, apply the criteria listed under "Assessing Programmatic Defenses" in the "Assessing Software Protection Schemes" chapter.
+
+*For the storage integrity checks*
+A similar approach holds here, but now answer the following questions:
+- Can the mechanisms be bypassed using trivial methods (e.g. changing the contents of a file or a key-value)?
+- How difficult is it to obtain the HMAC key or the asymmetric private key?
+- Did you need to write custom code to disable the defenses? How much time did you need to invest?
+- What is your subjective assessment of difficulty?
 
 #### References
 
@@ -712,6 +829,8 @@ For a more detailed assessment, apply the criteria listed under "Assessing Progr
 ##### Info
 
 - [1] Android Cracking Blog - http://androidcracking.blogspot.sg/2011/06/anti-tampering-with-crc-check.html
+- [2] Authenticated Encryption: Relations among notions and analysis of the generic composition paradigm - http://cseweb.ucsd.edu/~mihir/papers/oem.html
+- [3] Android Keystore System - https://developer.android.com/training/articles/keystore.html
 
 ### Testing Detection of Reverse Engineering Tools
 
@@ -827,7 +946,7 @@ if (fp) {
     fclose(fp);
 
     } else {
-       /* Error opening /proc/self/maps. If this happens, something is off. */
+       /* Error opening /proc/self/maps. If this happens, something is of. */
     }
 }
 ```

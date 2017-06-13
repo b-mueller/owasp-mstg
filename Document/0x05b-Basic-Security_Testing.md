@@ -345,6 +345,86 @@ Successfully installed 1 modules, 0 already installed
 This will install any module that matches your query. Newly installed modules are dynamically loaded into the
 console and are available for immediate use.
 
+#### Firebase/Google Cloud Messaging (FCM/GCM)
+
+Firebase Cloud Messaging (FCM) is the successor of Google Cloud Messaging (GCM) and is a free service offered by Google and allows to send messages between an application server and client apps. The server and client app are communicating via the FCM/GCM connection server that is handling the downstream and upstream messages.
+
+![Architectural Overview](Images/Chapters/0x05b/FCM-notifications-overview.png)
+
+Downstream messages are sent from the application server to the client app (push notifications); upstream messages are sent from the client app to the server.
+
+FCM is available for Android and also for iOS and Chrome. FCM provides two connection server protocols at the moment: HTTP and XMPP and there are several differences in the implementation, as described in the official documentation<sup>[24]</sup>. The following example demonstrates how to intercept both protocols.
+
+##### Preparation
+
+For a full dynamic analysis of an Android app FCM should be intercepted. To be able to intercept the messages several steps should be considered for preparation.
+
+* Install the CA certificate of your interception proxy into your Android phone<sup>[2]</sup>.
+* A Man-in-the-middle attack should be executed so all traffic from the mobile device is redirected to your testing machine. This can be done by using a tool like ettercap<sup>[24]</sup>. It can be installed by using brew on Mac OS X.
+
+```bash
+$ brew install ettercap
+```
+
+Ettercap can also be installed through `apt-get` on Debian based linux distributions.
+
+```bash
+sudo apt-get install zlib1g zlib1g-dev
+sudo apt-get install build-essential
+sudo apt-get install ettercap
+```
+
+FCM can use two different protocols to communicate with the Google backend, either XMPP or HTTP.
+
+**HTTP**
+
+The ports used by FCM for HTTP are 5228, 5229, and 5230. Typically only 5228 is used, but sometimes also 5229 or 5230 is used.
+
+* Configure a local port forwarding on your machine for the ports used by FCM. The following example can be used on Mac OS X<sup>[23]</sup>:
+
+```bash
+$ echo "
+rdr pass inet proto tcp from any to any port 5228-> 127.0.0.1 port 8080
+rdr pass inet proto tcp from any to any port 5229 -> 127.0.0.1 port 8080
+rdr pass inet proto tcp from any to any port 5239 -> 127.0.0.1 port 8080
+" | sudo pfctl -ef -
+```
+
+* The interception proxy need to listen to the port specified in the port forwarding rule above, which is 8080.
+
+**XMPP**
+
+The ports used by FCM over XMPP are 5235 (Production) and 5236 (Testing)<sup>[26]</sup>.
+
+* Configure a local port forwarding on your machine for the ports used by FCM. The following example can be used on Mac OS X<sup>[23]</sup>:
+
+```bash
+$ echo "
+rdr pass inet proto tcp from any to any port 5235-> 127.0.0.1 port 8080
+rdr pass inet proto tcp from any to any port 5236 -> 127.0.0.1 port 8080
+" | sudo pfctl -ef -
+```
+
+* The interception proxy need to listen to the port specified in the port forwarding rule above, which is 8080.
+
+##### Intercepting Messages
+
+Your testing machine and the Android device need to be in the same wireless network. Start ettercap with the following command and replace the IP addresses with the one of the Android device and the network gateway in the wireless network.
+
+```bash
+$ ettercap -T -i eth0 -M arp:remote /192.168.0.1// /192.168.0.105//
+```
+
+Start using the app and trigger a function that uses FCM. You should see HTTP messages showing up in your interception proxy.
+
+![Intercepted Messages](Images/Chapters/0x05b/FCM_Intercept.png)
+
+Interception proxies like Burp or OWASP ZAP will not show this traffic, as they are not capable of decoding it properly by default. There are two plugins available for Burp, which are Burp-non-HTTP-Extension<sup>[28]<sup> and Mitm-relay<sup>[27]<sup> that leverages Burp to visualize XMPP traffic.
+
+As an alternative to a Mitm attack executed on your machine, a Wifi Access Point (AP) or router can also be used instead. The setup would become a little bit more complicated, as port forwarding needs to be configured on the AP or router and need to point to your interception proxy that need to listen on the external interface of your machine. For this test setup tools like ettercap are not needed anymore.
+
+Tools like Wireshark can be used to monitor and record the traffic for further investigation either locally on your machine or through a span port, if the router or Wifi AP offers this functionality.
+
 
 #### Reverse Engineering
 

@@ -66,6 +66,108 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 
 
+### Testing JSON Web Token (JWT)
+
+#### Overview
+
+JSON Web Token (JWT) ensures the integrity of information within a JSON object between two parties and is defined in RFC 7519<sup>[1]</sup>. A cryptographic signature is created for the data within the token. This only allows the server to create and modify tokens and enables a stateless authentication. The server doesn't need to remember any session or any other authentication information, as everything is contained within JWT.
+
+An example of an encoded JSON Web Token can be found below<sup>[5]</sup>.
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+```
+
+JWTs are Base-64 encoded and are divided into three parts:
+
+* **Header** Algorithm and Token Type (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9):
+```JSON
+{"alg":"HS256","typ":"JWT"}
+```
+* **Claims** Data  (eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9):
+```JSON
+{"sub":"1234567890","name":"John Doe","admin":true}
+```
+* **JSON Web Signature (JWS)** (TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ):
+```JSON
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret
+)
+```
+
+For mobile apps it's more and more used to authenticate both the message sender and receiver by using JWT. JWT implementations are available for all major programming languages, like PHP<sup>[2]</sup> or Java Spring<sup>[3]</sup>.
+
+#### Static Analysis
+
+Identify the JWT library that is used on server and client side. Check if there are any known vulnerabilities available for the JWT libraries in use.
+
+The following best practices should be checked in the JWT libraries<sup>[7]</sup>:
+* Verify the signature or HMAC on server-side at all times for all incoming requests containing a token.
+* Verify where the private signing key or secret key for HMAC is located and stored. The key should always reside on the server side and never shared with the client. It should only be available for the issuer and verifier.
+* Verify if encryption is used to encrypt the data embedded into JWT.
+* Verify if replay attacks are addressed by using `jti` (JWT ID) claim, which provides a unique identifier for JWT.
+
+
+#### Dynamic Analysis
+
+Several known vulnerabilities in JWT should be checked while executing a dynamic analysis:
+* Hashing algorithm `none`<sup>[6]</sup>:
+  * Modify the `alg` attribute in the token header and delete `HS256` and set it to `none` and use an empty signature (e.g. signature = ""). Use this token and replay it in a request. Some libraries treat tokens signed with the none algorithm as a valid token with a verified signature. This would allow an attacker to create their own "signed" tokens.
+* Usage of asymmetric algorithms<sup>[6]</sup>:
+  *  JWT offers several asymmetric algorithms as RSA or ECDSA. In this case the private key will be used to sign the tokens and the verification will be done through the public key. If a server is expecting a token signed with an asymmetric algorithm as RSA, but actually receives a token signed with HMAC, it will think the public key is actually an HMAC secret key. The public key can now be misused as HMAC secret key in order to sign the tokens.
+* Token Storage on client side:
+  * When using a mobile app that uses JWT it should be verified where the token is stored locally on the device<sup>[5]</sup>.
+* Cracking the signing key:
+  * Creating a signature of the token is done through a private key on server side. Once a JWT is obtained there are several tools available that can try to brute force the secret key offline<sup>[8]</sup>. See the tools section for details.
+* Information Disclosure:
+  * Decode the Base-64 encoded JWT and check what kind of data is transmitted within it and if it's encrypted or not.
+
+Please also follow the test cases in the OWASP JWT Cheat Sheet<sup>[4]</sup> and check the implementation of the logout as described in "Testing the Logout Functionality".
+
+#### Remediation
+
+The following best practices should be considered, when implementing JWT:
+
+* The latest version available of the JWT libraries in use should be implemented, to avoid known vulnerabilities.
+* Store the JWT on the mobile phone using a secure mechanism, like KeyChain on iOS or KeyStore on Android.
+* The private signing key or secret key for HMAC should only be available on server side.
+* If replay attacks are a risk for the app, `jti` (JWT ID) claim should be implemented.
+* Ideally the content of JWT should be encrypted in order to ensure the confidentially of the information contained within it. There might be description of roles, usernames or other sensitive information available that should be protected. An example implementation in Java can be found in the OWASP JWT Cheat Sheet<sup>[4]</sup>
+* Clarify if copying a token to another device should or should not make an attacker able to continue authenticated. Check the device binding test case, if this should be enforced. 
+
+#### References
+
+##### OWASP Mobile Top 10 2016
+
+* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
+
+##### OWASP MASVS
+
+* 4.3: "The remote endpoint uses server side signed tokens, if stateless authentication is used, to authenticate client requests without sending the user's credentials."
+
+##### CWE
+
+* CWE-287: Improper Authentication - https://cwe.mitre.org/data/definitions/287.html
+
+##### Info
+
+* [1] RFC 7519 JSON Web Token (JWT) - https://tools.ietf.org/html/rfc7519
+* [2] PHP JWT - https://github.com/firebase/php-jwt
+* [3] Java Spring with JWT - http://projects.spring.io/spring-security-oauth/docs/oauth2.html
+* [4] OWASP JWT Cheat Sheet - `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
+* [5] Sample of JWT Token - https://jwt.io/#debugger
+* [6] Critical Vulnerabilities in JSON Web Token - https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/
+* [7] JWT the right way - https://stormpath.com/blog/jwt-the-right-way
+* [8] Attacking JWT Authentication - https://www.sjoerdlangkemper.nl/2016/09/28/attacking-jwt-authentication/
+
+##### Tools
+* jwtbrute - https://github.com/jmaxxz/jwtbrute
+* crackjwt - https://github.com/Sjord/jwtcrack/blob/master/crackjwt.py
+* John the ripper - https://github.com/magnumripper/JohnTheRipper
+
+
 ### Testing Session Management
 
 #### Overview
