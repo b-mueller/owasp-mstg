@@ -36,13 +36,28 @@ For example:
 
 ### Link to Books and Papers
 
-Papers:
+__Papers:__ 
+The general form for citing technical reports is to place the name and location of the company or institution after the author and title and to give the report number and date at the end of the reference. 
+
+Basic Format: 
+
+- [1] J. K. Author, “Title of report,” Abbrev. Name of Co., City of Co., Abbrev. State, Rep. xxx, year
 
 - [1] \[Author(s)\], \[Title\] - Link
 
-Books:
+__Books:__
 
 - [1] \[Author(s)\], \[Title\], \[Published\], \[Year\]
+
+- [1] J. K. Author, “Title of chapter in the book,” in Title of His Published Book, xth ed. City of Publisher, Country if not USA: Abbrev. of Publisher, year, ch. x, sec. x, pp. xxx–xxx. 
+
+NOTE: Use et al. when three or more names are given
+
+e.g. 
+  * [1] B. Klaus and P. Horn, Robot Vision. Cambridge, MA: MIT Press, 1986. 
+  * [2] L. Stein, “Random patterns,” in Computers and You, J. S. Brake, Ed. New York: Wiley, 1994, pp. 55-70. 
+  * [3] R. L. Myer, “Parametric oscillators and nonlinear materials,” in Nonlinear Optics, vol. 4, P. G. Harper and B. S. Wherret, Eds. San Francisco, CA: Academic, 1977, pp. 47-160. 
+  * [4]  M. Abramowitz and I. A. Stegun, Eds., Handbook of Mathematical Functions (Applied Mathematics Series 55). Washington, DC: NBS, 1964, pp. 32-33. 
 
 ## References Within The Guide
 
