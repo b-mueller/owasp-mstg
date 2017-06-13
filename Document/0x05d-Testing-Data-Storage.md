@@ -139,7 +139,7 @@ It’s also worth to know that files stored outside the application folder (`dat
 
 ##### KeyChain
 
-The KeyChain class <sup>[10]</sup> is used to store and retrieve *system-wide* private keys and their corresponding certificates (chain). The user will be prompted to set a lock screen pin or password to protect the credential storage if it hasn’t been set, if something gets imported into the KeyChain the first time. 
+The KeyChain class <sup>[10]</sup> is used to store and retrieve *system-wide* private keys and their corresponding certificates (chain). The user will be prompted to set a lock screen pin or password to protect the credential storage if it hasn’t been set, if something gets imported into the KeyChain the first time.
 
 ##### KeyStore
 
@@ -153,7 +153,7 @@ Stored keys can be configured to operate in one of the two modes:
 
 2. User authentication authorizes a specific cryptographic operation associated with one key. In this mode, each operation involving such a key must be individually authorized by the user. Currently, the only means of such authorization is fingerprint authentication.
 
-The level of security afforded by the KeyStore depends on its implementation, which differs between devices. Most modern devices offer a hardware-backed key store implementation. In that case, keys are generated and used in a secure hardware element and are not directly accessible for the operating system. This means that the encryption keys themselves cannot be retrieved even from a rooted device. 
+The level of security afforded by the KeyStore depends on its implementation, which differs between devices. Most modern devices offer a hardware-backed key store implementation. In that case, keys are generated and used in a secure hardware element and are not directly accessible for the operating system. This means that the encryption keys themselves cannot be retrieved even from a rooted device.
 
 In a software-only implementation, the keys are encrypted with a per-user encryption master key <sup>[16]</sup>. In that case, an attacker can access all keys on a rooted device in the folder <code>/data/misc/keystore/</code>. As the master key is generated using the user’s own lock screen pin/ password, the KeyStore is unavailable when the device is locked <sup>[9]</sup>.
 
@@ -770,9 +770,9 @@ If vulnerable to SQL Injection, the application will return a verbose error mess
 
 ```
 dz> run app.provider.query content://com.mwr.example.sieve.DBContentProvider/Passwords/ --projection "*
-FROM SQLITE_MASTER WHERE type='table';--" 
+FROM SQLITE_MASTER WHERE type='table';--"
 | type  | name             | tbl_name         | rootpage | sql              |
-| table | android_metadata | android_metadata | 3        | CREATE TABLE ... | 
+| table | android_metadata | android_metadata | 3        | CREATE TABLE ... |
 | table | Passwords        | Passwords        | 4        | CREATE TABLE ... |
 | table | Key              | Key              | 5        | CREATE TABLE ... |
 ```
@@ -788,8 +788,8 @@ dz> run app.provider.query content://com.mwr.example.sieve.DBContentProvider/Pas
 These steps can be automated by using the `scanner.provider.injection` module, which automatically finds vulnerable content providers within an app:
 
 ```
-dz> run scanner.provider.injection -a com.mwr.example.sieve 
-Scanning com.mwr.example.sieve... 
+dz> run scanner.provider.injection -a com.mwr.example.sieve
+Scanning com.mwr.example.sieve...
 Injection in Projection:
   content://com.mwr.example.sieve.DBContentProvider/Keys/
   content://com.mwr.example.sieve.DBContentProvider/Passwords
@@ -806,14 +806,14 @@ A content provider can provide access to the underlying file system. This allows
 
 ```
 dz> run app.provider.download content://com.vulnerable.app.FileProvider/../../../../../../../../data/data/com.vulnerable.app/database.db /home/user/database.db
-Written 24488 bytes 
+Written 24488 bytes
 ```
 
 To automate the process of finding content providers susceptible to directory traversal, the `scanner.provider.traversal` module should be used:
 
 ```
-dz> run scanner.provider.traversal -a com.mwr.example.sieve 
-Scanning com.mwr.example.sieve... 
+dz> run scanner.provider.traversal -a com.mwr.example.sieve
+Scanning com.mwr.example.sieve...
 Vulnerable Providers:
   content://com.mwr.example.sieve.FileBackupProvider/
   content://com.mwr.example.sieve.FileBackupProvider
@@ -915,9 +915,9 @@ In order to prevent leaking of passwords or pins, sensitive information should b
 
 #### Overview
 
-Like other modern mobile operating systems Android offers auto-backup features. The backups usually include copies of the data and settings of all apps installed on the the device. An obvious concern is whether sensitive user data stored by the app might unintentionally leak to those data backups. 
+Like other modern mobile operating systems Android offers auto-backup features. The backups usually include copies of the data and settings of all apps installed on the the device. An obvious concern is whether sensitive user data stored by the app might unintentionally leak to those data backups.
 
-Given its diverse ecosystem, Android has a lot of backup options to account for. 
+Given its diverse ecosystem, Android has a lot of backup options to account for.
 
 - Stock Android has built-in USB backup facilities. A full data backup, or a backup of a particular app's data directory, can be obtained using the <code>abd backup</code> command when USB debugging is enabled.
 
@@ -931,7 +931,7 @@ Given its diverse ecosystem, Android has a lot of backup options to account for.
 
 - OEMs may add additional options. For example, HTC devices have a "HTC Backup" option that, when activated, performs daily backups to the cloud.
 
--- [TODO - recommended approach] -- 
+-- [TODO - recommended approach] --
 
 #### Static Analysis
 
@@ -1121,7 +1121,7 @@ It needs to be identified within the code when sensitive information is stored w
 
 #### Dynamic Analysis
 
-To analyse the memory of an app, the app must be **debuggable**.
+To analyse the memory of an app in Android Studio, the app must be **debuggable**.
 See the instructions in XXX (-- TODO [Link to repackage and sign] --) on how to repackage and sign an Android app to enable debugging for an app, if not already done. Also adb integration need to be activated in Android Studio in “_Tools/Android/Enable ADB Integration_” in order to take a memory dump.
 
 For rudimentary analysis Android Studio built-in tools can be used. Android Studio includes tools in the “_Android Monitor_” tab to investigate the memory. Select the device and app you want to analyse in the "_Android Monitor_" tab and click on "_Dump Java Heap_" and a _.hprof_ file will be created.
@@ -1234,18 +1234,15 @@ The following list shows potential warnings or advises for a user when opening t
 
 #### Static Analysis
 
-A list of implemented education controls should be provided. The controls should be verified in the code if they are implemented properly and according to best practices.  
--- TODO [Create content on Static Analysis for Verifying User Education Controls] --
+A list of implemented education controls should be provided. The controls should be verified in the code if they are implemented properly and according to best practices.
 
 #### Dynamic Analysis
 
-After installing the app and also while using it, it should be checked if any warnings are shown to the user, that have an educational purpose.
--- TODO [Develop content on Dynamic Analysis on Verifying User Education Controls] --
+After installing the app and also while using it, it should be checked if any warnings are shown to the user, that have an educational purpose and are aligned with the defined education controls.
 
 #### Remediation
 
 Warnings should be implemented that address the key points listed in the overview section.
--- TODO [Develop remediations on Verifying User Education Controls] --
 
 #### References
 
@@ -1254,6 +1251,3 @@ Warnings should be implemented that address the key points listed in the overvie
 
 ##### OWASP MASVS
 - V2.12: "The app educates the user about the types of personally identifiable information processed, as well as security best practices the user should follow in using the app."
-
-##### CWE
-- CWE: -- TODO [Link to CWE issue] --
