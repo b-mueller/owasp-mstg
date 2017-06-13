@@ -7,7 +7,11 @@ pandoc -f markdown_github --columns 10000 -t docx -o ../Generated/MSTG.docx \
 Foreword.md \
 0x02-Frontispiece.md \
 0x03-Overview.md \
-0x04-Testing-Processes-and-Techniques.md \
+0x04-General-Testing-Guide.md \
+0x04a-Mobile-App-Taxonomy.md \
+0x04b-Mobile-App-Security-Testing.md \
+0x04c-Tampering-and-Reverse-Engineering.md \
+0x04d-Security-Testing-SDLC.md \
 0x05-Android-Testing-Guide.md \
 0x05a-Platform-Overview.md \
 0x05b-Basic-Security_Testing.md \
@@ -35,6 +39,7 @@ Foreword.md \
 0x07b-Testing-Network-Communication.md \
 0x07c-Testing-Cryptography.md \
 0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md \
+0x07e-ARM-Assembly-Tutorial.md \
 0x08-Testing-Tools.md \
 0x09-Suggested-Reading.md \
 0x08-Testing-Tools.md \
