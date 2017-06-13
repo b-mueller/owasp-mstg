@@ -66,6 +66,74 @@ If any of these two conditions raise an issue, reject the request and do not all
 [3] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema_(OTG-AUTHN-004)
 
 
+### Testing Session Management
+
+#### Overview
+
+All significant, if not privileged, actions must be done after a user is properly authenticated; the application will remember the user inside a session. When improperly managed, sessions are subject to a variety of attacks where the session of a legitimate user may be abused, allowing the attacker to impersonate the user. As a consequence, data may be lost, confidentiality compromised or illegitimate actions performed.
+
+Sessions must have a beginning and an end. It must be impossible for an attacker to forge a session token: instead, it must be ensured that a session can only be started by the system on the server side. Also, the duration of a session should be as short as possible, and the session must be properly terminated after a given amount of time or after the user has explicitly logged out. It must be impossible to reuse session tokens.
+
+As such, the scope of this test is to validate that sessions are securely managed and cannot be compromised by an attacker.
+
+#### Static Analysis
+
+When server source code is available, the tester should look for the place where sessions are initiated, stored, exchanged, verified and terminated. This must be done whenever any access to privileged information or action takes place. For those matters, automated tools or manual search can be used to look for relevant keywords in the target programming language. Sample frameworks on server side are:
+
+- Spring (Java) - http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#ns-session-mgmt
+- PHP - http://php.net/manual/en/book.session.php
+- Ruby on Rails -  http://guides.rubyonrails.org/security.html
+
+#### Dynamic Analysis
+
+A best practice is to crawl the application first, either manually or with an automated tool. The goal is to check if all parts of the application leading to privileged information or actions are protected and a valid session token is required or not.
+
+Then, you can use the crawled requests within any intercepting proxy to try to manipulate session tokens:
+- by modifying them into illegitimate ones (for instance, add 1 to the valid session token or delete parts of it).
+- by deleting a valid one in the request to test if the information and/or function of the application can still be accessed.
+- by trying to log out and re-log in again to check if the session token has changed or not.
+- when changing privilege level (step-up authentication). Try to use the former one (hence with a lower authorization level) to access the privileged part of the application.
+- by trying to re-use a session token after logging out.
+
+Also the OWASP Testing Guide<sup>[1]</sup> should be consulted for more session management test cases.
+
+#### Remediation
+
+In order to offer proper protection against the attacks mentioned earlier, session tokens must:
+- always be created on the server side,
+- not be predictable (use proper length and entropy),
+- always be exchanged over secure connections (e.g. HTTPS),
+- be stored securely within the mobile app,
+- be verified when a user is trying to access privileged parts of an application (a session token must be valid and correspond to the proper level of authorization),
+- be renewed when a user is asked to log in again to perform an operation requiring higher privileges and
+- be terminated on server side and deleted within the mobile app when a user logs out or after a specified timeout.
+
+It is strongly advised to use session token generators, that are build-in within the framework used, as they are more secure than building a custom one. Such generators exist for most frameworks and languages.
+
+#### References
+
+##### OWASP Mobile Top 10 2016
+
+* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
+
+##### OWASP MASVS
+
+* 4.2: "The remote endpoint uses randomly generated access tokens, if classical server side session management is used, to authenticate client requests without sending the user's credentials."
+
+##### CWE
+
+- CWE-613 - Insufficient Session Expiration https://cwe.mitre.org/data/definitions/613.html
+
+##### Info
+
+[1] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
+
+##### Tools
+
+* Zed Attack Proxy
+* Burp Suite
+
+
 
 ### Testing JSON Web Token (JWT)
 
@@ -136,7 +204,7 @@ The following best practices should be considered, when implementing JWT:
 * The private signing key or secret key for HMAC should only be available on server side.
 * If replay attacks are a risk for the app, `jti` (JWT ID) claim should be implemented.
 * Ideally the content of JWT should be encrypted in order to ensure the confidentially of the information contained within it. There might be description of roles, usernames or other sensitive information available that should be protected. An example implementation in Java can be found in the OWASP JWT Cheat Sheet<sup>[4]</sup>
-* Clarify if copying a token to another device should or should not make an attacker able to continue authenticated. Check the device binding test case, if this should be enforced. 
+* Clarify if copying a token to another device should or should not make an attacker able to continue authenticated. Check the device binding test case, if this should be enforced.
 
 #### References
 
@@ -167,74 +235,6 @@ The following best practices should be considered, when implementing JWT:
 * jwtbrute - https://github.com/jmaxxz/jwtbrute
 * crackjwt - https://github.com/Sjord/jwtcrack/blob/master/crackjwt.py
 * John the ripper - https://github.com/magnumripper/JohnTheRipper
-
-
-### Testing Session Management
-
-#### Overview
-
-All significant, if not privileged, actions must be done after a user is properly authenticated; the application will remember the user inside a session. When improperly managed, sessions are subject to a variety of attacks where the session of a legitimate user may be abused, allowing the attacker to impersonate the user. As a consequence, data may be lost, confidentiality compromised or illegitimate actions performed.
-
-Sessions must have a beginning and an end. It must be impossible for an attacker to forge a session token: instead, it must be ensured that a session can only be started by the system on the server side. Also, the duration of a session should be as short as possible, and the session must be properly terminated after a given amount of time or after the user has explicitly logged out. It must be impossible to reuse session tokens.
-
-As such, the scope of this test is to validate that sessions are securely managed and cannot be compromised by an attacker.
-
-#### Static Analysis
-
-When server source code is available, the tester should look for the place where sessions are initiated, stored, exchanged, verified and terminated. This must be done whenever any access to privileged information or action takes place. For those matters, automated tools or manual search can be used to look for relevant keywords in the target programming language. Sample frameworks on server side are:
-
-- Spring (Java) - http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#ns-session-mgmt
-- PHP - http://php.net/manual/en/book.session.php
-- Ruby on Rails -  http://guides.rubyonrails.org/security.html
-
-#### Dynamic Analysis
-
-A best practice is to crawl the application first, either manually or with an automated tool. The goal is to check if all parts of the application leading to privileged information or actions are protected and a valid session token is required or not.
-
-Then, you can use the crawled requests within any intercepting proxy to try to manipulate session tokens:
-- by modifying them into illegitimate ones (for instance, add 1 to the valid session token or delete parts of it).
-- by deleting a valid one in the request to test if the information and/or function of the application can still be accessed.
-- by trying to log out and re-log in again to check if the session token has changed or not.
-- when changing privilege level (step-up authentication). Try to use the former one (hence with a lower authorization level) to access the privileged part of the application.
-- by trying to re-use a session token after logging out.
-
-Also the OWASP Testing Guide<sup>[1]</sup> should be consulted for more session management test cases.
-
-#### Remediation
-
-In order to offer proper protection against the attacks mentioned earlier, session tokens must:
-- always be created on the server side,
-- not be predictable (use proper length and entropy),
-- always be exchanged over secure connections (e.g. HTTPS),
-- be stored securely within the mobile app,
-- be verified when a user is trying to access privileged parts of an application (a session token must be valid and correspond to the proper level of authorization),
-- be renewed when a user is asked to log in again to perform an operation requiring higher privileges and
-- be terminated on server side and deleted within the mobile app when a user logs out or after a specified timeout.
-
-It is strongly advised to use session token generators, that are build-in within the framework used, as they are more secure than building a custom one. Such generators exist for most frameworks and languages.
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-
-* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
-
-##### OWASP MASVS
-
-* 4.2: "The remote endpoint uses randomly generated access tokens to authenticate client requests without sending the user's credentials."
-
-##### CWE
-
-- CWE-613 - Insufficient Session Expiration https://cwe.mitre.org/data/definitions/613.html
-
-##### Info
-
-[1] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
-
-##### Tools
-
-* Zed Attack Proxy
-* Burp Suite
 
 
 
@@ -280,13 +280,12 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
--- TODO [Update reference "VX.Y" below for "Testing the Logout Functionality"] --
-- 4.3: "The remote endpoint terminates the existing session when the user logs out."
+
+* 4.4: "The remote endpoint terminates the existing session when the user logs out."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing the Logout Functionality"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+* CWE-613 - Insufficient Session Expiration
 
 ##### Info
 
@@ -345,10 +344,10 @@ For further details check the OWASP Authentication Cheat Sheet<sup>[1]</sup>.
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.4: "A password policy exists and is enforced at the remote endpoint."
+* 4.5: "A password policy exists and is enforced at the remote endpoint."
 
 ##### CWE
-- CWE-521 - Weak Password Requirements
+* CWE-521 - Weak Password Requirements
 
 ##### Info
 * [1] OWASP Authentication Cheat Sheet - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Implement_Proper_Password_Strength_Controls
@@ -392,7 +391,7 @@ Alternatives to locking accounts are enforcing 2-Factor-Authentication (2FA) for
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.5: "The remote endpoint implements an exponential back-off, or temporarily locks the user account, when incorrect authentication credentials are submitted an excessive number of times ."
+* 4.6: "The remote endpoint implements an exponential back-off, or temporarily locks the user account, when incorrect authentication credentials are submitted an excessive number of times ."
 
 ##### CWE
 
@@ -453,7 +452,7 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.7: "Sessions are terminated at the remote endpoint after a predefined period of inactivity."
+* 4.8: "Sessions are terminated at the remote endpoint after a predefined period of inactivity."
 
 ##### CWE
 - CWE-613 - Insufficient Session Expiration
@@ -588,7 +587,7 @@ https://authy.com/blog/security-of-sms-for-2fa-what-are-your-options/
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.10: "The app informs the user of all login activities with his or her account. Users are able view a list of devices used to access the account, and to block specific devices."
+* 4.11: "The app informs the user of all login activities with his or her account. Users are able view a list of devices used to access the account, and to block specific devices."
 
 ##### CWE
 
