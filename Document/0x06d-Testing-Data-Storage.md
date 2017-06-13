@@ -479,9 +479,10 @@ Keywords to look for:
 
 IPC mechanisms should be verified via static analysis in the iOS source code. At this point of time no tool is availalbe on iOS to verify IPC usage.
 
+
 #### Remediation
 
-XPC services is the most secure and flexible way when implementing IPC on iOS and should be used primarily. 
+XPC services is the most secure and flexible way when implementing IPC on iOS and should be used primarily.
 
 NSFileCoordinator<sup>[6]</sup> methods run synchronously, so your code will block until they complete. That's convenient since you don't have to wait for an asynchronous block callback. But it also means that they block the current thread.
 
