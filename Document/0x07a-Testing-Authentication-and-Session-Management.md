@@ -9,6 +9,7 @@ For all of the test cases below, it need to be investigated first what kind of a
 Cookie-Based Authentication is the traditional authentication mechanism used in web applications. In order to adopt to the different requirements of mobile apps Token-Based Authentication was specified and is more and more used nowadays in mobile apps. A prominent example for this is JSON Web Token or JWT<sup>[1]</sup> which can be part of an OAuth2 authentication and authorization framework.
 
 
+
 ### Verifying that Users Are Properly Authenticated
 
 #### Overview

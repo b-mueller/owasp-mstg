@@ -53,19 +53,6 @@ sm     11116 Fri Nov 11 12:07:48 ICT 2016 AndroidManifest.xml
 (...)
 ```
 
-The output for an APK signed with a Release certificate looks as follows:
-
-```
-$ jarsigner -verify -verbose -certs example.apk
-
-sm     11116 Fri Nov 11 12:07:48 ICT 2016 AndroidManifest.xml
-
-      X.509, CN=Awesome Corporation, OU=Awesome, O=Awesome Mobile, L=Palo Alto, ST=CA, C=US
-      [certificate is valid from 9/1/09 4:52 AM to 9/26/50 4:52 AM]
-      [CertPath not validated: Path does not chain with any of the trust anchors]
-(...)
-```
-
 Ignore the "CertPath not validated" error -  this error appears with Java SDK 7 and greater. Instead, you can rely on the <code>apksigner</code> to verify the certificate chain.
 
 #### Dynamic Analysis
@@ -138,10 +125,10 @@ Attack Surface:
     is debuggable
 ```
 
-To scan for all debuggable applications on a device, the `app.package.debuggable` module should be used: 
+To scan for all debuggable applications on a device, the `app.package.debuggable` module should be used:
 
 ```
-dz> run app.package.debuggable 
+dz> run app.package.debuggable
 Package: com.mwr.dz
   UID: 10083
   Permissions:
@@ -150,7 +137,7 @@ Package: com.vulnerable.app
   UID: 10084
   Permissions:
    - android.permission.INTERNET
-``` 
+```
 
 If an application is debuggable, it is trivial to get command execution in the context of the application. In `adb` shell, execute the `run-as` binary, followed by the package name and command:
 
@@ -268,21 +255,100 @@ Add the following to build.gradle:
 ### Testing for Debugging Code and Verbose Error Logging
 
 #### Overview
+StrictMode is a developer tool to be able to detect policy violation, e.g. disk or network access.
+It can be implemented in order to check the usage of good coding practices such as implementing high-performance code or usage of network access on the main thread.
+The policy are defined together with rules and different methods of showing the violation of a policy.
 
-`StrictMode` - https://developer.android.com/reference/android/os/StrictMode.html
--- TODO [Give an overview about the functionality and it's potential weaknesses] --
+There are two category of policies:
+* `StrictMode.ThreadPolicy`
+* `StrictMode.VmPolicy`
 
+The ThreadPolicy can monitor:
+* Disk Reads
+* Disk Writes
+* Network access
+* Custom Slow Code
+
+The VM policies,  applied to all threads in the virtual machine's process, are:
+* Leaked Activity objects
+* Leaked SQLite objects
+* Leaked Closable objects
+
+In order to enable `StrictMode`, the code should be implemented in onCreate().
+Here is an example of enabling both policies mentioned above<sup>[1]</sup>:
+```
+public void onCreate() {
+     if (DEVELOPER_MODE) {
+         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                 .detectDiskReads()
+                 .detectDiskWrites()
+                 .detectNetwork()   // or .detectAll() for all detectable problems
+                 .penaltyLog()
+                 .build());
+         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                 .detectLeakedSqlLiteObjects()
+                 .detectLeakedClosableObjects()
+                 .penaltyLog()
+                 .penaltyDeath()
+                 .build());
+     }
+     super.onCreate();
+ }
+
+```
 #### Static Analysis
+With the purpose to check if `StrictMode` is enabled you could look for the methods `StrictMode.setThreadPolicy` or `StrictMode.setVmPolicy`. Most likely they will be in the onCreate() method.
 
--- TODO [Add content on white-box testing for "Testing for Debugging Code and Verbose Error Logging"] --
+The various detect methods for Thread Policy are<sup>[3]</sup>:
+```
+detectDiskWrites() //API level 9
+detectDiskReads() //API level 9
+detectNetwork() //API level 9
+detectCustomSlowCalls()//Introduced in API level 11
+detectAll()
+detectCustomSlowCalls()
+```
+
+Another possibility is to capture all kind of violation as:
+```
+detectAll()
+detectCustomSlowCalls()
+```
+
+The possible penalties for thread policy are<sup>[3]</sup>:
+```
+penaltyLog() //Logs a message to LogCat
+penaltyDeath() //Crashes application, runs at the end of all enabled penalties
+penaltyDialog() //Show a dialog
+penaltyDeathOnNetwork() //Crashes the whole process on any network usage
+penaltyDropBox() //Enable detected violations log a stacktrace and timing data to the DropBox on policy violation
+penaltyFlashScreen() //Introduced in API level 11 which Flash the screen during a violation
+```
+
+Considering the VM policy of StrictMode, the policy are<sup>[3]</sup>:
+```
+detectActivityLeaks() //API level 11. Detect leaks of Activity subclasses.
+detectLeakedClosableObjects() //API level 11. Detect when an Closeable or other object with a explict termination method is finalized without having been closed.
+detectLeakedSqlLiteObjects() //API level 9. Detect when an SQLiteCursor or other SQLite object is finalized without having been closed.
+setClassInstanceLimit(Class.forName("my.app.sample.sampleclass"),10) //API level 11
+```
+
+The possible penalties for VM policy violation are<sup>[3]</sup>:
+```
+penaltyLog()
+penaltyDeath()
+penaltyDropBox()
+```
 
 #### Dynamic Analysis
-
--- TODO [Add content on black-box testing for "Testing for Debugging Code and Verbose Error Logging"] --
+There are different way of detecting the `StrictMode` and it depends on how the policies' role are implemented. Some of them are:
+* Logcat
+* Warning Dialog
+* Crash of the application
 
 #### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing for Debugging Code and Verbose Error Logging"] --
+It's recommended to insert the policy in the `if` statement with `DEVELOPER_MODE` as condition.
+The DEVELOPER_MODE has to be disabled for release build in order to disable `StrictMode` too.
 
 #### References
 
@@ -297,7 +363,9 @@ Add the following to build.gradle:
 - CWE-312 - Cleartext Storage of Sensitive Information
 
 ##### Info
--- TODO
+- [1] Official Developer Guide - https://developer.android.com/reference/android/os/StrictMode.html
+- [2] Envatotuts+ - https://code.tutsplus.com/tutorials/android-best-practices-strictmode--mobile-7581
+- [3] Javabeat- http://javabeat.net/strictmode-android-1/
 
 ##### Tools
 -- TODO [Add relevant tools for "Testing for Debugging Code and Verbose Error Logging"] --

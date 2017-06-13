@@ -12,15 +12,15 @@ The iOS SDK (Software Development Kit), formerly known as iPhone SDK, is a softw
 
 #### Utilities
 
-Class-dump by Steve Nygard<sup>[1]</sup> is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
+- Class-dump by Steve Nygard<sup>[1]</sup> is a command-line utility for examining the Objective-C runtime information stored in Mach-O files. It generates declarations for the classes, categories and protocols.
 
-Class-dump-z<sup>[9]</sup> is re-write of class-dump from scratch using C++, avoiding using dynamic calls. Removing these unnecessary calls makes class-dump-z near 10 times faster than the precedences.
+- Class-dump-z<sup>[9]</sup> is re-write of class-dump from scratch using C++, avoiding using dynamic calls. Removing these unnecessary calls makes class-dump-z near 10 times faster than the precedences.
 
-Class-dump-dyld by Elias Limneos<sup>[2]</sup> allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
+- Class-dump-dyld by Elias Limneos<sup>[2]</sup> allows dumping and retrieving symbols directly from the shared cache, eliminating the need to extract the files first. It can generate header files from app binaries, libraries, frameworks, bundles or the whole dyld_shared_cache. Is is also possible to Mass-dump the whole dyld_shared_cache or directories recursively.
 
-MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries.
+- MachoOView<sup>[3]</sup> is a useful visual Mach-O file browser that also allows for in-file editing of ARM binaries.
 
--- TODO [otool] --
+- otool is a tool for  displays  specified  parts	of object files or libraries. It understands both Mach-O (Mach object) files and universal file formats.  
 
 #### Reversing Frameworks
 
@@ -49,11 +49,11 @@ iOS applications store data in the application sandbox which is not accessible t
 
 #### How to Jailbreak iOS?
 
-Before we get into how to perform jailbreak on iOS, it is important to note that this section is merely served as a general guideline and is only up to date as of the writing of this guide. OWASP and the MSTG will not be responsible if you happen to brick your iOS device while performing the steps to jailbreak your iOS device. 
+The iOS jailbreak scene is evolving so rapidly that it is difficult to provide-up-to-date instructions.
 
--- TODO [Jailbreaking howto] --
+Note that obviously OWASP and the MSTG will not be responsible if you end up bricking your iOS device!
 
-Some reliable resources to read about content regarding jailbreak iOS
+Some reliable resources to read about content regarding jailbreak iOS.
 
 * The iPhone Wiki - https://www.theiphonewiki.com/wiki/Jailbreak
 * Redmond Pie - http://www.redmondpie.com/
@@ -69,7 +69,8 @@ We'll revisit this topic in the chapter "Testing Resilience Against Reverse Engi
 
 ### Reverse Engineering iOS Apps
 
--- TODO [Overview] --
+iOS reverse engineering is a mixed bag. On the one hand, apps programmed in Objective-C and Swift can be disassembled nicely
+
 
 #### Static Analysis
 
@@ -169,6 +170,8 @@ http://iphonedevwiki.net/index.php/Cycript_Tricks
 
 ### References
 
+-- TODO [Clean up References] --
+
 * [1] Class-dump - http://stevenygard.com/projects/class-dump/
 * [2] Class-dump-dyld - https://github.com/limneos/classdump-dyld/
 * [3] MachOView - https://sourceforge.net/projects/machoview/
@@ -179,3 +182,6 @@ http://iphonedevwiki.net/index.php/Cycript_Tricks
 * [7] Apple Xcode IDE - https://developer.apple.com/xcode/ide/
 * [8] Apple iOS 10 SDK - https://developer.apple.com/ios/
 * [9] Class-dump-z - https://code.google.com/archive/p/networkpx/wikis/class_dump_z.wiki
+
+
+- [x] IDA Pro - https://www.hex-rays.com/products/ida/
