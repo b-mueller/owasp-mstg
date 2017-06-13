@@ -242,7 +242,7 @@ The following best practices should be considered, when implementing JWT:
 
 #### Overview
 
-Session termination is an important part of the session lifecycle. Reducing the lifetime of the session tokens to a minimum decreases the likelihood of a successful session hijacking attack. The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side.
+Reducing the lifetime of (session) tokens to a minimum decreases the likelihood of a successful account hijacking attack. The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side or stateless token.
 
 ##### Static Analysis 
 
@@ -250,8 +250,8 @@ If server side code is available, it should be reviewed that the session is bein
 - Spring (Java) -  http://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/web/authentication/logout/SecurityContextLogoutHandler.html
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
 - PHP - http://php.net/manual/en/function.session-destroy.php
-- JSF - http://jsfcentral.com/listings/A20158?link
-- ASP.Net - https://msdn.microsoft.com/en-us/library/ms524798(v=vs.90).aspx
+
+Also for stateless authentication the access token and refresh token (if used) should be deleted from the mobile device and invalidate the refresh token on server side.
 
 #### Dynamic Analysis
 
@@ -269,10 +269,8 @@ A detailed explanation with more test cases, can also be found in the OWASP Web 
 One of the most common errors done when implementing a logout functionality is simply not destroying the session object on server side. This leads to a state where the session is still alive even though the user logs out of the application. The session remains alive, and if an attacker get’s in possession of a valid session he can still use it and a user cannot even protect himself by logging out or if there are no session timeout controls in place.
  
 To mitigate it, the logout function on the server side must invalidate the session identifier immediately after logging out to prevent it to be reused by an attacker that could have intercepted it.
- 
-Related to this, it must be checked that after calling an operation with an expired token, the application does not generate another valid token. This could lead to another authentication bypass.
- 
-Many mobile apps do not automatically logout a user, because of customer convenience. The user logs in once, afterwards a token is generated on server side and stored within the applications internal storage and used for authentication when the application starts instead of asking again for user credentials. If the token expires a refresh token might be used (OAuth2/JWT) to transparently reinitiate the session for the user. There should still be a logout function available within the application and this should work accordingly to best practices by also destroying the session on server side.
+
+Many mobile apps do not automatically logout a user, because of customer convenience by implementing stateless authentication. The user logs in once, afterwards a token is generated on server side and stored within the applications internal storage and used for authentication when the application starts instead of asking again for user credentials. If the token expires a refresh token might be used (OAuth2/JWT) to transparently reinitiate the session for the user. There should still be a logout function available within the application and this should work accordingly to best practices by also destroying the accesss and refresh token on client and server side. Otherwise this could lead to another authentication bypass in case the refresh token is not invalidated.
 
 #### References
 
