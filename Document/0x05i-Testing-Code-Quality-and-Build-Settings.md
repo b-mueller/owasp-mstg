@@ -376,23 +376,92 @@ The DEVELOPER_MODE has to be disabled for release build in order to disable `Str
 ### Testing Exception Handling
 
 #### Overview
-
--- TODO [Give an overview about the functionality and it's potential weaknesses] --
+Exceptions can often occur when an application gets into a non-normal or erroneous state. Both in Java and C++ exceptions can be thrown when such state occurs. 
+Testing exception handling is about reassuring that the application will handle the exception and get to a safe state without exposing any sensitive information at both the UI and the logging mechanisms used by the application.
 
 #### Static Analysis
 
 Review the source code to understand and identify how the application handles various types of errors (IPC communications, remote services invocation, etc). Here are some examples of the checks to be performed at this stage :
 
 * Verify that the application use a well-designed and unified scheme to handle exceptions<sup>[1]</sup>.
-* Verify that the application doesn't expose sensitive information while handling exceptions, but are still verbose enough to explain the issue to the user.
+* Verify that standard `RuntimeException`s (e.g.`NullPointerException`, `IndexOutOfBoundsException`, `ActivityNotFoundException`, `CancellationException`, `SQLException`) are anticipated upon by creating proper null-checks, bound-checks and alike. See <sup>[2]</sup> for an overview of the provided child-classes of `RuntimeException`. If the developer still throws a child of `RuntimeException` then this should always be intentional and that intention should be handled by the calling method.
+* Verify that for every non-runtime `Throwable`, there is a proper catch handler, which ends up handling the actual exception properly. 
+* Verify that the application doesn't expose sensitive information while handling exceptions in its UI or in its log-statements, but are still verbose enough to explain the issue to the user.
+* Verify that any confidential information, such as keying material and/or authentication information is always wiped at the `finally` blocks in case of a high risk application.
+
 
 #### Dynamic Analysis
+There are various ways of doing dynamic analysis: 
 
--- TODO [Describe how to test for this issue using static and dynamic analysis techniques. This can include everything from simply monitoring aspects of the app’s behavior to code injection, debugging, instrumentation, etc. ] --
+- Use Xposed to hook into methods and call the method with unexpected values or overwrite existing variables to unexpected values (e.g. Null values, etc.).
+- Provide unexpected values to UI fields in the Android application.
+- Interact with the application using its intents and public providers by using values that are unexpected. 
+- Tamper the network communication and/or the files stored by the application.
+
+In all cases, the application should not crash, but instead, it should:
+
+- Recover from the error or get into a state in which it can inform the user of not being able to continue.
+- If necessary, inform the user in an informative message to make him/her take appropriate action. The message itself should not leak sensitive information.
+- Not provide any information in logging mechanims used by the application.
 
 #### Remediation
+There are a few things a developer can do:
+- Ensure that the application use a well-designed and unified scheme to handle exceptions<sup>[1]</sup>.
+- When an exception is thrown, make sure that the application has centralized handlers for exceptions that result in similar behavior. This can be a static class for instance. For specific exceptions given the methods context, specific catch blocks should be provided.
+- When executing operations that involve high risk information, make sure you wipe the information in the finally block in java:
 
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Exception Handling"] --
+```java
+byte[] secret;
+try{
+	//use secret
+} catch (SPECIFICEXCEPTIONCLASS | SPECIFICEXCEPTIONCLASS2  e) {
+	// handle any issues
+} finally {
+	//clean the secret.
+}
+```
+
+- Add a general exception-handler for uncaught exceptions to clear out the state of the application prior to a crash:
+```java
+public class MemoryCleanerOnCrash implements Thread.UncaughtExceptionHandler {
+
+    private static final MemoryCleanerOnCrash S_INSTANCE = new MemoryCleanerOnCrash();
+    private final List<Thread.UncaughtExceptionHandler> mHandlers = new ArrayList<>();
+
+	//initiaze the handler and set it as the default exception handler
+    public static void init() {
+        S_INSTANCE.mHandlers.add(Thread.getDefaultUncaughtExceptionHandler());
+        Thread.setDefaultUncaughtExceptionHandler(S_INSTANCE);
+    }
+
+	 //make sure that you can still add exception handlers on top of it (required for ACRA for instance)
+    public void subscribeCrashHandler(Thread.UncaughtExceptionHandler handler) {
+        mHandlers.add(handler);
+    }
+
+    @Override
+    public void uncaughtException(Thread thread, Throwable ex) {
+
+			//handle the cleanup here
+			//....
+			//and then show a message to the user if possible given the context
+			
+        for (Thread.UncaughtExceptionHandler handler : mHandlers) {
+            handler.uncaughtException(thread, ex);
+        }
+    }
+}
+
+```
+Now you need to call the initializer for the handler at your custom `Application` class (e.g. the class that extends `Application`):
+```java
+	
+	 @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MemoryCleanerOnCrash.init();
+    }
+```
 
 #### References
 
@@ -410,11 +479,11 @@ Review the source code to understand and identify how the application handles va
 ##### Info
 
 [1] Exceptional Behavior (ERR) - https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=18581047
+[2] Android developer API documentation - https://developer.android.com/reference/java/lang/RuntimeException.html
 
 ##### Tools
 
--- TODO [Add relevant tools for "Testing Exception Handling"] --
-* Enjarify - https://github.com/google/enjarify
+* Xposed - http://repo.xposed.info/
 
 
 

@@ -48,7 +48,7 @@ This is the official Github Repository of the OWASP Mobile Security Testing Guid
 
 ### Appendix
 
-- [Remote Authentication and Authorization](Document/x07a-Testing-Authentication-and-Session-Management.md)
+- [Remote Authentication and Authorization](Document/0x07a-Testing-Authentication-and-Session-Management.md)
 - [Testing Network Communication](Document/0x07b-Testing-Network-Communication.md)
 - [Cryptography for Mobile Apps](Document/0x07c-Testing-Cryptography.md)
 * [Assessing Software Protection Schemes](Document/0x07d-Assessing-Anti-Reverse-Engineering-Schemes.md)

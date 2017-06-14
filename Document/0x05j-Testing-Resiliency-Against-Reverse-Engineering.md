@@ -644,7 +644,7 @@ If anti-debugging is missing or too easily bypassed, make suggestions in line wi
 There are two file-integrity related topics:
 
  1. _The application-source related integrity checks:_ In the "Tampering and Reverse Engineering" chapter, we discussed Android's APK code signature check. We also saw that determined reverse engineers can easily bypass this check by re-packaging and re-signing an app. To make this process more involved, a protection scheme can be augmented with CRC checks on the app bytecode and native libraries as well as important data files. These checks can be implemented both on the Java and native layer. The idea is to have additional controls in place so that the only runs correctly in its unmodified state, even if the code signature is valid.
- 2. _The file storage related integrity checks:_ When files are stored by the application using the SD-card or public storage or the `SharedPreferences`, then the file integrity should be protected.
+ 2. _The file storage related integrity checks:_ When files are stored by the application using the SD-card or public storage, or when key-value pairs are stored in the `SharedPreferences`, then their integrity should be protected.
 
 ##### Sample Implementation - application-source
 
@@ -679,11 +679,11 @@ private void crcTest() throws IOException {
 ```
 ##### Sample Implementation - Storage
 
-When providing integrity on the file-storage itself. You can either create an HMAC over a given key-value pair as for the Android `SharedPreferences` or you can create an HMAC over a complete file provided by the filesystem.
-When using an HMAC, you can either use a bouncy castle implementation to HMAC the given content or the AndroidKeyStore and then verify the HMAC later on. There are a few steps to take care of.
-In case of the need for encryptionl. Please make sure that you encrypt and then HMAC as described in [2].
+When providing integrity on the storage itself. You can either create an HMAC over a given key-value pair as for the Android `SharedPreferences` or you can create an HMAC over a complete file provided by the filesystem.
+When using an HMAC, you can either use a bouncy castle implementation to HMAC the given content or the AndroidKeyStore and then verify the HMAC later on: There are a few steps to take care of.
+In case of the need for encryption. Please make sure that you encrypt and then HMAC as described in [2].
 
-When generating an HMAC with BC:
+When generating an HMAC with BouncyCastle:
 
 1. Make sure BounceyCastle or SpongeyCastle are registered as a security provider.
 2. Initialize the HMAC with a key, which can be stored in a keystore.
@@ -692,12 +692,12 @@ When generating an HMAC with BC:
 5. Append the HMAC to the bytearray of step 3.
 6. Store the result of step 5.
 
-When verifying the HMAC with BC:
+When verifying the HMAC with BouncyCastle:
 
 1. Make sure BounceyCastle or SpongeyCastle are registered as a security provider.
 2. Extract the message and the hmacbytes as separate arrays.
-3. repeate step 1-4 of generating an hmac on the message.
-4. now compare the extracted hamcbytes to the result of step 3.
+3. Repeat step 1-4 of generating an hmac on the data.
+4. Now compare the extracted hamcbytes to the result of step 3.
 
 When generating the HMAC based on the Android keystore, then it is best to only do this for Android 6 and higher. In that case you generate the key for hmacking as described in [3].
 A convinient HMAC implementation without the `AndroidKeyStore` can be found below:
