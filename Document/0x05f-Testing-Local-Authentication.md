@@ -82,7 +82,7 @@ When setting up fingerprint authentication, create a new AES key using the <code
 
 	generator.generateKey();
 ```
-Please note, that since Android 7 you can use the `setInvalidatedByBiometricEnrollment(boolean value)` as a method of the builder. If you set this to true, then the fingerprint will not be invalidated when new fingerprints are enrolled. Even though this might provide user-convinience, it opens op a problem area when possible attackers are somehow able to social-engineer their fingerprint in.
+Please note, that since Android 7 you can use the `setInvalidatedByBiometricEnrollment(boolean value)` as a method of the builder. If you set this to true, then the fingerprint will not be invalidated when new fingerprints are enrolled. Even though this might provide user-convenience, it opens op a problem area when possible attackers are somehow able to social-engineer their fingerprint in.
 
 To perform encryption or decryption, create a <code>Cipher</code> object and initialize it with the AES key.
 

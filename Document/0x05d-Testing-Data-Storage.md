@@ -578,6 +578,8 @@ android:longClickable="false"
 ##### Tools
 * Drozer - https://labs.mwrinfosecurity.com/tools/drozer/
 
+
+
 ### Testing Whether Sensitive Data Is Exposed via IPC Mechanisms
 
 #### Overview
@@ -911,6 +913,7 @@ In order to prevent leaking of passwords or pins, sensitive information should b
 ##### CWE
 - CWE-200 - Information Exposure
 
+
 ### Testing for Sensitive Data in Backups
 
 #### Overview
@@ -1211,13 +1214,9 @@ Different checks on the Android device can be implemented by querying different 
 ##### OWASP MASVS
 * V2.11: "The app enforces a minimum device-access-security policy, such as requiring the user to set a device passcode."
 
-##### CWE
-* CWE -- TODO [Link to CWE issue] --
-
 ##### Info
 * [1] Settings.Secure - https://developer.android.com/reference/android/provider/Settings.Secure.html
 * [2] Device Administration API - https://developer.android.com/guide/topics/admin/device-admin.html
-
 
 
 ### Verifying User Education Controls
