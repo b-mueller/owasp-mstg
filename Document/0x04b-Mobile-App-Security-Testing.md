@@ -188,13 +188,4 @@ The same problems with reflected XSS also applied to CSRF attacks. A typical CSR
 The basis for CSRF attacks, access to session cookies of all browser tabs and attaching them automatically if a request to a web page is executed is not applicable on mobile platforms. This is the default behaviour of full blown browsers. Every app has, due to the sandboxing mechanism, it's own web cache and stores it's own cookies, if WebViews are used. Therefore a CSRF attack against a mobile app is by design not possible as the session cookies are not shared with the Android browser.
 
 Only if a user logs in by using the Android browser (instead of using the mobile App) a CSRF attack would be possible, as then the session cookies are accessible for the browser instance.
-## Mobile App Security Testing
 
-Mobile app testing involves evaluating the security of four different attack surfaces: the **app**, the **operating system**, any **remote services** consumed by the app, and the **network** used to communicate with them.  
-
-Examples of vulnerabilities in these surfaces include:
-
-* **App:**  Insecure data storage, poor resiliency against reverse engineering etc.
-* **Operating System:** Any native API to which sensitive info is sent. E.g. Tampering with the system HTTP client might give access to the all SSL/TLS traffic from and to the phone, even when SSL with certificate pinning is used.…mobile app is by design not possible as the session cookies are not shared with the Android browser.
-
-Only if a user logs in by using the Android browser (instead of using the mobile App) a CSRF attack would be possible, as then the session cookies are accessible for the browser instance.
