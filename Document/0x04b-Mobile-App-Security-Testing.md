@@ -1,13 +1,10 @@
 ## Mobile App Security Testing
 
-Mobile app testing involves evaluating the security of four different attack surfaces: the **app**, the **operating system**, any **remote services** consumed by the app, and the **network** used to communicate with them.  
+Mobile app security testing involves, unsurprisingly, evaluating the security of mobile apps using technical analysis methods. Often (but not necessarily) this is done in the context of a larger security assessment that also encompasses the overall client-server architecture, as well as server-side APIs used by the mobile app. 
 
-Examples of vulnerabilities in these surfaces include:
+You'll find that various terms such as "Mobile App Penetration Testing", "Mobile App Security Review", and others are used in the security industry. All of those terms refer to roughly the same thing. Throughout the guide, we'll simply use "mobile app security testing" as an umbrella term. There's a few key points to consider:
 
-* **App:**  Insecure data storage, poor resiliency against reverse engineering etc.
-* **Operating System:** Any native API to which sensitive info is sent. E.g. Tampering with the system HTTP client might give access to the all SSL/TLS traffic from and to the phone, even when SSL with certificate pinning is used.
-* **Network:** Usage of insecure or unencrypted communication channel, missing SSL certificate pinning etc.
-* **Remote Services:** Flawed authentication and session management, vulnerable server side functions etc.
+- As far as mobile apps are concerned, there isn't really a difference between white-box and black-box testing. You always have access to the compiled app, and once you learn reading bytecode and binary code (or using a decompiler), having the compiled app is pretty much the same as having the source code.
 
 The following sections will show how to use the OWASP mobile application security checklist and testing guide during a security test. It is split into four sections:
 

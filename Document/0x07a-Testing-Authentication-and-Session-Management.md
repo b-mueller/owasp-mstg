@@ -27,7 +27,7 @@ When server-side source code is available, first identify which authentication m
 Authentication mechanisms shouldn't be implemented from scratch, instead they should be build on top of frameworks that offer this functionality. The framework used on the server side should be identified and the usage of the available authentication APIs/functions should be verified if they are used accordingly to best practices. Widely used frameworks on server side are for example:
 
 - Spring (Java) - https://projects.spring.io/spring-security/
-- Struts (Java) - https://struts.apache.org/docs/
+- Struts (Java) - https://struts.apache.org/docs/security.html
 - Laravel (PHP) - https://laravel.com/docs/5.4/authentication
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
 
@@ -61,9 +61,9 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 ##### Info
 
-[1] OWASP JWT Cheat Sheet for Java: `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
-[2] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
-[3] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema_(OTG-AUTHN-004)
+* [1] OWASP JWT Cheat Sheet for Java: https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java
+* [2] OWASP Testing Guide V4 (Testing for Session Management) - https://www.owasp.org/index.php/Testing_for_Session_Management
+* [3] OWASP Testing Guide V4 (OTG-AUTHN-004) - https://www.owasp.org/index.php/Testing_for_Bypassing_Authentication_Schema_(OTG-AUTHN-004)
 
 
 ### Testing Session Management
@@ -200,6 +200,7 @@ Please also follow the test cases in the OWASP JWT Cheat Sheet<sup>[4]</sup> and
 The following best practices should be considered, when implementing JWT:
 
 * The latest version available of the JWT libraries in use should be implemented, to avoid known vulnerabilities.
+* Make sure that tokens with a different signature type are guaranteed to be rejected.
 * Store the JWT on the mobile phone using a secure mechanism, like KeyChain on iOS or KeyStore on Android.
 * The private signing key or secret key for HMAC should only be available on server side.
 * If replay attacks are a risk for the app, `jti` (JWT ID) claim should be implemented.
@@ -225,7 +226,7 @@ The following best practices should be considered, when implementing JWT:
 * [1] RFC 7519 JSON Web Token (JWT) - https://tools.ietf.org/html/rfc7519
 * [2] PHP JWT - https://github.com/firebase/php-jwt
 * [3] Java Spring with JWT - http://projects.spring.io/spring-security-oauth/docs/oauth2.html
-* [4] OWASP JWT Cheat Sheet - `https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java`
+* [4] OWASP JWT Cheat Sheet - https://www.owasp.org/index.php/JSON_Web_Token_(JWT)_Cheat_Sheet_for_Java
 * [5] Sample of JWT Token - https://jwt.io/#debugger
 * [6] Critical Vulnerabilities in JSON Web Token - https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/
 * [7] JWT the right way - https://stormpath.com/blog/jwt-the-right-way
@@ -253,7 +254,7 @@ If server side code is available, it should be reviewed that the session is bein
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
 - PHP - http://php.net/manual/en/function.session-destroy.php
 
-For stateless authentication the access token and refresh token (if used) should be deleted from the mobile device and the refresh token should be invalidated on server side.
+For stateless authentication the access token and refresh token (if used) should be deleted from the mobile device and the refresh token should be invalidated on server side<sup>[1]</sup>.
 
 #### Dynamic Analysis
 
@@ -264,11 +265,11 @@ For a dynamic analysis of the application an interception proxy should be used. 
 4.  Resend one of the operations detailed in step 2 using an interception proxy. For example, with Burp Repeater. The purpose of this is to send to the server a request with the session ID or token that has been invalidated in step 3.
  
 If the logout is correctly implemented on the server side, either an error message or redirect to the login page will be sent back to the client. On the other hand, if you have the same response you had in step 2, then the token or session ID is still valid and has not been correctly terminated on the server side.
-A detailed explanation with more test cases, can also be found in the OWASP Web Testing Guide (OTG-SESS-006)<sup>[1]</sup>.
+A detailed explanation with more test cases, can also be found in the OWASP Web Testing Guide (OTG-SESS-006)<sup>[2]</sup>.
 
 #### Remediation 
 
-The logout function on the server side must invalidate the session identifier or token immediately after logging out to prevent it to be reused by an attacker that could have intercepted it.
+The logout function on the server side must invalidate the session identifier or token immediately after logging out to prevent it to be reused by an attacker that could have intercepted it<sup>[3]</sup>.
 
 Many mobile apps do not automatically logout a user, because of customer convenience by implementing stateless authentication. There should still be a logout function available within the application and this should work accordingly to best practices by also destroying the access and refresh token on client and server side. Otherwise this could lead to another authentication bypass in case the refresh token is not invalidated.
 
@@ -287,8 +288,9 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 
 ##### Info
 
-* [1] OTG-SESS-006 - https://www.owasp.org/index.php/Testing_for_logout_functionality
-* [2] Session Management Cheat Sheet - https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
+* [1] JWT token blacklisting - https://auth0.com/blog/blacklist-json-web-token-api-keys/
+* [2] OTG-SESS-006 - https://www.owasp.org/index.php/Testing_for_logout_functionality
+* [3] Session Management Cheat Sheet - https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
 
 
 
@@ -305,8 +307,13 @@ Regular Expressions are often used to validate passwords. The password verificat
 
 Passwords can be set when registering accounts, changing the password or when resetting the password in a forgot password process. All of the available functions in the application that are able to change or set a password need to be identified in the source code. They should all be using the same password verification check, that is aligned with the password policy.
 
-If a frameworks is used that offers the possibility to create and enforce a password policy for all users of the application, the configuration should be checked.
+Here are different examples on how a validation can be implemented server-side:
 
+* Spring (Java) -  https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation/Validator.html
+* Ruby on Rails -  http://guides.rubyonrails.org/active_record_validations.html
+* PHP - http://php.net/manual/en/filter.filters.validate.php
+
+If a framework is used that offers the possibility to create and enforce a password policy for all users of the application, the configuration should be checked.
 
 #### Dynamic Analysis
 
@@ -316,12 +323,12 @@ All available functions that allow a user to set a password need to be verified,
 - Forgot Password function that allows a user to set a new password or
 - Change Password function that allows a logged in user to set a new password.
 
-An interception proxy should be used, to bypass client passwords checks within the app in order to be able verify the password policy implemented on server side.
+An interception proxy should be used, to bypass client passwords checks within the app in order to be able verify the password policy implemented on server side. More information about testing methods can be found in the OWASP Testing Guide (OTG-AUTHN-007)<sup>[1]</sup>
 
 
 #### Remediation
 
-A good password policy should define the following requirements in order to avoid password brute-forcing.
+A good password policy should define the following requirements<sup>[2]</sup> in order to avoid password brute-forcing:
 
 **Password Length**
 * Minimum length of the passwords should be enforced, at least 10 characters.
@@ -334,7 +341,8 @@ A good password policy should define the following requirements in order to avoi
 3. at least 1 digit (0-9)
 4. at least 1 special character (punctuation)
 
-For further details check the OWASP Authentication Cheat Sheet<sup>[1]</sup>.
+For further details check the OWASP Authentication Cheat Sheet<sup>[2]</sup>. A common library that can be used for estimating password strength is zxcvbn<sup>[3]</sup>, which is availalbe for many programming languages. 
+
 
 #### References
 
@@ -348,9 +356,9 @@ For further details check the OWASP Authentication Cheat Sheet<sup>[1]</sup>.
 * CWE-521 - Weak Password Requirements
 
 ##### Info
-* [1] OWASP Authentication Cheat Sheet - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Implement_Proper_Password_Strength_Controls
-* [2] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
-
+* [1] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
+* [2] OWASP Authentication Cheat Sheet - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Implement_Proper_Password_Strength_Controls
+* [3] zxcvbn - https://github.com/dropbox/zxcvbn
 
 
 ### Testing Excessive Login Attempts
@@ -457,36 +465,66 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 - CWE-613 - Insufficient Session Expiration
 
 ##### Info
-* [1] OWASP Web Application Test Guide (OTG-SESS-007) -  https://www.owasp.org/index.php/Test_Session_Timeout_(OTG-SESS-007)
-* [2] OWASP Session management cheatsheet https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
+* [1] OWASP Web Application Test Guide (OTG-SESS-007) - https://www.owasp.org/index.php/Test_Session_Timeout_(OTG-SESS-007)
+* [2] OWASP Session management cheatsheet - https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
 * [3] Session Timeout in Java Spring - http://docs.spring.io/spring-session/docs/current/reference/html5/
 * [4] Session Timeout in Ruby on Rails - https://github.com/rails/rails/blob/318a20c140de57a7d5f820753c82258a3696c465/railties/lib/rails/application/configuration.rb#L130
 * [5] Session Timeout in PHP - http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
 * [6] Session Timeout in ASP -  https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
 
-### Testing 2-Factor Authentication
+### Testing 2-Factor Authentication and Step-up Authentication
 
 #### Overview
 
-https://authy.com/blog/security-of-sms-for-2fa-what-are-your-options/
--- TODO [Provide a general description of the issue "Testing 2-Factor Authentication".] --
+Two-factor authentication (2FA) is becoming a standard when logging into mobile apps. Typically the first factor might be credentials (username/password), followed by a second factor which could be an One Time Password (OTP) sent via SMS. The key aspect of 2FA is to use two different factors out of the following categories:
+* Something you have: this can be a physical object like a hardware token, a digital object like X.509 certificates (in enterprise environments) or generation of software tokens on the mobile phone itself.
+* Something you know: this can be a secret only known to the user like a password.
+* Something you are: this can be biometric characteristics that identify the users like TouchID.
+
+Applications that offer access to sensitive data or critical functions, might require users additionally to re-authenticate with a stronger authentication mechanism. For example, after logging in via biometric authentication (e.g. TouchID) into a banking app, a user might need to do a so called "Step-up Authentication" again through OTP in order to execute a bank transfer.
+
+A key advantage of step-up authentication is improved usability for the user. A user is asked to authenticate with the additional factor only when necessary.
+
 
 #### Static Analysis
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+When server-side source code is available, first identify how a second factor or step-up authentication is used and enforced. Afterwards locate all endpoints with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user has already passed 2FA or the step-up authentication and that he is allowed to access the endpoint.
 
--- TODO [Confirm remark on "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+2FA or step-up authentication shouldn't be implemented from scratch, instead they should be build on top of available libraries that offer this functionality. The libraries used on the server side should be identified and the usage of the available APIs/functions should be verified if they are used accordingly to best practices.
 
--- TODO [Develop content on Testing 2-Factor Authentication with source code] --
+For example server side libraries like GoogleAuth<sup>[2]</sup> can be used. Such libraries rely on a widely accepted mechanism of implementing an additional factor by using Time-Based One-Time Password Algorithms (TOTP). TOTP is a cryptographic algorithm that computes a OTP from a shared secret key between the client and server and the current time. The created OTPs are only valid for a short amount of time, usually 30 to 60 seconds.
 
+Instead of using libraries in the server side code, also available cloud solutions can be used like for example:
+
+- Google Authenticator<sup>[2]</sup>
+- Microsoft Authenticator<sup>[3]</sup>
+- Authy<sup>[4]</sup>
+
+Regardless if the implementation is done within the server side or by using a cloud provider, the TOTP app need to be started and will display the OTP that need to be keyed in into the app that is waiting to authenticate the user.
+
+For local biometric authentication as an additional factor, please verify the test case "Testing Biometric Authentication".
 
 #### Dynamic Analysis
 
--- TODO [Describe how to test for this issue "Testing 2-Factor Authentication" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
+First, all privileged endpoints a user can only access with step-up authentication or 2FA within an app should be explored. For all of these requests sent to an endpoint, an interception proxy can be used to capture network traffic. Then, try to replay requests with a token or session information that hasn't been elevated yet via 2FA or step-up authentication. If the endpoint is still sending back the requested data, that should only be available after 2FA or step-up authentication, authentication checks are not implemented properly on the endpoint.
+
+The recorded requests should also be replayed without providing any authentication information, in order to check for a complete bypass of authentication mechanisms.
 
 #### Remediation
 
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing 2-Factor Authentication".] --
+The implementation of a second or multiple factors should be strictly enforced on server-side for all critical operations. If cloud solutions are in place, they should be implemented accordingly to best practices.
+
+Step-up authentication should be optional for the majority of user scenarios and only enforced for critical functions or when accessing sensitive data.
+
+Regardless of 2FA or step-up authentication, additionally it should be supplemented with passive contextual authentication<sup>[1]</sup>, which can be:
+
+* Geolocation
+* IP address
+* Time of day
+
+Ideally the user's context is compared to previously recorded data to identify anomalies that might indicate account abuse or potential fraud. This is all happening transparent for the user, but can become a powerful control in order to stop attackers.
+
+An additional control to ensure that an authorized user is using the app on an authorized device is to verify if device binding controls are in place. Please check also "Testing Device Binding" for iOS and Android.
 
 #### References
 
@@ -494,70 +532,20 @@ https://authy.com/blog/security-of-sms-for-2fa-what-are-your-options/
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.8: "A second factor of authentication exists at the remote endpoint and the 2FA requirement is consistently enforced."
+
+* 4.9: "A second factor of authentication exists at the remote endpoint and the 2FA requirement is consistently enforced."
+* 4.10: "Step-up authentication is required to enable actions that deal with sensitive data or transactions."
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing 2-Factor Authentication"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-308 - Use of Single-factor Authentication
 
 ##### Info
 
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
-
-##### Tools
-
--- TODO [Add relevant tools for "Testing 2-Factor Authentication"] --
-* Enjarify - https://github.com/google/enjarify
-
-
-
-
-### Testing Step-up Authentication
-
-#### Overview
-
--- TODO [Provide a general description of the issue "Testing Step-up Authentication".] --
-
-#### Static Analysis
-
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
-
--- TODO [Confirm remark on "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>." ] --
-
--- TODO [Develop content on Testing Step-up Authentication with source code] --
-
-#### Dynamic Analysis
-
--- TODO [Describe how to test for this issue "Testing Step-up Authentication" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
-
-#### Remediation
-
--- TODO [Describe the best practices that developers should follow to prevent this issue "Testing Step-up Authentication".] --
-
-#### References
-
-##### OWASP Mobile Top 10 2016
-* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
-
-##### OWASP MASVS
-* 4.9: "Step-up authentication is required to enable actions that deal with sensitive data or transactions."
-
-##### CWE
-
--- TODO [Add relevant CWE for "Testing Step-up Authentication"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
-
-##### Info
-
-- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx
-- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
-
-##### Tools
-
--- TODO [Add relevant tools for "Testing Step-up Authentication"] --
-* Enjarify - https://github.com/google/enjarify
+* [1] Best Practices for Step-up Multi-factor Authentication  - http://www.mtechpro.com/2016/newsletter/may/Ping_Identity_best-practices-stepup-mfa-3001.pdf
+* [2] Google Authenticator - https://support.google.com/accounts/answer/1066447?hl=en
+* [3] Microsoft Authenticator - https://docs.microsoft.com/en-us/azure/multi-factor-authentication/end-user/microsoft-authenticator-app-how-to
+* [4] Authy - https://authy.com/
 
 
 ### Testing User Device Management
