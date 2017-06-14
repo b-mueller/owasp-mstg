@@ -2,7 +2,7 @@
 
 The OWASP Mobile Security Testing Guide (MSTG) is an extension of the OWASP Testing Project specifically focusing on the security testing of Android and iOS devices.
 
-The goal of this project is to help people understand the what, why, when, where, and how of testing applications on Android and iOS devices. The project delivers a complete suite of test cases designed to address the OWASP Mobile Top 10, the Mobile App Security Checklist and the Mobile Application Security Verification Standard (MASVS). 
+The goal of this project is to help people understand the what, why, when, where, and how of testing applications on Android and iOS devices. The project delivers a complete suite of test cases designed to address the OWASP Mobile Top 10, the Mobile App Security Checklist and the Mobile Application Security Verification Standard (MASVS).
 
 ## What Makes Mobile Security Testing Different?
 
@@ -62,13 +62,12 @@ For example, the MASVS requirements could be used in the planning and architectu
 
 All requirements specified in the MASVS are described in technical detail in the testing guide. The main sections of the MSTG are explained briefly in this chapter.
 
-The guide is organized as follows: 
+The guide is organized as follows:
 
-- In the Testing Processes and Techniques Section, we present the mobile app security testing methodology, vulnerability analysis techniques, security testing in the SDLC, and vulnerability analysis techniques. 
+- In the Testing Processes and Techniques Section, we present the mobile app security testing methodology, vulnerability analysis techniques, security testing in the SDLC, and vulnerability analysis techniques.
 
 - The Android Testing Guide covers the everything specific to the Android platform, including security basics, security test cases, and reverse engineering and tampering techniques and preventions.
 
 - The iOS Testing Guide Testing Guide covers everything specific to iOS, including an overview of the iOS OS, security testing, reverse engineering and anti-reversing.
 
-- The appendix presents technical test cases that apply independent of mobile OS, such as authentication and session management endpoint, network communications, and cryptography. We also include a methodology for assessing software protection schemes.
-
+- The appendix presents technical test cases that apply independent of mobile OS, such as authentication and session management, network communications and cryptography. We also include a methodology for assessing software protection schemes.

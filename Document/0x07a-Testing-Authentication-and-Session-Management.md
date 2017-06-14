@@ -3,10 +3,10 @@
 The following chapter outlines authentication and session management requirements of the MASVS into technical test cases. Test cases listed in this chapter are focused on server side and therefore are not relying on a specific implementation on iOS or Android.  
 
 For all of the test cases below, it need to be investigated first what kind of authentication mechanism is used. There are different mechanisms available, to implement server side authentication, either:
-* Cookie-Based Authentication or
+* Cookie-Based Authentication using a session ID or
 * Token-Based Authentication.
 
-Cookie-Based Authentication is the traditional authentication mechanism used in web applications. In order to adopt to the different requirements of mobile apps Token-Based Authentication was specified and is more and more used nowadays in mobile apps. A prominent example for this is JSON Web Token or JWT<sup>[1]</sup> which can be part of an OAuth2 authentication and authorization framework.
+Cookie-Based Authentication is the traditional authentication mechanism used in web applications, which is stateful. In order to adopt to the different requirements of mobile apps, a shift to stateless authentication or Token-Based Authentication can be seen. A prominent example for this is JSON Web Token or JWT<sup>[1]</sup> which can be part of an OAuth2 authentication and authorization framework.
 
 
 
@@ -22,7 +22,7 @@ In case Token-Based authentication with JWT is used, please also look at the tes
 
 #### Static Analysis
 
-When server-side source code is available, first identify which authentication mechanism (Token or Cookie based) is used and enforced on server side. Afterwards locate all endpoints with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the endpoint. Look for keywords in the server source code that are used to authenticate a user or to retrieve and check an existing session token.
+When server-side source code is available, first identify which authentication mechanism (Token or Cookie based) is used and enforced on server side. Afterwards locate all endpoints with sensitive and privileged information and functions: they are the ones that need to be protected. Prior to accessing any item, the application must make sure the user is really who he pretends to and that he is allowed to access the endpoint. Look for keywords in the server source code that are used to authenticate a user or to retrieve and check an existing session.
 
 Authentication mechanisms shouldn't be implemented from scratch, instead they should be build on top of frameworks that offer this functionality. The framework used on the server side should be identified and the usage of the available authentication APIs/functions should be verified if they are used accordingly to best practices. Widely used frameworks on server side are for example:
 
@@ -39,9 +39,9 @@ Further attacks methods can be found in the OWASP Testing Guide V4 (OTG-AUTHN-00
 
 #### Remediation
 
-For every endpoint that needs to be protected, implement a mechanism that checks the session token of the user:
-- if there is no session token, the user may not have been authenticated before;
-- if a token exists, make sure this token is valid and that it grants the user with sufficient privileges to allow the user to access the endpoint.
+For every endpoint that needs to be protected, implement a mechanism that checks the session ID or token of the user:
+- if there is no session ID or token, the user may not have been authenticated before;
+- if a session ID or token exists, make sure that it is valid and that it grants the user with sufficient privileges to allow the user to access the endpoint.
 
 If any of these two conditions raise an issue, reject the request and do not allow the user to access the endpoint.
 
@@ -72,7 +72,7 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 All significant, if not privileged, actions must be done after a user is properly authenticated; the application will remember the user inside a session. When improperly managed, sessions are subject to a variety of attacks where the session of a legitimate user may be abused, allowing the attacker to impersonate the user. As a consequence, data may be lost, confidentiality compromised or illegitimate actions performed.
 
-Sessions must have a beginning and an end. It must be impossible for an attacker to forge a session token: instead, it must be ensured that a session can only be started by the system on the server side. Also, the duration of a session should be as short as possible, and the session must be properly terminated after a given amount of time or after the user has explicitly logged out. It must be impossible to reuse session tokens.
+Sessions must have a beginning and an end. It must be impossible for an attacker to forge a session ID: instead, it must be ensured that a session can only be started by the system on the server side. Also, the duration of a session should be as short as possible, and the session must be properly terminated after a given amount of time or after the user has explicitly logged out. It must be impossible to reuse session ID.
 
 As such, the scope of this test is to validate that sessions are securely managed and cannot be compromised by an attacker.
 
@@ -86,29 +86,29 @@ When server source code is available, the tester should look for the place where
 
 #### Dynamic Analysis
 
-A best practice is to crawl the application first, either manually or with an automated tool. The goal is to check if all parts of the application leading to privileged information or actions are protected and a valid session token is required or not.
+A best practice is to crawl the application first, either manually or with an automated tool. The goal is to check if all parts of the application leading to privileged information or actions are protected and a valid session ID is required or not.
 
-Then, you can use the crawled requests within any intercepting proxy to try to manipulate session tokens:
-- by modifying them into illegitimate ones (for instance, add 1 to the valid session token or delete parts of it).
+Then, you can use the crawled requests within any intercepting proxy to try to manipulate session IDs:
+- by modifying them into illegitimate ones (for instance, add 1 to the valid session ID or delete parts of it).
 - by deleting a valid one in the request to test if the information and/or function of the application can still be accessed.
-- by trying to log out and re-log in again to check if the session token has changed or not.
+- by trying to log out and re-log in again to check if the session ID has changed or not.
 - when changing privilege level (step-up authentication). Try to use the former one (hence with a lower authorization level) to access the privileged part of the application.
-- by trying to re-use a session token after logging out.
+- by trying to re-use a session ID after logging out.
 
 Also the OWASP Testing Guide<sup>[1]</sup> should be consulted for more session management test cases.
 
 #### Remediation
 
-In order to offer proper protection against the attacks mentioned earlier, session tokens must:
+In order to offer proper protection against the attacks mentioned earlier, session IDs must:
 - always be created on the server side,
 - not be predictable (use proper length and entropy),
 - always be exchanged over secure connections (e.g. HTTPS),
 - be stored securely within the mobile app,
-- be verified when a user is trying to access privileged parts of an application (a session token must be valid and correspond to the proper level of authorization),
+- be verified when a user is trying to access privileged parts of an application (a session ID must be valid and correspond to the proper level of authorization),
 - be renewed when a user is asked to log in again to perform an operation requiring higher privileges and
 - be terminated on server side and deleted within the mobile app when a user logs out or after a specified timeout.
 
-It is strongly advised to use session token generators, that are build-in within the framework used, as they are more secure than building a custom one. Such generators exist for most frameworks and languages.
+It is strongly advised to use session ID generators that are build-in within the framework used, as they are more secure than building a custom one. Such generators exist for most frameworks and languages.
 
 #### References
 
@@ -118,7 +118,7 @@ It is strongly advised to use session token generators, that are build-in within
 
 ##### OWASP MASVS
 
-* 4.2: "The remote endpoint uses randomly generated access tokens, if classical server side session management is used, to authenticate client requests without sending the user's credentials."
+* 4.2: "The remote endpoint uses randomly generated session identifiers, if classical server side session management is used, to authenticate client requests without sending the user's credentials."
 
 ##### CWE
 
@@ -130,7 +130,7 @@ It is strongly advised to use session token generators, that are build-in within
 
 ##### Tools
 
-* Zed Attack Proxy
+* OWASP ZAP (Zed Attack Proxy)
 * Burp Suite
 
 
@@ -242,16 +242,18 @@ The following best practices should be considered, when implementing JWT:
 
 #### Overview
 
-Reducing the lifetime of (session) tokens to a minimum decreases the likelihood of a successful account hijacking attack. The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side or stateless token.
+Reducing the lifetime of session identifiers and tokens to a minimum decreases the likelihood of a successful account hijacking attack. The scope for this test case is to validate that the application has a logout functionality and it effectively terminates the session on client and server side or invalidates a stateless token.
+
+One of the most common errors done when implementing a logout functionality is simply not destroying the session object or invalidating the token on server side. This leads to a state where the session or token is still alive even though the user logs out of the application. If an attacker get’s in possession of valid authentication information he can continue using it and hijack a user account.
 
 ##### Static Analysis 
 
-If server side code is available, it should be reviewed that the session is being terminated as part of the logout functionality. The check needed here will be different depending on the technology used. Here are different examples on how a session can be terminated in order to implement a proper logout on server side:
+If server side code is available, it should be reviewed that the session is being terminated or token invalidated as part of the logout functionality. The check needed here will be different depending on the technology used. Here are different examples on how a session can be terminated in order to implement a proper logout on server side:
 - Spring (Java) -  http://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/web/authentication/logout/SecurityContextLogoutHandler.html
 - Ruby on Rails -  http://guides.rubyonrails.org/security.html
 - PHP - http://php.net/manual/en/function.session-destroy.php
 
-Also for stateless authentication the access token and refresh token (if used) should be deleted from the mobile device and invalidate the refresh token on server side.
+For stateless authentication the access token and refresh token (if used) should be deleted from the mobile device and the refresh token should be invalidated on server side.
 
 #### Dynamic Analysis
 
@@ -259,18 +261,16 @@ For a dynamic analysis of the application an interception proxy should be used. 
 1.  Log into the application.
 2.  Do a couple of operations that require authentication inside the application.
 3.  Perform a logout operation.
-4.  Resend one of the operations detailed in step 2 using an interception proxy. For example, with Burp Repeater. The purpose of this is to send to the server a request with the token that has been invalidated in step 3.
+4.  Resend one of the operations detailed in step 2 using an interception proxy. For example, with Burp Repeater. The purpose of this is to send to the server a request with the session ID or token that has been invalidated in step 3.
  
-If the session is correctly terminated on the server side, either an error message or redirect to the login page will be sent back to the client. On the other hand, if you have the same response you had in step 2, then, this session is still valid and has not been correctly terminated on the server side.
+If the logout is correctly implemented on the server side, either an error message or redirect to the login page will be sent back to the client. On the other hand, if you have the same response you had in step 2, then the token or session ID is still valid and has not been correctly terminated on the server side.
 A detailed explanation with more test cases, can also be found in the OWASP Web Testing Guide (OTG-SESS-006)<sup>[1]</sup>.
 
 #### Remediation 
 
-One of the most common errors done when implementing a logout functionality is simply not destroying the session object on server side. This leads to a state where the session is still alive even though the user logs out of the application. The session remains alive, and if an attacker get’s in possession of a valid session he can still use it and a user cannot even protect himself by logging out or if there are no session timeout controls in place.
- 
-To mitigate it, the logout function on the server side must invalidate the session identifier immediately after logging out to prevent it to be reused by an attacker that could have intercepted it.
+The logout function on the server side must invalidate the session identifier or token immediately after logging out to prevent it to be reused by an attacker that could have intercepted it.
 
-Many mobile apps do not automatically logout a user, because of customer convenience by implementing stateless authentication. The user logs in once, afterwards a token is generated on server side and stored within the applications internal storage and used for authentication when the application starts instead of asking again for user credentials. If the token expires a refresh token might be used (OAuth2/JWT) to transparently reinitiate the session for the user. There should still be a logout function available within the application and this should work accordingly to best practices by also destroying the accesss and refresh token on client and server side. Otherwise this could lead to another authentication bypass in case the refresh token is not invalidated.
+Many mobile apps do not automatically logout a user, because of customer convenience by implementing stateless authentication. There should still be a logout function available within the application and this should work accordingly to best practices by also destroying the access and refresh token on client and server side. Otherwise this could lead to another authentication bypass in case the refresh token is not invalidated.
 
 #### References
 
@@ -279,7 +279,7 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 
 ##### OWASP MASVS
 
-* 4.4: "The remote endpoint terminates the existing session when the user logs out."
+* 4.4: "The remote endpoint terminates the existing session or server side signed tokens when the user logs out."
 
 ##### CWE
 
@@ -296,38 +296,38 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 
 #### Overview
 
-Password strength is a key concern when using passwords for authentication. Password policy defines requirements that end users should adhere to. Password length, password complexity and password topologies should properly be included in the Password Policy. A "strong" password policy makes it difficult or even infeasible for one to guess the password through either manual or automated means.
+Password strength is a key concern when using passwords for authentication. Password policy defines requirements that end users should adhere to. Password length, password complexity and password topologies should properly be included in the password policy. A "strong" password policy makes it difficult or even infeasible for one to guess the password through either manual or automated means.
 
 
 #### Static Analysis
 
 Regular Expressions are often used to validate passwords. The password verification check against a defined password policy need to be reviewed if it rejects passwords that violate the password policy.
 
-Passwords can be set when registering accounts, changing the password or when resetting the password in a forgot password process. All of the available mechanisms in the application need to use the same password verification check that is aligned with the password policy.
+Passwords can be set when registering accounts, changing the password or when resetting the password in a forgot password process. All of the available functions in the application that are able to change or set a password need to be identified in the source code. They should all be using the same password verification check, that is aligned with the password policy.
 
 If a frameworks is used that offers the possibility to create and enforce a password policy for all users of the application, the configuration should be checked.
 
 
 #### Dynamic Analysis
 
-All available functions that allow a user to set a password need to verified if passwords can be used that violate the password policy specifications. This can be:
+All available functions that allow a user to set a password need to be verified, if passwords can be used that violate the password policy specifications. This can be:
 
-- Self-registration function for new users that allows to specify a password
-- Forgot Password function that allows a user to set a new password
-- Change Password function that allows a logged in user to set a new password
+- Self-registration function for new users that allows to specify a password,
+- Forgot Password function that allows a user to set a new password or
+- Change Password function that allows a logged in user to set a new password.
 
-An interception proxy should be used, to bypass local passwords checks within the app and to be able verify the password policy implemented on server side.
+An interception proxy should be used, to bypass client passwords checks within the app in order to be able verify the password policy implemented on server side.
 
 
 #### Remediation
 
-A good password policy should define the following requirements in order to avoid password guessing attacks or even brute-forcing.
+A good password policy should define the following requirements in order to avoid password brute-forcing.
 
-#####  Password Length
+**Password Length**
 * Minimum length of the passwords should be enforced, at least 10 characters.
 * Maximum password length should not be set too low, as it will prevent users from creating passphrases. Typical maximum length is 128 characters.
 
-##### Password Complexity
+**Password Complexity**
 * Password must meet at least 3 out of the following 4 complexity rules
 1. at least 1 uppercase character (A-Z)
 2. at least 1 lowercase character (a-z)
@@ -352,15 +352,16 @@ For further details check the OWASP Authentication Cheat Sheet<sup>[1]</sup>.
 * [2] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
 
 
+
 ### Testing Excessive Login Attempts
 
 #### Overview
 
-We all have heard about brute force attacks. This is one of the simplest attack types, as already many tools are available that work out of the box. It also doesn’t require a deep technical understanding of the target, as only a list of username and password combinations is sufficient to execute the attack. Once a valid combination of credentials is identified access to the application is possible and the account can be compromised.
+We all have heard about brute force attacks. This is one of the simplest attack types, as already many tools are available that work out of the box. It also doesn’t require a deep technical understanding of the target, as only a list of username and password combinations is sufficient to execute the attack. Once a valid combination of credentials is identified access to the application is possible and the account can be taken over.
  
 To be protected against these kind of attacks, applications need to implement a control to block the access after a defined number of incorrect login attempts.
  
-Depending on the application that you want to protect, the number of incorrect attempts allowed may vary. For example, in a banking application it should be around three to five attempts, but, in a public forum, it could be a higher number. Once this threshold is reached it also needs to be decided if the account gets locked permanently or temporarily. Locking the account temporarily is also called login throttling.
+Depending on the application that you want to protect, the number of incorrect attempts allowed may vary. For example, in a banking application it should be around three to five attempts, but, in a app that doesn't handle sensitive information it could be a higher number. Once this threshold is reached it also needs to be decided if the account gets locked permanently or temporarily. Locking the account temporarily is also called login throttling.
  
 The test consists by entering the password incorrectly for the defined number of attempts to trigger the account lockout. At that point, the anti-brute force control should be activated and your logon should be rejected when the correct credentials are entered.
 
@@ -372,9 +373,9 @@ It need to be checked that a validation method exists during logon that checks i
 #### Dynamic Analysis
 
 For a dynamic analysis of the application an interception proxy should be used. The following steps can be applied to check if the lockout mechanism is implemented properly.  
-1.  Log in incorrectly for a number of times to trigger the lockout control (generally 3 to 15 incorrect attempts)
+1.  Log in incorrectly for a number of times to trigger the lockout control (generally 3 to 15 incorrect attempts). This can be automated by using Burp Intruder<sup>[5]</sup>.
 2.  Once you have locked out the account, enter the correct logon details to verify if login is not possible anymore.
-If this is correctly implemented logon should be denied when the right password is entered, as the credential has already been blocked.
+If this is correctly implemented logon should be denied when the right password is entered, as the account has already been blocked.
 
 #### Remediation
 
@@ -393,14 +394,14 @@ Alternatives to locking accounts are enforcing 2-Factor-Authentication (2FA) for
 
 ##### CWE
 
--- TODO [Add relevant CWE for "Testing Excessive Login Attempts"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-307 - Improper Restriction of Excessive Authentication Attempts
 
 ##### Info
 * [1] OTG-AUTHN-003 - https://www.owasp.org/index.php/Testing_for_Weak_lock_out_mechanism
 * [2] Brute Force Attacks - https://www.owasp.org/index.php/Brute_force_attack
 * [3] Blocking Brute Force Attacks - https://www.owasp.org/index.php/Blocking_Brute_Force_Attacks
 * [4] OWASP Automated Threats to Web Applications - https://www.owasp.org/index.php/OWASP_Automated_Threats_to_Web_Applications
+* [5] Burp Intruder - https://portswigger.net/burp/help/intruder.html
 
 ##### Tools
 * Burp Suite Professional - https://portswigger.net/burp/
@@ -412,20 +413,20 @@ Alternatives to locking accounts are enforcing 2-Factor-Authentication (2FA) for
 
 #### Overview
 
-Compared to web applications most mobile applications don’t have a session timeout mechanism that terminates the session after some period of inactivity and force the user to login again. For most mobile applications users need to enter the credentials once. After authenticating on server side an access token is stored on the device which is used to authenticate. If the token is about to expire the token will be renewed transparently without entering the credentials again (e.g. OAuth2 or JWT). Applications that handle sensitive data like patient data or critical functions like financial transactions should implement a session timeout as a security-in-depth measure that forces users to re-login after a defined period.
+Compared to web applications most mobile applications don’t have a visible timeout mechanism that terminates the session ID or token after some period of inactivity and force the user to login again. For most mobile applications users need to enter the credentials once and use a stateless authentication mechanism. Mobile apps that handle sensitive data like patient data or critical functions like financial transactions should implement a timeout as a security-in-depth measure that forces users to re-login after a defined period of time.
  
 We will explain here how to check that this control is implemented correctly, both in the client and server side.
 
 #### Static Analysis
 
-If server side code is available, it should be reviewed that the session timeout functionality is correctly configured and a timeout is triggered after a defined period of time.  
+If server side code is available, it should be reviewed that the session timeout or token invalidation functionality is correctly configured and a timeout is triggered after a defined period of time.  
 The check needed here will be different depending on the technology used. Here are different examples on how a session timeout can be configured:
-- Spring (Java) - http://docs.spring.io/spring-session/docs/current/reference/html5/
-- Ruby on Rails -  https://github.com/rails/rails/blob/318a20c140de57a7d5f820753c82258a3696c465/railties/lib/rails/application/configuration.rb#L130
-- PHP - http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
-- ASP.Net - https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
-- Amazon AWS - http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/config-idle-timeout.html
- 
+- Spring (Java)<sup>[3]</sup>
+- Ruby on Rails<sup>[4]</sup>  
+- PHP<sup>[5]</sup>
+- ASP.Net<sup>[6]</sup>
+
+-- TODO explain timeout for Stateless and give examples of implementations
 
 #### Dynamic Analysis
 
@@ -450,7 +451,7 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 * M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.8: "Sessions are terminated at the remote endpoint after a predefined period of inactivity."
+* 4.8: "Sessions and server side signed tokens are terminated at the remote endpoint after a predefined period of inactivity."
 
 ##### CWE
 - CWE-613 - Insufficient Session Expiration
@@ -458,7 +459,10 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 ##### Info
 * [1] OWASP Web Application Test Guide (OTG-SESS-007) -  https://www.owasp.org/index.php/Test_Session_Timeout_(OTG-SESS-007)
 * [2] OWASP Session management cheatsheet https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
-
+* [3] Session Timeout in Java Spring - http://docs.spring.io/spring-session/docs/current/reference/html5/
+* [4] Session Timeout in Ruby on Rails - https://github.com/rails/rails/blob/318a20c140de57a7d5f820753c82258a3696c465/railties/lib/rails/application/configuration.rb#L130
+* [5] Session Timeout in PHP - http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
+* [6] Session Timeout in ASP -  https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
 
 ### Testing 2-Factor Authentication
 

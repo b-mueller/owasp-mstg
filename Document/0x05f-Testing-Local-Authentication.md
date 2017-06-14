@@ -10,11 +10,13 @@ Android 6.0 introduced public APIs for authenticating users via fingerprint. Acc
 
 By using the fingerprint API in conjunction with the Android KeyGenerator class, apps can create a cryptographic key that must be "unlocked" with the user's fingerprint. This can be used to implement more convenient forms of user login. For example, to allow users access to a remote service, a symmetric key can be created and used to encrypt the user PIN or authentication token. By calling <code>setUserAuthenticationRequired(true)</code> when creating the key, it is ensured that the user must re-authenticate using their fingerprint to retrieve it. The encrypted authentication data itself can then be saved using regular storage (e.g. SharedPreferences).
 
-Apart from this relatively reasonable method, fingerprint authentication can also be implemented in unsafe ways. For instance, developers might opt to assume successful authentication based solely on whether the <code>onAuthenticationSucceeded</code> callback <sup>3</sup> is called or when the Samsung Pass SDK is used for instance. This event however isn't proof that the user has performed biometric authentication - such a check can be easily patched or bypassed using instrumentation. Leveraging the Keystore is the only way to be reasonably sure that the user has actually entered their fingerprint.
+Apart from this relatively reasonable method, fingerprint authentication can also be implemented in unsafe ways. For instance, developers might opt to assume successful authentication based solely on whether the <code>onAuthenticationSucceeded</code> callback <sup>[3]</sup> is called or when the Samsung Pass SDK is used for instance. This event however isn't proof that the user has performed biometric authentication - such a check can be easily patched or bypassed using instrumentation. Leveraging the Keystore is the only way to be reasonably sure that the user has actually entered their fingerprint.
 
 Unless, of course, the keystore is compromised. Which has been the case as reported in [5] and mostly explained in [6]. There are a few known CVEs registered for instance: CVE-2016-2431, CVE-2016-2432, CVE-2015-6639, CVE-2015-6647. Therefore one should always check the security patch-level:
 
-```java	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", 	Locale.getDefault());	sdf.parse(Build.VERSION.SECURITY_PATCH).after(sdf.parse("2016-05-01"));
+```java
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", 	Locale.getDefault());
+	sdf.parse(Build.VERSION.SECURITY_PATCH).after(sdf.parse("2016-05-01"));
 ```
 
 
