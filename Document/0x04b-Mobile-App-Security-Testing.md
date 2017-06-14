@@ -1,10 +1,16 @@
 ## Mobile App Security Testing
 
-Mobile app security testing involves evaluating the security of mobile apps using static and dynamic analysis. Often (but not necessarily) this is done in the context of a larger security assessment that also encompasses the overall client-server architecture, as well as server-side APIs used by the mobile app. 
+You'll find that various terms such as "Mobile App Penetration Testing", "Mobile App Security Review", and others are used (somehat inconsistenly) in the security industry. Throughout the guide, we'll simply use "mobile app security testing" as an catch-all phrase for evaluating the security of mobile apps using static and/or dynamic analysis. Often (but not necessarily) this is done in the context of a larger security assessment or penetration test that also encompasses the overall client-server architecture, as well as server-side APIs used by the mobile app. 
 
-You'll find that various terms such as "Mobile App Penetration Testing", "Mobile App Security Review", and others are used in the security industry. All those terms refer to roughly the same thing. Throughout the guide, we'll simply use "mobile app security testing" as an all-catch phrase. There's a few key points to consider:
+A few key points to consider:
 
-- As far as mobile apps are concerned, there isn't really a difference between white-box and black-box testing. You always have access to the compiled app, and once you learn reading bytecode and binary code (or using a decompiler), having the compiled app is pretty much the same as having the source code.
+- It doesn't make a lot of sense to talk of mobile app "penetration testing" because there's nothing to penetrate.
+
+- As far as mobile apps are concerned, there isn't really a difference between white-box and black-box testing. You always have access to the compiled app, and once you learn reading bytecode and binary code (or using a decompiler), having the compiled app is pretty much equivalent to having the source code.
+
+In this guide, we'll cover mobile app security testing in two different contexts. The first one is the "classical" security test done towards the end of the development lifecyle. Here, the tester gets access to a near-final or production-ready version of the app, identifies security issues, and writes an (usually devastating) report. The other context is automating security tests during earlier stages of the software development lifecycle. In both cases, the same basic requirements and test cases apply, but there's a big difference in the high-level methodology and level of interaction with the client.
+
+### Security Testing the Old-School Way
 
 The following sections will show how to use the OWASP mobile application security checklist and testing guide during a security test. It is split into four sections:
 
@@ -47,7 +53,6 @@ If no data classification policy is available, the following kinds of informatio
 
 It may be impossible to detect leakage of sensitive data without a firm definition of what counts as such, so such a definition must be agreed upon in advance of testing.
 
-
 ### Intelligence Gathering
 
 Intelligence gathering involves the collection of information about the architecture of the app, the business use cases it serves, and the context in which it operates. Such information may be broadly divided into `environmental` and `architectural`.
@@ -70,7 +75,6 @@ Architectural information concerns understanding:
 * **Network:** - are secure transport protocols used (e.g. TLS), is network traffic encryption secured with strong keys and cryptographic algorithms (e.g. SHA-2), is certificate pinning used to verify the endpoint, etc.
 * **Remote Services:** - what remote services does the app consume? If they were compromised, could the client by compromised?
 
-
 ### Threat Modeling
 
 Threat Modeling involves using the results of the information gathering phase to determine what threats are likely or severe, producing test cases that may be executed at later stages. Threat Modeling should be a key part of the general SDLC, ideally performed throughout development, rather than just before a penetration test.
@@ -78,7 +82,6 @@ Threat Modeling involves using the results of the information gathering phase to
 General threat Modeling guidelines have been defined by OWASP<sup>[3]</sup>, and these are usually applicable to mobile apps.
 
 <!-- are there any threat Modeling techniques specially applicable to mobile apps? -->
-
 
 ### Vulnerability Analysis
 
@@ -142,7 +145,7 @@ In case another (proprietary) protocol is used in a mobile app that is not HTTP,
 * Mallory - https://github.com/intrepidusgroup/mallory
 * Wireshark - https://www.wireshark.org/
 
-##### Input Fuzzing
+#### Input Fuzzing
 
 The process of fuzzing is to repeatedly feeding an application with various combinations of input value, with the goal of finding security vulnerabilities in the input-parsing code. There were instances when the application simply crashes, but also were also occasions when it did not crash but behave in a manner which the developers did not expect them to be, which may potentially lead to exploitation by attackers.  
 
@@ -157,14 +160,13 @@ Also refer to the OWASP Fuzzing guide<sup>[5]</sup>
 
 Note: Fuzzing only detects software bugs. Classifying this issue as a security flaw requires further analysis by the researcher.
 
-##### Eliminating Common False Positives
-
 * **Protocol adherence** - for data to be handled at all by an application, it may need to adhere relatively closely to a given protocol (e.g. HTTP) or format (e.g. file headers). The greater the adherence to the structure of a given protocol or format, the more likely it is that meaningful errors will be detected in a short time frame. However, it comes at the cost of decreasing the test surface, potentially missing low level bugs in the protocol or format.
 
 * **Fuzz Vectors**<sup>[6]</sup> - fuzz vectors may be used to provide a list of known risky values likely to cause undefined or dangerous behaviour in an app. Using such a list focuses tests more closely on likely problems, reducing the number of false positives and decreasing the test execution time.
 
+### Common Pitfalls
 
-#### Cross-Site Scripting (XSS)
+#### False Positives From Web App Scanners
 
 A typical reflected XSS attack is executed by sending a URL to the victim(s), which for example can contain a payload to connect to some exploitation framework like BeeF<sup>[2]</sup>. When clicking on it a reverse tunnel is established with the Beef server in order to attack the victim(s). As a WebView is only a slim browser, it is not possible for a user to insert a URL into a WebView of an app as no address bar is available. Also, clicking on a link will not open the URL in a WebView of an app, instead it will open directly within the default browser of the respective mobile device. Therefore, a typical reflected Cross-Site Scripting attack that targets a WebView in an app is not applicable and will not work.
 
@@ -176,15 +178,12 @@ If an attacker finds a stored Cross-Site Scripting vulnerability in an endpoint,
 
 In summary, a reflected Cross-Site Scripting is no concern for a mobile App, but a stored Cross-Site Scripting vulnerability or MITM injected JavaScript can become a dangerous vulnerability if the WebView if configured insecurely.
 
-#### Cross-Site Request Forgery (CSRF)
-
 The same problems with reflected XSS also applied to CSRF attacks. A typical CSRF attack is executed by sending a URL to the victim(s) that contains a state changing request like creation of a user account or triggering a financial transaction. Just as with XSS, it is not possible for a user to insert a URL into a WebView of an app. Therefore a typical CSRF attack that targets a WebView in an app is not applicable.
 
 The basis for CSRF attacks, access to session cookies of all browser tabs and attaching them automatically if a request to a web page is executed is not applicable on mobile platforms. This is the default behaviour of full blown browsers. Every app has, due to the sandboxing mechanism, it's own web cache and stores it's own cookies, if WebViews are used. Therefore a CSRF attack against a mobile app is by design not possible as the session cookies are not shared with the Android browser.
 
 Only if a user logs in by using the Android browser (instead of using the mobile App) a CSRF attack would be possible, as then the session cookies are accessible for the browser instance.
 
-<<<<<<< HEAD
 #### References
 
 * [1] MASVS - https://github.com/OWASP/owasp-masvs
@@ -193,5 +192,3 @@ Only if a user logs in by using the Android browser (instead of using the mobile
 * [4] SecureAssist - https://www.synopsys.com/software-integrity/resources/datasheets/secureassist.html
 * [5] OWASP Fuzzing Guide - https://www.owasp.org/index.php/Fuzzing
 * [6] OWASP Testing Guide Fuzzing - https://www.owasp.org/index.php/OWASP_Testing_Guide_Appendix_C:_Fuzz_Vectors
-=======
->>>>>>> 5cbecb98eb6ff6fabefe97988c6088e1e7740858
