@@ -451,9 +451,10 @@ public class MemoryCleanerOnCrash implements Thread.UncaughtExceptionHandler {
         }
     }
 }
-
 ```
+
 Now you need to call the initializer for the handler at your custom `Application` class (e.g. the class that extends `Application`):
+
 ```java
 	
 	 @Override
@@ -478,8 +479,8 @@ Now you need to call the initializer for the handler at your custom `Application
 
 ##### Info
 
-[1] Exceptional Behavior (ERR) - https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=18581047
-[2] Android developer API documentation - https://developer.android.com/reference/java/lang/RuntimeException.html
+- [1] Exceptional Behavior (ERR) - https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=18581047
+- [2] Android developer API documentation - https://developer.android.com/reference/java/lang/RuntimeException.html
 
 ##### Tools
 
