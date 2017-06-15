@@ -259,22 +259,7 @@ StrictMode is a developer tool to be able to detect policy violation, e.g. disk 
 It can be implemented in order to check the usage of good coding practices such as implementing high-performance code or usage of network access on the main thread.
 The policy are defined together with rules and different methods of showing the violation of a policy.
 
-There are two category of policies:
-* `StrictMode.ThreadPolicy`
-* `StrictMode.VmPolicy`
-
-The ThreadPolicy can monitor:
-* Disk Reads
-* Disk Writes
-* Network access
-* Custom Slow Code
-
-The VM policies,  applied to all threads in the virtual machine's process, are:
-* Leaked Activity objects
-* Leaked SQLite objects
-* Leaked Closable objects
-
-In order to enable `StrictMode`, the code should be implemented in onCreate().
+Here an example of `StrictMode`.
 Here is an example of enabling both policies mentioned above<sup>[1]</sup>:
 ```
 public void onCreate() {
@@ -301,43 +286,15 @@ With the purpose to check if `StrictMode` is enabled you could look for the meth
 
 The various detect methods for Thread Policy are<sup>[3]</sup>:
 ```
-detectDiskWrites() //API level 9
-detectDiskReads() //API level 9
-detectNetwork() //API level 9
-detectCustomSlowCalls()//Introduced in API level 11
-detectAll()
-detectCustomSlowCalls()
+detectDiskWrites()
+detectDiskReads()
+detectNetwork()
 ```
-
-Another possibility is to capture all kind of violation as:
-```
-detectAll()
-detectCustomSlowCalls()
-```
-
 The possible penalties for thread policy are<sup>[3]</sup>:
 ```
 penaltyLog() //Logs a message to LogCat
 penaltyDeath() //Crashes application, runs at the end of all enabled penalties
 penaltyDialog() //Show a dialog
-penaltyDeathOnNetwork() //Crashes the whole process on any network usage
-penaltyDropBox() //Enable detected violations log a stacktrace and timing data to the DropBox on policy violation
-penaltyFlashScreen() //Introduced in API level 11 which Flash the screen during a violation
-```
-
-Considering the VM policy of StrictMode, the policy are<sup>[3]</sup>:
-```
-detectActivityLeaks() //API level 11. Detect leaks of Activity subclasses.
-detectLeakedClosableObjects() //API level 11. Detect when an Closeable or other object with a explict termination method is finalized without having been closed.
-detectLeakedSqlLiteObjects() //API level 9. Detect when an SQLiteCursor or other SQLite object is finalized without having been closed.
-setClassInstanceLimit(Class.forName("my.app.sample.sampleclass"),10) //API level 11
-```
-
-The possible penalties for VM policy violation are<sup>[3]</sup>:
-```
-penaltyLog()
-penaltyDeath()
-penaltyDropBox()
 ```
 
 #### Dynamic Analysis

@@ -114,7 +114,7 @@ If any of these two conditions raise an issue, reject the request and do not all
 
 ##### CWE
 
-- CWE-287: Improper Authentication - https://cwe.mitre.org/data/definitions/287.html
+- CWE-287: Improper Authentication
 
 ##### Info
 
@@ -179,7 +179,7 @@ It is strongly advised to use session ID generators that are build-in within the
 
 ##### CWE
 
-- CWE-613 - Insufficient Session Expiration https://cwe.mitre.org/data/definitions/613.html
+- CWE-613: Insufficient Session Expiration
 
 ##### Info
 
@@ -276,7 +276,7 @@ The following best practices should be considered, when implementing JWT:
 
 ##### CWE
 
-* CWE-287: Improper Authentication - https://cwe.mitre.org/data/definitions/287.html
+* CWE-287: Improper Authentication
 
 ##### Info
 
@@ -341,7 +341,7 @@ Many mobile apps do not automatically logout a user, because of customer conveni
 
 ##### CWE
 
-* CWE-613 - Insufficient Session Expiration
+* CWE-613: Insufficient Session Expiration
 
 ##### Info
 
@@ -410,7 +410,7 @@ For further details check the OWASP Authentication Cheat Sheet<sup>[2]</sup>. A 
 * 4.5: "A password policy exists and is enforced at the remote endpoint."
 
 ##### CWE
-* CWE-521 - Weak Password Requirements
+* CWE-521: Weak Password Requirements
 
 ##### Info
 * [1] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
@@ -459,7 +459,7 @@ Alternatives to locking accounts are enforcing 2-Factor-Authentication (2FA) for
 
 ##### CWE
 
-- CWE-307 - Improper Restriction of Excessive Authentication Attempts
+- CWE-307: Improper Restriction of Excessive Authentication Attempts
 
 ##### Info
 * [1] OTG-AUTHN-003 - https://www.owasp.org/index.php/Testing_for_Weak_lock_out_mechanism
@@ -540,7 +540,7 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 * 4.8: "Sessions and server side signed tokens are terminated at the remote endpoint after a predefined period of inactivity."
 
 ##### CWE
-- CWE-613 - Insufficient Session Expiration
+- CWE-613: Insufficient Session Expiration
 
 ##### Info
 * [1] OWASP Web Application Test Guide (OTG-SESS-007) - https://www.owasp.org/index.php/Test_Session_Timeout_(OTG-SESS-007)
@@ -587,11 +587,15 @@ First, all privileged endpoints a user can only access with step-up authenticati
 
 The recorded requests should also be replayed without providing any authentication information, in order to check for a complete bypass of authentication mechanisms.
 
+Another attack is related to the case "Testing Excessive Login Attempts" - given that many OTPs are just numeric values, if the accounts are not locked after N unsuccessful attempts on this stage, an attacker can bypass second factor by simply bruterorcing the values within the range at the lifespan of the OTP. For 6-digit values and 30-second time step there's more than 90% probability to find a match within 72 hours.
+
 #### Remediation
 
 The implementation of a second or multiple factors should be strictly enforced on server-side for all critical operations. If cloud solutions are in place, they should be implemented accordingly to best practices.
 
 Step-up authentication should be optional for the majority of user scenarios and only enforced for critical functions or when accessing sensitive data.
+
+Account lockouts for the second factor should be implemented the same way as for non-2FA cases (see "Testing Excessive Login Attempts" and [5]).
 
 Regardless of 2FA or step-up authentication, additionally it should be supplemented with passive contextual authentication<sup>[1]</sup>, which can be:
 
@@ -614,8 +618,8 @@ An additional control to ensure that an authorized user is using the app on an a
 * 4.10: "Step-up authentication is required to enable actions that deal with sensitive data or transactions."
 
 ##### CWE
-
-- CWE-308 - Use of Single-factor Authentication
+- CWE-287: Improper Authentication
+- CWE-308: Use of Single-factor Authentication
 
 ##### Info
 
@@ -623,6 +627,7 @@ An additional control to ensure that an authorized user is using the app on an a
 * [2] Google Authenticator - https://support.google.com/accounts/answer/1066447?hl=en
 * [3] Microsoft Authenticator - https://docs.microsoft.com/en-us/azure/multi-factor-authentication/end-user/microsoft-authenticator-app-how-to
 * [4] Authy - https://authy.com/
+* [5] https://www.owasp.org/index.php/Blocking_Brute_Force_Attacks
 
 
 ### Testing User Device Management
@@ -659,7 +664,7 @@ An additional control to ensure that an authorized user is using the app on an a
 ##### CWE
 
 -- TODO [Add relevant CWE for "Testing User Device Management"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-312: Cleartext Storage of Sensitive Information
 
 ##### Info
 

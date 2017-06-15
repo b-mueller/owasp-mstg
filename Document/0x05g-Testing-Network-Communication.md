@@ -203,6 +203,7 @@ The SSL pinning process should be implemented as described on the static analysi
 #### Overview 
 Android relies on a security provider to provide SSL/TLS based connections. The problem with this security provider (for instance OpenSSL) which is packed with the device, is that it often has bugs and/or vulnerabilities<sup>[1]</sup>.
 Developers need to make sure that the application will install a proper security provider to make sure that there will be lesser bugs and vulnerabilities.
+Since July 11, 2016, Google rejects Play Store application submissions (both new applications and updates) if they are using vulnerable versions of OpenSSL<sup>[3]</sup>.
 
 #### Static Analysis
 In case of an Android SDK based application. The application should have a dependency on the GooglePlayServices. (e.g. in a. gradle build file, you will find `compile 'com.google.android.gms:play-services-gcm:x.x.x'` in the dependencies block). Next you need to make sure that the `ProviderInstaller` class is called with either `installIfNeeded()` or with `installIfNeededAsync()` is called as soon as possible. Exceptions that are thrown by these methods should be caught and handled correctly.
@@ -375,3 +376,4 @@ public class MainActivity extends Activity
 
 - [1] OpenSSL Vulnerabilities - https://www.openssl.org/news/vulnerabilities.html
 - [2] Updating Your Security Provider to Protect Against SSL Exploits - https://developer.android.com/training/articles/security-gms-provider.html
+- [3] How to address OpenSSL vulnerabilities in your apps - https://support.google.com/faqs/answer/6376725?hl=en

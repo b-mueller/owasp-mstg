@@ -69,6 +69,9 @@ When looking for instances of insecure data storage in an iOS app you should con
 
 * `sqlite3`: The `libsqlite3.dylib` library is required to be added in an application. This library is a C++ wrapper that provides the API to the SQLite commands.
 
+##### Realm databases
+The Realm Objective-C <sup>[13]</sup> and the Realm Swift <sup>[14]</sup> are not supplied by Apple, but still worth noting here. They either store everything unencrypted, unless the configuration has encryption enabled.
+
 ##### NSUserDefaults
 
 The `NSUserDefaults`<sup>[11]</sup> class provides a programmatic interface for interacting with the default system. The default system allows an application to customize its behavior to match a user’s preferences. Data saved by NSUserDefaults can be viewed from the application bundle. It also stores data in a plist file, but it's meant for smaller amounts of data.
@@ -137,6 +140,20 @@ Hardware-backed storage mechanisms must be used for storing sensitive data. Perm
 
 - Storing the data in the keychain with the `kSecAttrAccessibleWhenUnlocked` attribute.
 - Encrypting the data using standard crypto APIs before storing it, and storing the encryption key in the keychain.
+- Another option is to use the encryption support, such as Realm provides. 
+
+```swift
+
+// Open the encrypted Realm file where getKey() is a method to obtain a key from the keychain or a server
+let config = Realm.Configuration(encryptionKey: getKey())
+do {
+  let realm = try Realm(configuration: config)
+  // Use the Realm as normal
+} catch let error as NSError {
+  // If the encryption key is wrong, `error` will say that it's an invalid database
+  fatalError("Error opening realm: \(error)")
+}
+```
 - Creating a file with the `NSFileProtectionComplete` attribute.
 
 The following example shows how to create a securely encrypted file using the `createFileAtPath` method:
@@ -179,7 +196,8 @@ A generic example for using the KeyChain to store, update or delete data can be 
 [10] Core Data iOS - https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/CoreData/nsfetchedresultscontroller.html#//apple_ref/doc/uid/TP40001075-CH8-SW1
 [11] NSUserDefaults - https://developer.apple.com/documentation/foundation/nsuserdefaults
 [12] GenericKeyChain - https://developer.apple.com/library/content/samplecode/GenericKeychain/Introduction/Intro.html#//apple_ref/doc/uid/DTS40007797-Intro-DontLinkElementID_2
-
+[13] Realm Objective-C - https://realm.io/docs/objc/latest/
+[14] Realm Swift - https://realm.io/docs/swift/latest/
 
 ### Testing for Sensitive Data in Logs
 

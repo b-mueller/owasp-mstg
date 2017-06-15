@@ -14,12 +14,13 @@ A vulnerability occurs when sensitive data is not properly protected by an app w
 
 Consequences for disclosing sensitive information can be various, like disclosure of encryption keys that can be used by an attacker to decrypt information. More generally speaking an attacker might be able to identify this information to use it as a basis for other attacks like social engineering (when PII is disclosed), session hijacking (if session information or a token is disclosed) or gather information from apps that have a payment option in order to attack and abuse it.
 
-Storing data<sup>[1]</sup> is essential for many mobile applications, for example in order to keep track of user settings or data a user has keyed in that needs to be stored locally or offline. Data can be stored persistently in various ways. The following list shows those mechanisms that are available on the Android platform:
+Storing data<sup>[1]</sup> is essential for many mobile applications, for example in order to keep track of user settings or data a user has keyed in that needs to be stored locally or offline. Data can be stored persistently in various ways. The following list shows those mechanisms that are widely used on the Android platform:
 
 * Shared Preferences
 * Internal Storage  
 * External Storage  
 * SQLite Databases  
+* Realm Databases
 
 The following snippets of code demonstrate bad practices that disclose sensitive information, but also show the different storage mechanisms on Android in detail.
 
@@ -96,6 +97,22 @@ A secure approach to retrieve the key, instead of storing it locally could be to
 * Ask the user every time for a PIN or password to decrypt the database, once the app is opened (weak password or PIN is prone to Brute Force Attacks), or
 * Store the key on the server and make it accessible via a Web Service (then the app can only be used when the device is online)
 
+##### Realm Databases
+
+The Realm Database for Java <sup>[17]</sup> is getting more and more popular amongst developers. The database its contents can be encrypted by providing the configuration a key.
+
+```java
+//the getKey() method either gets the keuy from the server or from a Keychain, or is deferred from a password.
+RealmConfiguration config = new RealmConfiguration.Builder()
+  .encryptionKey(getKey())
+  .build();
+
+Realm realm = Realm.getInstance(config);
+
+```
+
+If encryption is not used, you should be able to obtain the data. If encryption is enabled, check if the key is hardcoded in the source or resources, whether it is stored unprotected in shared preferences or somehwere else.
+
 ##### Internal Storage
 
 Files can be saved directly on the internal storage<sup>[6]</sup> of the device. By default, files saved to the internal storage are private to your application and other applications cannot access them. When the user uninstalls your application, these files are removed.
@@ -136,6 +153,7 @@ FileOutputStream fos;
 Once the activity is called, the file is created with the provided data and the data is stored in clear text in the external storage.
 
 It’s also worth to know that files stored outside the application folder (`data/data/<packagename>/`) will not be deleted when the user uninstall the application.
+
 
 ##### KeyChain
 
@@ -271,6 +289,7 @@ Install and use the app as it is intended and execute all functions at least onc
 * Check if SQLite databases are available and if they contain sensitive information (usernames, passwords, keys etc.). SQLite databases are stored in `/data/data/<package_name>/databases`.
 * Check Shared Preferences that are stored as XML files in the shared_prefs directory of the app for sensitive information, which is in `/data/data/<package_nam>/shared_prefs`.
 * Check the file system permissions of the files in `/data/data/<package_name>`. Only the user and group created when installing the app (e.g. u0_a82) should have the user rights read, write, execute (rwx). Others should have no permissions to files, but may have the executable flag to directories.
+* Check if there is a Realm database available and if it is unencrypted & contains sensitive information, which is in ` /data/data<package_name>/files/<dbfilename>.realm`, where dbfilename is `default` by default. Inspecting the Realm database is done with the RealmBrowser.
 
 #### Remediation
 
@@ -325,7 +344,7 @@ The following is a list of best practice used for secure storage of certificates
 [14] AccountManager -  https://developer.android.com/reference/android/accounts/AccountManager.html
 [15] Secure Preferences - https://github.com/scottyab/secure-preferences
 [16] Nikolay Elenvok - Credential storage enhancements in Android 4.3 - https://nelenkov.blogspot.sg/2013/08/credential-storage-enhancements-android-43.html
-
+[17] Realm Database - https://realm.io/docs/java/latest/
 
 ##### Tools
 
@@ -1345,6 +1364,7 @@ Different checks on the Android device can be implemented by querying different 
 ##### Info
 * [1] Settings.Secure - https://developer.android.com/reference/android/provider/Settings.Secure.html
 * [2] Device Administration API - https://developer.android.com/guide/topics/admin/device-admin.html
+
 
 
 ### Verifying User Education Controls
