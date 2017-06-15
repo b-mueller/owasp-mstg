@@ -200,9 +200,28 @@ For any application, each of these custom URL schemes needs to be enumerated, an
 It should be investigated if custom URL schemes are defined. This can be done in the AndroidManifest file inside of an intent-filter element<sup>[1]</sup>.
 
 ```xml
-<data android:scheme="myapp" android:host="path" />
+<activity android:name=".MyUriActivity">
+  <intent-filter>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.DEFAULT" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <data android:scheme="myapp" android:host="path" />
+  </intent-filter>
+</activity>
+
 ```
-The example above is specifying a new URL called `myapp://`.
+The example above is specifying a new URL scheme called `myapp://`. The category `brwoseable` will allow to open the URI within a browser.
+
+Data can then be transmitted trough this new scheme, by using for example the following URI:  `myapp://path/to/what/i/want?keyOne=valueOne&keyTwo=valueTwo`. Code like the following can be used to retrieve the data:
+
+```
+Intent intent = getIntent();
+if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+  Uri uri = intent.getData();
+  String valueOne = uri.getQueryParameter("keyOne");
+  String valueTwo = uri.getQueryParameter("keyTwo");
+}
+```
 
 #### Dynamic Analysis
 
@@ -242,7 +261,8 @@ dz> run app.activity.start  --action android.intent.action.VIEW --data-uri "sms:
 N/A
 
 ##### Info
-- [1] Custom URL scheme - https://developer.android.com/guide/components/intents-filters.html#DataTest
+* [1] Custom URL scheme - https://developer.android.com/guide/components/intents-filters.html#DataTest
+* [2] How to build your URL scheme on Android - https://stackoverflow.com/questions/2448213/how-to-implement-my-very-own-uri-scheme-on-android
 
 ##### Tools
 * Drozer - https://github.com/mwrlabs/drozer
