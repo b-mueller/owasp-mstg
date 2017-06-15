@@ -61,7 +61,7 @@ Static analysis should be used to verify the APK signature.
 
 #### Remediation
 
-Developers need to make sure that release builds are signed with the appropriate certificate from the release keystore. In Android Studio, this can be done manually or by configuring creating a signing configuration and assigning it to the release build type<sup>[2]</sup>.
+Developers need to make sure that release builds are signed with the appropriate certificate from the release keystore. In Android Studio, this can be done manually or by creating a signing configuration and assigning it to the release build type<sup>[2]</sup>.
 
 The signing configuration can be managed through the Android Studio GUI or the <code>signingConfigs {}</code> block in <code>build.gradle</code>. The following values need to be set to activate both v1 and v2 scheme:
 
@@ -376,7 +376,7 @@ The DEVELOPER_MODE has to be disabled for release build in order to disable `Str
 ### Testing Exception Handling
 
 #### Overview
-Exceptions can often occur when an application gets into a non-normal or erroneous state. Both in Java and C++ exceptions can be thrown when such state occurs. 
+Exceptions can often occur when an application gets into a non-normal or erroneous state. Both in Java and C++ exceptions can be thrown when such state occurs.
 Testing exception handling is about reassuring that the application will handle the exception and get to a safe state without exposing any sensitive information at both the UI and the logging mechanisms used by the application.
 
 #### Static Analysis
@@ -385,17 +385,17 @@ Review the source code to understand and identify how the application handles va
 
 * Verify that the application use a well-designed and unified scheme to handle exceptions<sup>[1]</sup>.
 * Verify that standard `RuntimeException`s (e.g.`NullPointerException`, `IndexOutOfBoundsException`, `ActivityNotFoundException`, `CancellationException`, `SQLException`) are anticipated upon by creating proper null-checks, bound-checks and alike. See <sup>[2]</sup> for an overview of the provided child-classes of `RuntimeException`. If the developer still throws a child of `RuntimeException` then this should always be intentional and that intention should be handled by the calling method.
-* Verify that for every non-runtime `Throwable`, there is a proper catch handler, which ends up handling the actual exception properly. 
+* Verify that for every non-runtime `Throwable`, there is a proper catch handler, which ends up handling the actual exception properly.
 * Verify that the application doesn't expose sensitive information while handling exceptions in its UI or in its log-statements, but are still verbose enough to explain the issue to the user.
 * Verify that any confidential information, such as keying material and/or authentication information is always wiped at the `finally` blocks in case of a high risk application.
 
 
 #### Dynamic Analysis
-There are various ways of doing dynamic analysis: 
+There are various ways of doing dynamic analysis:
 
 - Use Xposed to hook into methods and call the method with unexpected values or overwrite existing variables to unexpected values (e.g. Null values, etc.).
 - Provide unexpected values to UI fields in the Android application.
-- Interact with the application using its intents and public providers by using values that are unexpected. 
+- Interact with the application using its intents and public providers by using values that are unexpected.
 - Tamper the network communication and/or the files stored by the application.
 
 In all cases, the application should not crash, but instead, it should:
@@ -445,7 +445,7 @@ public class MemoryCleanerOnCrash implements Thread.UncaughtExceptionHandler {
 			//handle the cleanup here
 			//....
 			//and then show a message to the user if possible given the context
-			
+
         for (Thread.UncaughtExceptionHandler handler : mHandlers) {
             handler.uncaughtException(thread, ex);
         }
@@ -456,7 +456,7 @@ public class MemoryCleanerOnCrash implements Thread.UncaughtExceptionHandler {
 Now you need to call the initializer for the handler at your custom `Application` class (e.g. the class that extends `Application`):
 
 ```java
-	
+
 	 @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -596,7 +596,7 @@ class a$b
 
 #### Remediation
 
-ProGuard should be used to strip unneeded debugging information from the Java bytecode. By default, ProGuard removes attributes that are useful for debugging, including line numbers, source file names and variable names. ProGuard is a free Java class file shrinker, optimizer, obfuscator and pre-verifier. It is shipped with Android’s SDK tools. To activate shrinking for the release build, add the following to build.gradle:
+ProGuard should be used to strip unneeded debugging information from the Java bytecode. By default, ProGuard removes attributes that are useful for debugging, including line numbers, source file names and variable names. ProGuard is a free Java class file shrinker, optimizer, obfuscate and pre-verifier. It is shipped with Android’s SDK tools. To activate shrinking for the release build, add the following to build.gradle:
 
 ```
 android {

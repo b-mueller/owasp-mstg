@@ -119,9 +119,9 @@ Note that this method cannot be used for `signature` level permissions, as Droze
 
 #### Remediation
 
-Developers should take care to secure sensitive IPC components with the `signature` protection level, which will only allow applications signed with the same certificate to access the component.
+Only permissions that are needed within the app should be requested in the Android Manifest file and all other permissions should be removed.
 
-Only permissions that are needed within the app should be requested in the Android Manifest file and all other permissions should be removed. 
+Developers should take care to secure sensitive IPC components with the `signature` protection level, which will only allow applications signed with the same certificate to access the component.
 
 #### References
 
@@ -143,6 +143,7 @@ Only permissions that are needed within the app should be requested in the Andro
 ##### Tools
 * AAPT - http://elinux.org/Android_aapt
 * Drozer - https://github.com/mwrlabs/drozer
+
 
 ### Testing Input Validation and Sanitization
 
@@ -196,15 +197,16 @@ For any application, each of these custom URL schemes needs to be enumerated, an
 
 #### Static Analysis
 
-Inside of an intent-filter a custom URL scheme can be defined<sup>[1]</sup>.
+It should be investigated if custom URL schemes are defined. This can be done in the AndroidManifest file inside of an intent-filter element<sup>[1]</sup>.
 
 ```xml
 <data android:scheme="myapp" android:host="path" />
 ```
+The example above is specifying a new URL called `myapp://`.
 
 #### Dynamic Analysis
 
-To enumerate URL schemes within an application that can be called by a web browser, the module `scanner.activity.browsable` should be used:
+To enumerate URL schemes within an application that can be called by a web browser, the Drozer module `scanner.activity.browsable` should be used:
 
 ```
 dz> run scanner.activity.browsable -a com.google.android.apps.messaging
@@ -237,7 +239,7 @@ dz> run app.activity.start  --action android.intent.action.VIEW --data-uri "sms:
 * V6.3: "The app does not export sensitive functionality via custom URL schemes, unless these mechanisms are properly protected."
 
 ##### CWE
--- TODO [Add link to relevant CWE for "Testing Custom URL Schemes"]
+N/A
 
 ##### Info
 - [1] Custom URL scheme - https://developer.android.com/guide/components/intents-filters.html#DataTest
@@ -313,7 +315,7 @@ Package: com.mwr.example.sieve
 
 To communicate with a service, static analysis must first be used to identify the required inputs. By reversing the target application we can see the service `AuthService` provides functionality to change the password and PIN protecting the target app.
 
-```java
+```
    public void handleMessage(Message msg) {
             AuthService.this.responseHandler = msg.replyTo;
             Bundle returnBundle = msg.obj;
@@ -342,7 +344,7 @@ To communicate with a service, static analysis must first be used to identify th
                     }
 ```
 
-Since this service is exported, it is possible to use the module `app.service.send` to communicate with the service and change the password stored in the target application: 
+Since this service is exported, it is possible to use the module `app.service.send` to communicate with the service and change the password stored in the target application:
 
 ```
 dz> run app.service.send com.mwr.example.sieve com.mwr.example.sieve.AuthService --msg  6345 7452 1 --extra string com.mwr.example.sieve.PASSWORD "abcdabcdabcdabcd" --bundle-as-obj
@@ -368,7 +370,7 @@ In the example app "Android Insecure Bank"<sup>2</sup>, we can see that one broa
 
 In the extract below taken from the source code of the target application, we can see that the broadcast receiver triggers a SMS message to be sent containing the decrypted password of the user.
 
-```java
+```
 public class MyBroadCastReceiver extends BroadcastReceiver {
   String usernameBase64ByteString;
   public static final String MYPREFS = "mySharedPreferences";
@@ -447,6 +449,7 @@ Extra: newpass=12345 (java.lang.String)
 ##### Tools
 * Drozer - https://github.com/mwrlabs/drozer
 
+
 ### Testing JavaScript Execution in WebViews
 
 #### Overview
@@ -514,9 +517,6 @@ Devices running platforms older than Android 4.4 (API level 19) use a version of
 - [3] WebView Best Practices - https://developer.android.com/training/articles/security-tips.html#WebView
 - [4] Stored Cross-Site Scripting - https://www.owasp.org/index.php/Testing_for_Stored_Cross_site_scripting_(OTG-INPVAL-002)
 
-##### Tools
--- TODO [Add link to tools for "Testing JavaScript Execution in WebViews"] --
-
 
 ### Testing WebView Protocol Handlers
 
@@ -578,7 +578,7 @@ Access to files in the file system can be enabled and disabled for a WebView wit
 - V6.6: "WebViews are configured to allow only the minimum set of protocol handlers required (ideally, only https is supported). Potentially dangerous handlers, such as file, tel and app-id, are disabled."
 
 ##### CWE
--- TODO [Add links and titles to relevant CWE for "Testing WebView Protocol Handlers"] --
+N/A
 
 ##### Info
 - [1] File Access in WebView - https://developer.android.com/reference/android/webkit/WebSettings.html#setAllowFileAccess%28boolean%29
@@ -586,8 +586,6 @@ Access to files in the file system can be enabled and disabled for a WebView wit
 - [3] Intent List - https://developer.android.com/guide/appendix/g-app-intents.html
 - [4] WebView Settings - https://developer.android.com/reference/android/webkit/WebSettings.html
 
-##### Tools
--- TODO [Add links to relevant tools for "Testing WebView Protocol Handlers"] --
 
 
 ### Testing for Local File Inclusion in WebViews
@@ -636,13 +634,11 @@ Create checksums of the local HTML/JavaScript files and check it during start up
 - V6.7: "The app does not load user-supplied local resources into WebViews."
 
 ##### CWE
--- TODO [Add reference to relevant CWE for "Testing for Local File Inclusion in WebViews"] --
+N/A
 
 ##### Info
 - [1] loadURL() in WebView - https://developer.android.com/reference/android/webkit/WebView.html#loadUrl(java.lang.String)
 
-##### Tools
--- TODO [Add links to tools for "Testing for Local File Inclusion in WebViews"] --
 
 
 ### Testing Whether Java Objects Are Exposed Through WebViews
@@ -777,8 +773,9 @@ Another compliant solution is to define the API level to 17 (JELLY_BEAN_MR1) and
 
 ##### OWASP MASVS
 - V6.8: "If Java objects are exposed in a WebView, verify that the WebView only renders JavaScript contained within the app package."
+
 ##### CWE
--- TODO [Add links and titles to relevant CWE for "Testing Whether Java Objects Are Exposed Through WebViews"] --
+* CWE-502 - Deserialization of Untrusted Data
 
 ##### Info
 - [1] DRD13 addJavascriptInterface()  - https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=129859614
@@ -786,8 +783,6 @@ Another compliant solution is to define the API level to 17 (JELLY_BEAN_MR1) and
 - [3] Method shouldOverrideUrlLoading() - https://developer.android.com/reference/android/webkit/WebViewClient.html#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)
 - [4] Method addJavascriptInterface() - https://developer.android.com/reference/android/webkit/WebView.html#addJavascriptInterface(java.lang.Object, java.lang.String)
 
-##### Tools
--- TODO [Add links to tools for "Testing Whether Java Objects Are Exposed Through WebViews"] --
 
 
 ### Testing Object (De-)Serialization
@@ -825,16 +820,11 @@ Check if serialized data is stored temporarily or permanently within the app's d
 * V6.9: "Object serialization, if any, is implemented using safe serialization APIs."
 
 ##### CWE
-
--- TODO [Add link and title to CWE for "Testing Object (De-)Serialization"] --
+N/A
 
 ##### Info
-
 * [1] Update Security Provider - https://developer.android.com/training/articles/security-gms-provider.html
 
-
-##### Tools
--- TODO [Add link to relevant tools for "Testing Object (De-)Serialization"] --
 
 
 ### Testing Root Detection
@@ -902,7 +892,7 @@ To implement root detection within an Android app, libraries can be used like `R
 - V6.10: "The app detects whether it is being executed on a rooted or jailbroken device. Depending on the business requirement, users are warned, or the app is terminated if the device is rooted or jailbroken."
 
 ##### CWE
-Not covered.
+N/A
 
 ##### Info
 - [1] RootBeer - https://github.com/scottyab/rootbeer

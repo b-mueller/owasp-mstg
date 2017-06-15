@@ -6,7 +6,7 @@ The following chapter outlines network communication requirements of the MASVS i
 
 #### Overview
 
-A functionality of most mobile applications requires sending or receiving information from services on the Internet. This reveals another surface of attacks aimed at data on the way. It's possible for an attacker to sniff or even modify (MiTM attacks) an unencrypted information if he controls any part of network infrastructure (e.g. an WiFi Access Point) [1]. For this reason, developers should make a general rule, that any confidential data cannot be sent in a cleartext [2].
+A functionality of most mobile applications requires sending or receiving information from services on the Internet. This reveals another surface of attacks aimed at data on the way. It's possible for an attacker to sniff or even modify (MiTM attacks) an unencrypted information if he controls any part of network infrastructure (e.g. an WiFi Access Point)<sup>[1]</sup>. For this reason, developers should make a general rule, that any confidential data cannot be sent in a cleartext<sup>[2]</sup>.
 
 #### Static Analysis
 
@@ -35,11 +35,11 @@ It is important to capture all traffic (TCP and UDP), so you should run all poss
 
 #### Remediation
 
-Ensure that sensitive information is being sent via secure channels, using HTTPS [5], or SSLSocket [6] for socket-level communication using TLS.
+Ensure that sensitive information is being sent via secure channels, using HTTPS<sup>[5]</sup>, or SSLSocket<sup>[6]</sup> for socket-level communication using TLS.
 
-> Please be aware that `SSLSocket` **does not** verify hostname. The hostname verification should be done by using `getDefaultHostnameVerifier()` with expected hostname. Here [7] you can find an example of correct usage.
+Please be aware that `SSLSocket` **does not** verify hostname. The hostname verification should be done by using `getDefaultHostnameVerifier()` with expected hostname. Consult documentation<sup>[7]</sup> for an example of correct usage.
 
-Some applications may use localhost address, or binding to INADDR_ANY for handling sensitive IPC, what is bad from security perspective, as this interface is accessible for other applications installed on a device. For such purpose developers should consider using secure Android IPC mechanism [8].
+Some applications may use localhost address, or binding to INADDR_ANY for handling sensitive IPC, what is bad from security perspective, as this interface is accessible for other applications installed on a device. For such purpose developers should consider using secure Android IPC mechanism<sup>[8]</sup>.
 
 #### References
 
@@ -73,11 +73,52 @@ Some applications may use localhost address, or binding to INADDR_ANY for handli
 
 #### Overview
 
-Using encryption is essential when you are sending confidential data. However, encryption can defend your privacy, only if it uses enough strong cryptography. To reach this goal SSL-based services should not offer the possibility to choose weak cipher suite. A cipher suite is specified by an encryption protocol (e.g. DES, RC4, AES), the encryption key length (e.g. 40, 56, or 128 bits), and a hash algorithm (e.g. SHA, MD5) used for integrity checking. To ensure, that your encryption cannot be easily defeated, you should verify your TLS configuration that it does not use any weak cipher/protocol/key [1].
+Many mobile applications consume remote services over the HTTP protocol. HTTPS is HTTP over SSL/TLS. Other encrypted channels are less common. Thus, it is important to ensure that TLS configuration is done properly. SSL is the older name of the TLS protocol and should no longer be used, since SSLv3 is considered vulnerable. TLS v1.2 and v1.3 are the most modern and most secure versions, but many services still include configurations for TLS v1.0 and v1.1, to ensure compatibility with the older clients. This is especially true for browsers that can connect to arbitrary servers and for servers that expect connections from arbitrary clients.
+
+In the situation where both the client and the server are controlled by the same organization and are used for the purpose of only communicating with each other, higher levels of security can be achieved by more strict configurations<sup>[1]</sup>.
+
+If a mobile application connects to a specific server for a specific part of its functionality, the networking stack for that client can be tuned to ensure highest levels of security possible given the server configuration. Additionally, the mobile application may have to use a weaker configuration due to the lack of support in the underlying operating system.
+
+For example, the popular Android networking library okhttp uses the following list as the preferred set of cipher suites, but these are only available on Android 7.0 and later:
+
+* `TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256`
+* `TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256`
+
+To support earlier versions of Android, it adds a few ciphers that are not considered as secure:
+
+* `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA`
+* `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA`
+* `TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA`
+* `TLS_RSA_WITH_AES_128_GCM_SHA256`
+* `TLS_RSA_WITH_AES_256_GCM_SHA384`
+* `TLS_RSA_WITH_AES_128_CBC_SHA`
+* `TLS_RSA_WITH_AES_256_CBC_SHA`
+* `TLS_RSA_WITH_3DES_EDE_CBC_SHA`
+
+
+Similarly, the iOS ATS (App Transport Security) configuration requires one of the following ciphers:
+
+* `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384`
+* `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256`
+* `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA`
+* `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`
+* `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`
+* `TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384`
+* `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256`
+* `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
+
 
 #### Static Analysis
 
-Static analysis is not applicable for this test case.
+This is platform/language/library specific.
 
 #### Dynamic Analysis
 
@@ -85,7 +126,7 @@ After identifying all servers communicating with your application (e.g. using Tc
 
 * testssl.sh: via following command:
 
-The Github repo of testssl.sh offers also a compiled openssl version for download that supports **all ciphersuites and protocols including SSLv2**.
+The Github repo of testssl.sh offers also a compiled openssl version for download that supports **all cipher suites and protocols including SSLv2**.
 
 ```
 $ OPENSSL=./bin/openssl.Linux.x86_64 bash ./testssl.sh yoursite.com
@@ -111,7 +152,7 @@ sslyze --regular www.example.com:443
 ```
 o-saft.tcl
 ```
-or via command. There are multiple options, which can be specified here [2], but the most general one, verifying certificate, ciphers and SSL connection is the following:
+or via command. There are multiple options<sup>[2]</sup>, but the most general one, verifying certificate, ciphers and SSL connection is the following:
 
 ```
 perl o-saft.pl +check www.example.com:443
@@ -137,6 +178,9 @@ Any vulnerability or misconfiguration should be solved either by patching or rec
 * [2] O-Saft various tests - https://www.owasp.org/index.php/O-Saft/Documentation#COMMANDS
 * [3] Transport Layer Protection Cheat Sheet - https://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet
 * [4] Qualys SSL/TLS Deployment Best Practices - https://dev.ssllabs.com/projects/best-practices/
+* [5] okhttp `okhttp.ConnectionSpec` class, `APPROVED_CIPHER_SUITES` array - https://github.com/square/okhttp/
+* [6] Requirements for Connecting Using ATS, App Transport Security - https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW57
+
 
 ##### Tools
 * testssl.sh- https://testssl.sh
@@ -147,7 +191,7 @@ Any vulnerability or misconfiguration should be solved either by patching or rec
 
 #### Overview
 
-For sensitive applications, like banking apps, OWASP MASVS introduces "Defense in Depth" verification level [1]. Critical operations (e.g. user enrollment, or account recovery) of such sensitive applications are the most attractive targets from attacker's perspective. This creates a need of implementing advanced security controls for such operations, like adding additional channels (e.g. SMS and e-mail) to confirm user's action. Additional channels may reduce a risk of many attacking scenarios (mainly phishing), but only when they are out of any security faults.
+For sensitive applications, like banking apps, OWASP MASVS introduces "Defense in Depth" verification level<sup>[1]</sup>. Critical operations (e.g. user enrollment, or account recovery) of such sensitive applications are the most attractive targets from attacker's perspective. This creates a need of implementing advanced security controls for such operations, like adding additional channels (e.g. SMS and e-mail) to confirm user's action. Additional channels may reduce a risk of many attacking scenarios (mainly phishing), but only when they are out of any security faults.
 
 #### Static Analysis
 
@@ -166,7 +210,7 @@ Identify all critical operations implemented in tested application (e.g. user en
 
 #### Remediation
 
-Ensure that critical operations require at least one additional channel to confirm user's action. Each channel must not be bypassed to execute a critical operation. If you are going to implement additional factor to verify user's identity, you may consider usage of Infobip 2FA library [2], one-time passcodes via Google Authenticator [3].
+Ensure that critical operations require at least one additional channel to confirm user's action. Each channel must not be bypassed to execute a critical operation. If you are going to implement additional factor to verify user's identity, you may consider usage of Infobip 2FA library<sup>[2]</sup>, one-time passcodes via Google Authenticator<sup>[3]</sup>.
 
 #### References
 

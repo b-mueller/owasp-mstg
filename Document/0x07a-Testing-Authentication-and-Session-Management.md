@@ -8,6 +8,63 @@ For all of the test cases below, it need to be investigated first what kind of a
 
 Cookie-Based Authentication is the traditional authentication mechanism used in web applications, which is stateful. In order to adopt to the different requirements of mobile apps, a shift to stateless authentication or Token-Based Authentication can be seen. A prominent example for this is JSON Web Token or JWT<sup>[1]</sup> which can be part of an OAuth2 authentication and authorization framework.
 
+#### OAuth2
+
+OAuth2 is an authorization framework used to authorize an application to use a user account on an HTTP service for a limited time and, at the same time, preventing the client applications from having knowledge of any user credentials.
+
+OAuth2 defines 4 roles:
+
+* Resource Owner: the user owning the account.
+* Client: the application that wants to access the user's account using the access tokens.
+* Resource Server: hosts the user accounts.
+* Authorization Server: verifies the identity of the user and issues access tokens to the application.
+
+Note: The API fulfills both the resource and authorization server roles. Therefore we will refer to both as the API.
+
+<img src="Images/Chapters/0x07a/abstract-oauth2-flow.png" width="350px"/>
+
+Here is a more detailed explanation of the steps in the diagram <sup>[1]</sup> <sup>[2]</sup>:
+
+1. The application requests authorization to access service resources from the user.
+2. If the user authorized the request, the application receives an authorization grant. The authorization grant might have different forms (explicit, implicit, etc).
+3. The application requests an access token from the authorization server (API) by presenting authentication of its own identity, and the authorization grant. 
+4. If the application identity is authenticated and the authorization grant is valid, the authorization server (API) issues an access token to the application. The access token might have a companion refresh token. Authorization is complete.
+5. The application requests the resource from the resource server (API) and presents the access token for authentication. The access token might be used on different ways (e.g., as a bearer token). 
+6. If the access token is valid, the resource server (API) serves the resource to the application.
+
+These are some of the common best practices for OAuth2 on native apps:
+
+User-agent:
+- Use an external user-agent (the browser) instead of an embedded user-agent (e.g. WebView or internal client user interface) to prevent End-User Credentials Phishing (e.g. you do not want an app offering you a "Login with Facebook" to get your Facebook password). However, by using the browser, the app relies on the OS Keychain for server trust. This way it will not be possible to implement certificate pinning. A solution for this would be to restrict the embedded user-agent to only the relevant domain.
+- The user should have a way to verify visual trust mechanisms (e.g., Transport Layer Security (TLS) confirmation, web site mechanisms).
+- The client should validate the fully qualified domain name of the server to the public key presented by the server during connection establishment to prevent man-in-the-middle attacks.
+
+Type of grant:
+- Use code grant instead of implicit grant on native apps.
+- When using code grant, implement PKCE (Proof Key for Code Exchange) to protect the code grant. Make sure that the server also implements it.
+- The auth "code" should be short-lived and only used immediately after receiving it. Make sure that they only reside on transient memory and are not stored or logged.
+
+Client secrets:
+- No shared secret should be used as proof of the client's identity as this could lead to client impersonation ("client_id" already serves this purpose). If for some reason they do use client secrets, be sure that they are stored in secure local storage.
+
+End-User credentials:
+- The transmission of end-user credentials must be protected using transport-layer mechanisms such as TLS.
+
+Tokens:
+- Keep access tokens in transient memory.
+- Access tokens must be securely transmitted via TLS.
+- The scope and expiry time of access tokens should be reduced when end-to-end confidentiality cannot be guaranteed or when the token provides access to sensitive information or allows the execution of high risk actions.
+- Remember that if the app uses access tokens as bearer tokens and no additional mechanism is used to identify the client, the attacker can access all resources associated with the token and its scope after stealing the tokens.
+- Store refresh tokens in secure local storage as they are long-term credentials.
+
+For additional best practices and detailed information please refer to the source documents <sup>[2]</sup> <sup>[3]</sup> <sup>[4]</sup>.
+
+##### References
+- [1] An Introduction into OAuth2 - https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2
+- [2] RFC6749: The OAuth 2.0 Authorization Framework (October 2012) - https://tools.ietf.org/html/rfc6749
+- [3] draft_ietf-oauth-native-apps-12: OAuth 2.0 for Native Apps (June 2017) - https://tools.ietf.org/html/draft-ietf-oauth-native-apps-12
+- [4] RFC6819: OAuth 2.0 Threat Model and Security Considerations (January 2013) - https://tools.ietf.org/html/rfc6819
+
 
 
 ### Verifying that Users Are Properly Authenticated
@@ -429,12 +486,33 @@ We will explain here how to check that this control is implemented correctly, bo
 
 If server side code is available, it should be reviewed that the session timeout or token invalidation functionality is correctly configured and a timeout is triggered after a defined period of time.  
 The check needed here will be different depending on the technology used. Here are different examples on how a session timeout can be configured:
-- Spring (Java)<sup>[3]</sup>
-- Ruby on Rails<sup>[4]</sup>  
-- PHP<sup>[5]</sup>
-- ASP.Net<sup>[6]</sup>
+* Spring (Java) - http://docs.spring.io/spring-session/docs/current/reference/html5/
+* Ruby on Rails - http://guides.rubyonrails.org/security.html#session-expiry
+* PHP - http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
+* ASP.Net - https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
 
--- TODO explain timeout for Stateless and give examples of implementations
+In case of stateless authentication, once a token is signed, it is valid forever unless the signing key is changed or expiration explicitly set. One could use "exp" expiration claim<sup>[3]</sup> to define the expiration time on or after which the JWT must not be accepted for processing.
+Speaking of tokens for stateless authentication, one should differentiate types of tokens, such as access tokens and refresh tokens<sup>[4]</sup>. Access tokens are used for accessing protected resources and should be short-lived. Refresh tokens are primarily used to obtain renewed access tokens. They are rather long-lived but should expire too, as otherwise their leakage would expose the system for unauthorized use. 
+
+The exact values for token expiration depend on the application requirements and capacity. Sample code for JWT token refreshments is presented below:
+```
+ app.post('/refresh_token', function (req, res) {
+  // verify the existing token
+  var profile = jwt.verify(req.body.token, secret);
+
+  // if more than 14 days old, force login
+  if (profile.original_iat - new Date() > 14) { // iat == issued at
+    return res.send(401); // re-logging
+  }
+
+  // check if the user still exists or if authorization hasn't been revoked
+  if (!valid) return res.send(401); // re-logging
+
+  // issue a new token
+  var refreshed_token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
+  res.json({ token: refreshed_token });
+});
+```
 
 #### Dynamic Analysis
 
@@ -467,10 +545,9 @@ Most of the frameworks have a parameter to configure the session timeout. This p
 ##### Info
 * [1] OWASP Web Application Test Guide (OTG-SESS-007) - https://www.owasp.org/index.php/Test_Session_Timeout_(OTG-SESS-007)
 * [2] OWASP Session management cheatsheet - https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
-* [3] Session Timeout in Java Spring - http://docs.spring.io/spring-session/docs/current/reference/html5/
-* [4] Session Timeout in Ruby on Rails - https://github.com/rails/rails/blob/318a20c140de57a7d5f820753c82258a3696c465/railties/lib/rails/application/configuration.rb#L130
-* [5] Session Timeout in PHP - http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
-* [6] Session Timeout in ASP -  https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
+* [3] RFC 7519 - https://tools.ietf.org/html/rfc7519#section-4.1.4
+* [4] Refresh tokens & access tokens - https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
+
 
 ### Testing 2-Factor Authentication and Step-up Authentication
 
