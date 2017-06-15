@@ -24,9 +24,9 @@ On Android in particular, one has to deal with the problem of fragmentation. Not
 
 ### Communication with Trusted Endpoints
 
-Mobile devices regularly connect to a variety of networks, including public WiFi networks shared with other (possibly malicious) clients. This creates great opportunities for network-based attacks, from simple packet sniffing to creating a rogue access point and going SSL man-in-the-middle (or even old-school stuff like routing protocol injection - those baddies use whatever works).
+Mobile devices regularly connect to a variety of networks, including public WiFi networks shared with other (possibly malicious) clients. This creates great opportunities for network-based attacks, from simple packet sniffing to creating a rogue access point and going SSL man-in-the-middle (or even old-school stuff like routing protocol injection - the bad guys aren't picky).
 
-It is crucial to maintain confidentiality and integrity of information exchanged between the mobile app and remote service endpoints. At the very least, a mobile app must set up a secure, encrypted channel for network communication using the TLS protocol with appropriate settings. Level 2 lists additional defense-in-depth measure such as SSL pinning.
+It is crucial to maintain confidentiality and integrity of information exchanged between the mobile app and remote service endpoints. At the very least, a mobile app must set up a secure, encrypted channel for network communication using the TLS protocol with appropriate settings.
 
 ### Authentication and Authorization
 
@@ -40,11 +40,13 @@ The controls in this group ensure that the app uses platform APIs and standard c
 
 ### Code Quality and Exploit Mitigation
 
--- [TODO] --
+"Classical" injection and memory management issues play less of a role on the mobile app side. This is mostly due to the lack of the necessary attack surface: For the most part, mobile apps only interface with the trusted backend service and the user interface, so even if a ton of buffer overflow vulnerabilities would exist in the app, those vulnerabilities wouldn't open up any useful attack vectors. The same can be said for browser exploits such as XSS that are very prevalent in the web world (again, XSS is theoretically possible in some cases, but it's very rare to see XSS issues that one can actually exploit for benefit).
+
+All that doesn't mean however that we should let developers get away with writing sloppy code. Following security best practice results in hardened release builds that are resilient against tampering. "Free" security features offered by compilers and mobile SDKs help to increase security and mitigate attacks.
 
 ### Anti-Tampering and Anti-Reversing
 
--- [TODO] --
+There is three things you should never bring up in date conversations: Religion, politics and code obfuscation. Many security experts dismiss client-side protections outright. However, the fast is that software protection controls are widely used in the mobile app world, so security testers need ways to deal with them. We also think that there is *some* benefit to be had, as long as the protections are employed with a clear purpose and realistic expectations in mind, and aren't used to *replace* security controls.
 
 ## The OWASP Mobile AppSec Verification Standard, Checklist and Testing Guide
 
