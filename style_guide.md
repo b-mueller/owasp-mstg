@@ -49,33 +49,33 @@ Link to background information where necessary.
 
 ### Write so people will read with joy!
 
-  Use the following methods to increase scannability:
-• Use shorter (50–80 characters per line) rather than longer line lengths (100 characters per line)
-• Use left alignment for headings, subheadings, and text
-• Link where appropriate
-• Use lists rather than paragraphs wherever possible
-• Include only one main idea in each paragraph
-• Put the most important information at the top
-• Start the page with the conclusion as well as a short summary of the remaining content
-• Use headings where applicable
-• Use capitalization (CAPS) for emphasis, however use it sparingly as it interferes with scannability
-• Use short, simple words that are to the point
-• Be concise and focused 
+* Use the following methods to increase scannability:
+* Use shorter (50–80 characters per line) rather than longer line lengths (100 characters per line)
+* Use left alignment for headings, subheadings, and text
+* Link where appropriate
+* Use lists rather than paragraphs wherever possible
+* Include only one main idea in each paragraph
+* Put the most important information at the top
+* Start the page with the conclusion as well as a short summary of the remaining content
+* Use headings where applicable
+* Use capitalization (CAPS) for emphasis, however use it sparingly as it interferes with scannability
+* Use short, simple words that are to the point
+* Be concise and focused 
 
   For longer pages, use the following tools to make the page easily scannable:
-• Anchor links
-• Subheadings and relevant links
-• Bulleted copy
-• Meaningful graphics, or pull quotes, to break up larger blocks of text
-• End links
+* Anchor links
+* Subheadings and relevant links
+* Bulleted copy
+* Meaningful graphics, or pull quotes, to break up larger blocks of text
+* End links
 
 ### Effective use of lists
 
 When presenting your content in a list format:
-• Use numbered lists when the order of entries is important.
-• Use bulleted lists whenever the order of the entries is not important.
-• Generally, limit the number of items in a single list to no more than nine.
-• Generally, limit lists to no more than two levels: primary and secondary.
+* Use numbered lists when the order of entries is important.
+* Use bulleted lists whenever the order of the entries is not important.
+* Generally, limit the number of items in a single list to no more than nine.
+* Generally, limit lists to no more than two levels: primary and secondary.
 
 ### Numbering conventions
 When using a number between zero and ten, spell out the number (e.g., "three" or "ten").

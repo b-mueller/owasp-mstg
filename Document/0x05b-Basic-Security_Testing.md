@@ -2,13 +2,15 @@
 
 ### Setting Up Your Testing Environment
 
-When setting up the testing environment, this can become a challenging task. For example when testing on-site at client premises there might be restrictions when using an enterprise Access Point due to limitations in the connections that can be made (e.g. ports are blocked), making it more difficult to start a dynamic analysis of the app. Rooted phones might also not be allowed within the enterprise network due to company policies. Also, root detection and other countermeasures implemented within an app can lead to significant extra work just to be able to finally test the app. Either way, the testing team responsible for the Android assessment need to work together with the app developer(s) and operation team in order to find a proper solution for a working testing environment.
+Setting up a testing environment can be a challenging task. When performing testing on-site at client premises, the restrictions on the enterprise wireless access points and networks may make dynamic analysis more difficult. Company policies may prohibit use of rooted phones or network testing tools (hardware and software) within the enterprise networks. Apps implementing root detection and other reverse engineering countermeasures may add a significant amount of extra work before further analysis can be performed.
 
-This section will give an overview of different methods on how an Android app can be tested and will illustrate also its limitations. Due to the reasons stated above you should be aware of all possible testing methods to select the right one for your testing environment, but also to articulate restrictions so that everybody in the project is on the same page.
+To overcome these and other challenges, the testing team responsible for Android app assessment needs to work together with the app developers and the operation team in order to find a proper solution for an effective testing environment.
+
+This section provides an overview of different methods of testing an Android app and illustrates their limitations. For the reasons stated above, not all testing methods documented here may be applicable for your testing environment. Being able to articulate the reasons for these restrictions will help all the project stakeholders to be on the same page.
 
 #### Preparation
 
-Security testing involves many invasive tasks such as monitoring and manipulating the network traffic between the mobile app and its remote endpoints, inspecting the app's data files, and instrumenting API calls. Security controls like SSL Pinning and root detection might can impede these tasks and slow down the testing dramatically.
+Security testing involves many invasive tasks such as monitoring and manipulating the network traffic between the mobile app and its remote endpoints, inspecting the app's data files, and instrumenting API calls. Security controls like SSL Pinning and root detection might impede these tasks and slow down testing dramatically.
 
 During the preparation phase it should be discussed with the company developing the mobile app, to provide two versions of the app. One app should be built as release to check if the implemented controls like SSL Pinning are working properly or can be easily bypassed. The same app should also be provided as debug build that deactivates certain security controls. Through this approach all scenarios and test cases can be tested in the most efficient way.
 
@@ -39,17 +41,18 @@ After finishing these steps and starting the app, the requests should show up in
 ###### Risks of Rooting
 
 As a security tester, you may want to root your mobile device: while some tests can be performed on a non-rooted mobile, some do require a rooted one. However, you need to be aware of the fact that rooting is not an easy process and requires advanced knowledge. Rooting is risky, and three main consequences need to be clarified before you may proceed: rooting
-* usually voids the device guarantee (always check the manufacturer policy before taking any action),
-* may "brick" the device, e.g. render it inoperable and unusable.
-* brings additional security risks as built-in exploit mitigations are often removed.
+
+* Usually voids the device warranty (always check the manufacturer policy before taking any action),
+* May "brick" the device, i.e., render it inoperable and unusable.
+* Brings additional security risks as built-in exploit mitigations are often removed.
 
 **You need to understand that rooting your device is ultimately YOUR own decision and that OWASP shall in no way be held responsible for any damage. In case you feel unsure, always seek expert advice before starting the rooting process.**
 
 ###### What Mobiles Can Be Rooted?
 
-Virtually, any Android mobile can be rooted. Commercial versions of Android OS, at the kernel level evolutions of Linux OS, are optimized for the mobile world. Here some features are removed or disabled, such as the possibility for a non-privileged user to become the 'root' user (who has elevated privileges). Rooting a phone means adding the feature to become the root user, e.g. technically speaking adding a standard Linux executable called 'su' used for switching users.
+Virtually, any Android mobile can be rooted. Commercial versions of Android OS, at the kernel level evolutions of Linux OS, are optimized for the mobile world. Here some features are removed or disabled, such as the possibility for a non-privileged user to become the 'root' user (who has elevated privileges). Rooting a phone means adding the feature to become the root user, e.g. technically speaking adding a standard Linux executable called `su` used for switching users.
 
-The first step in rooting a mobile is to unlock its boot loader. The procedure depends on each manufacturer. However, for practical reasons, rooting some mobiles is more popular than rooting others, particularly when it comes to security testing: devices created by Google (and manufactured by other companies like Samsung, LG and Motorola) are among the most popular, particularly because they are widely used by developers. The device warranty is not nullified when the boot loader is unlocked and Google provides many tools to support the root itself to work with rooted devices. A curated list of guide on rooting devices from all major brands can be found in xda forums<sup>[21]</sup>.
+The first step in rooting a mobile is to unlock its boot loader. The procedure depends on each manufacturer. However, for practical reasons, rooting some mobiles is more popular than rooting others, particularly when it comes to security testing: devices created by Google (and manufactured by other companies like Samsung, LG and Motorola) are among the most popular, particularly because they are widely used by developers. The device warranty is not nullified when the boot loader is unlocked and Google provides many tools to support the root itself to work with rooted devices. A curated list of guide on rooting devices from all major brands can be found in XDA forums<sup>[21]</sup>.
 
 See also "Android Platform Overview" for further details.
 
@@ -94,8 +97,8 @@ HTTP and HTTPS requests should now be routed over the proxy on the host machine.
 
 An easy way to install a CA certificate is pushing the cert to the device and adding it to the certificate store via Security Settings. For example, you can install the PortSwigger (Burp) CA certificate as follows:
 
-1. Start Burp and navigate to http://burp/ using a web browser on the host, and download cacert.der by clicking the "CA Certificate" button.
-2. Change the file extension from .der to .cer
+1. Start Burp and navigate to http://burp/ using a web browser on the host, and download `cacert.der` by clicking the "CA Certificate" button.
+2. Change the file extension from `.der` to `.cer`
 3. Push the file to the emulator:
 
 ```bash
@@ -103,7 +106,7 @@ $ adb push cacert.cer /sdcard/
 ```
 
 4. Navigate to "Settings" -> "Security" -> "Install from SD Card"
-5. Scroll down and tap on "cacert.cer"
+5. Scroll down and tap on `cacert.cer`
 
 You should now be prompted to confirm installation of the certificate (you'll also be asked to set a device PIN if you haven't already).
 
@@ -187,7 +190,7 @@ Since you have the source code in hand, you can check for cryptographic mistakes
 
 During **Black box testing** you will not have access to the source code in its original form. Usually, you will have the application package in hand (in Android .apk format<sup>[17]</sup>), which can be installed on an Android device or reverse engineered with the goal to retrieve parts of the source code.
 
-An easy way on the CLI to retrieve the source code of an APK is through <code>apkx</code>, which also packages <code>dex2jar</code> and CFR and automates the extracting, conversion and decompilation steps. Install it as follows:
+An easy way on the CLI to retrieve the source code of an APK is through `apkx`, which also packages `dex2jar` and CFR and automates the extracting, conversion and decompilation steps. Install it as follows:
 
 ```
 $ git clone https://github.com/b-mueller/apkx
@@ -195,7 +198,7 @@ $ cd apkx
 $ sudo ./install.sh
 ```
 
-This should copy <code>apkx</code> to <code>/usr/local/bin</code>. Run it on the APK that need to be tested:
+This should copy `apkx` to `/usr/local/bin`. Run it on the APK that need to be tested:
 
 ```bash
 $ apkx UnCrackable-Level1.apk
@@ -421,7 +424,7 @@ Start using the app and trigger a function that uses FCM. You should see HTTP me
 
 Interception proxies like Burp or OWASP ZAP will not show this traffic, as they are not capable of decoding it properly by default. There are two plugins available for Burp, which are Burp-non-HTTP-Extension<sup>[28]<sup> and Mitm-relay<sup>[27]<sup> that leverages Burp to visualize XMPP traffic.
 
-As an alternative to a Mitm attack executed on your machine, a Wifi Access Point (AP) or router can also be used instead. The setup would become a little bit more complicated, as port forwarding needs to be configured on the AP or router and need to point to your interception proxy that need to listen on the external interface of your machine. For this test setup tools like ettercap are not needed anymore.
+As an alternative to a MITM attack executed on your machine, a Wifi Access Point (AP) or router can also be used instead. The setup would become a little bit more complicated, as port forwarding needs to be configured on the AP or router and need to point to your interception proxy that need to listen on the external interface of your machine. For this test setup tools like ettercap are not needed anymore.
 
 Tools like Wireshark can be used to monitor and record the traffic for further investigation either locally on your machine or through a span port, if the router or Wifi AP offers this functionality.
 
