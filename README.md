@@ -1,4 +1,4 @@
-<img width=200px align="right" style="float: right;" src="Document/Images/titlepage-small.jpg">
+<a href="https://leanpub.com/mobile-security-testing-guide-preview"><img width=180px align="right" style="float: right;" src="Document/Images/summit_preview.jpg"></a>
 
 # OWASP Mobile Security Testing Guide
 
