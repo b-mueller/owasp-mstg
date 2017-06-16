@@ -155,7 +155,7 @@ Hardware-backed storage mechanisms must be used for storing sensitive data. Perm
 
 - Storing the data in the keychain with the `kSecAttrAccessibleWhenUnlocked` attribute.
 - Encrypting the data using standard crypto APIs before storing it, and storing the encryption key in the keychain.
-- Another option is to use the encryption support, such as Realm provides. 
+- Another option is to use the encryption support, such as Realm provides.
 
 ```swift
 
@@ -182,7 +182,7 @@ The following example shows how to create a securely encrypted file using the `c
 
 A generic example for using the KeyChain to store, update or delete data can be found in the official Apple documentation<sup>[12]</sup>.
 
-A sample for using TouchID and passcode protected keys can be found in the official Apple documentaiton <sup>[13]</sup>.
+A sample for using TouchID and passcode protected keys can be found in the official Apple documentation <sup>[13]</sup>.
 
 Here is a sample in swift with which you can create the keys as follows (notice the `kSecAttrTokenID as String: kSecAttrTokenIDSecureEnclave`: here you instruct that we want to use the Secure Enclave directly):
 
@@ -215,22 +215,22 @@ Here is a sample in swift with which you can create the keys as follows (notice 
 ```
 
 
---- {TODO: add key generation for RSA encryption 
+--- {TODO: add key generation for RSA encryption
 
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.1: "System credential storage facilities are used appropriately to store sensitive data, such as user credentials or cryptographic keys."
 
 ##### CWE
-* CWE-311 - Missing Encryption of Sensitive Data
-* CWE-312 - Cleartext Storage of Sensitive Information
-* CWE-522 - Insufficiently Protected Credentials
-* CWE-922 - Insecure Storage of Sensitive Information
+- CWE-311 - Missing Encryption of Sensitive Data
+- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-522 - Insufficiently Protected Credentials
+- CWE-922 - Insecure Storage of Sensitive Information
 
 ##### Info
 
@@ -251,6 +251,7 @@ Here is a sample in swift with which you can create the keys as follows (notice 
 - [15] Keychain concepts - https://developer.apple.com/library/content/documentation/Security/Conceptual/keychainServConcepts/02concepts/concepts.html
 - [16] Realm Objective-C - https://realm.io/docs/objc/latest/
 - [17] Realm Swift - https://realm.io/docs/swift/latest/
+
 
 ### Testing for Sensitive Data in Logs
 
@@ -304,19 +305,19 @@ Use a define to enable NSLog statements for development and debugging, and disab
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
-* V2.2: "No sensitive data is written to application logs."
+- V2.2: "No sensitive data is written to application logs."
 
 ##### CWE
-* CWE-117: Improper Output Neutralization for Logs
-* CWE-532: Information Exposure Through Log Files
-* CWE-534: Information Exposure Through Debug Log Files
+- CWE-117: Improper Output Neutralization for Logs
+- CWE-532: Information Exposure Through Log Files
+- CWE-534: Information Exposure Through Debug Log Files
 
 ##### Tools
-* Xcode
+- Xcode
 
 
 ### Testing Whether Sensitive Data Is Sent to Third Parties
@@ -346,18 +347,18 @@ All data that is sent to 3rd Party services should be anonymized, so no PII data
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
-* V2.3: "No sensitive data is shared with third parties unless it is a necessary part of the architecture."
+- V2.3: "No sensitive data is shared with third parties unless it is a necessary part of the architecture."
 
 ##### CWE
-* CWE-359 "Exposure of Private Information ('Privacy Violation')": [Link to CWE issue]
+- CWE-359 "Exposure of Private Information ('Privacy Violation')": [Link to CWE issue]
 
 ##### Tools
-* OWASP ZAP
-* Burp Suite Professional
+- OWASP ZAP
+- Burp Suite Professional
 
 
 ### Testing for Sensitive Data in the Keyboard Cache
@@ -405,8 +406,8 @@ textField.autocorrectionType = UITextAutocorrectionTypeNo;
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.4: "The keyboard cache is disabled on text inputs that process sensitive data."
@@ -481,8 +482,8 @@ UIPasteboard *pb = [UIPasteboard generalPasteboard];
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.5: "The clipboard is deactivated on text fields that may contain sensitive data."
@@ -560,8 +561,8 @@ NSFileCoordinator<sup>[6]</sup> methods run synchronously, so your code will blo
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.6: "No sensitive data is exposed via IPC mechanisms."
@@ -600,8 +601,8 @@ NSFileCoordinator<sup>[6]</sup> methods run synchronously, so your code will blo
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.7: "No sensitive data, such as passwords or pins, is exposed through the user interface."
@@ -696,7 +697,9 @@ If your app must support iOS 5.0.1, you can use the following method to set the 
 
 #### Static Analysis
 
-Review the iOS mobile application source code to see if there is any usage of
+Review the iOS mobile application source code to see if data is backed up unencrypted.
+-- TODO
+
 #### Dynamic Analysis
 
 After the App data has been backed up, review the data content of the backup files and folders. Specifically, the following directories should be reviewed to check if it contains any sensitive data:
@@ -719,8 +722,8 @@ While all the files in `Documents/` and `Library/Application Support/` are alway
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.8: "No sensitive data is included in backups generated by the mobile operating system."
@@ -761,7 +764,7 @@ It is highly recommended to have a default screenshot that will be cached whenev
 
 #### Remediation
 
-Possible remediation method that will set a default screenshot:
+Possible remediation method that will set a default screenshot<sup>[1]</sup>:
 
 ```
 @property (UIImageView *)backgroundImage;
@@ -778,8 +781,8 @@ This will cause the background image to be set to the "overlayImage.png" instead
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M1 - Improper Platform Usage
-* M2 - Insecure Data Storage
+- M1 - Improper Platform Usage
+- M2 - Insecure Data Storage
 
 ##### OWASP MASVS
 - V2.9: "The app removes sensitive data from views when backgrounded."
@@ -788,8 +791,7 @@ This will cause the background image to be set to the "overlayImage.png" instead
 - CWE
 
 #### Info
--- TODO [Add references for "Testing For Sensitive Information in Auto-Generated Screenshots" ] --
-
+- [1] UIImageView - https://developer.apple.com/documentation/uikit/uiimageview
 
 
 ### Testing for Sensitive Data in Memory

@@ -12,11 +12,11 @@ The following rules are meant to ensure consistency of the MSTG:
   
 The primary measure for amount of content on a page should be based on the purpose it serves.
 
-  * Use short pages 
+- Use short pages 
   
 Those containing one or two screens of text at most. Users are scanning for link choices. Use longer pages (those that require more scrolling or reading) deeper within the chapter where content can be printed and read later.
 
-  * For very large sections of information
+- For very large sections of information
   
 Consider creating a supporting document and linking to it from the page rather than displaying all the information directly on the page.
 
@@ -49,33 +49,35 @@ Link to background information where necessary.
 
 ### Write so people will read with joy!
 
-* Use the following methods to increase scannability:
-* Use shorter (50–80 characters per line) rather than longer line lengths (100 characters per line)
-* Use left alignment for headings, subheadings, and text
-* Link where appropriate
-* Use lists rather than paragraphs wherever possible
-* Include only one main idea in each paragraph
-* Put the most important information at the top
-* Start the page with the conclusion as well as a short summary of the remaining content
-* Use headings where applicable
-* Use capitalization (CAPS) for emphasis, however use it sparingly as it interferes with scannability
-* Use short, simple words that are to the point
-* Be concise and focused 
+- Use the following methods to increase scannability:
+- Use shorter (50–80 characters per line) rather than longer line lengths (100 characters per line)
+- Use left alignment for headings, subheadings, and text
+- Link where appropriate
+- Use lists rather than paragraphs wherever possible
+- Use dashes `-` rather than asterisks `*` for lists
+- Include only one main idea in each paragraph
+- Put the most important information at the top
+- Start the page with the conclusion as well as a short summary of the remaining content
+- Use headings where applicable
+- Use capitalization (CAPS) for emphasis, however use it sparingly as it interferes with scannability
+- Use short, simple words that are to the point
+- Be concise and focused 
 
-  For longer pages, use the following tools to make the page easily scannable:
-* Anchor links
-* Subheadings and relevant links
-* Bulleted copy
-* Meaningful graphics, or pull quotes, to break up larger blocks of text
-* End links
+For longer pages, use the following tools to make the page easily scannable:
+  
+- Anchor links
+- Subheadings and relevant links
+- Bulleted copy
+- Meaningful graphics, or pull quotes, to break up larger blocks of text
+- End links
 
 ### Effective use of lists
 
 When presenting your content in a list format:
-* Use numbered lists when the order of entries is important.
-* Use bulleted lists whenever the order of the entries is not important.
-* Generally, limit the number of items in a single list to no more than nine.
-* Generally, limit lists to no more than two levels: primary and secondary.
+- Use numbered lists when the order of entries is important.
+- Use bulleted lists whenever the order of the entries is not important.
+- Generally, limit the number of items in a single list to no more than nine.
+- Generally, limit lists to no more than two levels: primary and secondary.
 
 ### Numbering conventions
 When using a number between zero and ten, spell out the number (e.g., "three" or "ten").
@@ -84,11 +86,12 @@ When using any number higher than ten, use the numeric version (e.g., "12" or �
 
 ## 2. Language 
 
- * British spellings and terminology
- 
-Change all British spellings to American spellings where applicable. This includes "toward" (US) vs. "towards" (UK), "among" (US) vs. "amongst" (UK), etc.
+### American spelling and terminology
 
- * Plurals
+Use American spelling and terminology.
+Change all British spelling and terminology to the American equivalents where applicable. This includes "toward" (US) vs. "towards" (UK), "among" (US) vs. "amongst" (UK), "color" (US) vs "colour" (UK), "flashlight" (US) vs "torch" (UK), etc.
+
+### Plurals
 Adhere to standard grammar and punctuation rules when it comes to pluralization of typical words.
 
 The plural of calendar years does not take the apostrophe before the “s.” For example, the plural form of 1990 is 1990s
@@ -141,10 +144,11 @@ __Books:__
 NOTE: Use et al. when three or more names are given
 
 e.g. 
-  * [1] B. Klaus and P. Horn, Robot Vision. Cambridge, MA: MIT Press, 1986. 
-  * [2] L. Stein, “Random patterns,” in Computers and You, J. S. Brake, Ed. New York: Wiley, 1994, pp. 55-70. 
-  * [3] R. L. Myer, “Parametric oscillators and nonlinear materials,” in Nonlinear Optics, vol. 4, P. G. Harper and B. S. Wherret, Eds. San Francisco, CA: Academic, 1977, pp. 47-160. 
-  * [4]  M. Abramowitz and I. A. Stegun, Eds., Handbook of Mathematical Functions (Applied Mathematics Series 55). Washington, DC: NBS, 1964, pp. 32-33. 
+
+- [1] B. Klaus and P. Horn, Robot Vision. Cambridge, MA: MIT Press, 1986. 
+- [2] L. Stein, “Random patterns,” in Computers and You, J. S. Brake, Ed. New York: Wiley, 1994, pp. 55-70. 
+- [3] R. L. Myer, “Parametric oscillators and nonlinear materials,” in Nonlinear Optics, vol. 4, P. G. Harper and B. S. Wherret, Eds. San Francisco, CA: Academic, 1977, pp. 47-160. 
+- [4] M. Abramowitz and I. A. Stegun, Eds., Handbook of Mathematical Functions (Applied Mathematics Series 55). Washington, DC: NBS, 1964, pp. 32-33. 
 
 ## References Within The Guide
 
@@ -156,7 +160,7 @@ Pictures should be uploaded to the Images/Chapters directory. Afterwards they sh
 
 ```HTML
 <img src="Images/Chapters/0x06d/key_hierarchy_apple.jpg" width="500px"/>
-*iOS Data Protection Key Hierarchy <sup>[3]</sup>*
+- *iOS Data Protection Key Hierarchy <sup>[3]</sup>*
 ```
 
 ## Lowercase or capital letter after a colon

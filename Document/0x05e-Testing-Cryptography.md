@@ -30,19 +30,19 @@ Below you can find the output on the Emulator running Android 4.4 with Google Pl
 
 ```
 
-provider: GmsCore_OpenSSL1.0 (Android's OpenSSL-backed security provider) 
-provider: AndroidOpenSSL1.0 (Android's OpenSSL-backed security provider) 
-provider: DRLCertFactory1.0 (ASN.1, DER, PkiPath, PKCS7) 
-provider: BC1.49 (BouncyCastle Security Provider v1.49) 
-provider: Crypto1.0 (HARMONY (SHA1 digest; SecureRandom; SHA1withDSA signature)) 
-provider: HarmonyJSSE1.0 (Harmony JSSE Provider) 
-provider: AndroidKeyStore1.0 (Android KeyStore security provider) 
+provider: GmsCore_OpenSSL1.0 (Android's OpenSSL-backed security provider)
+provider: AndroidOpenSSL1.0 (Android's OpenSSL-backed security provider)
+provider: DRLCertFactory1.0 (ASN.1, DER, PkiPath, PKCS7)
+provider: BC1.49 (BouncyCastle Security Provider v1.49)
+provider: Crypto1.0 (HARMONY (SHA1 digest; SecureRandom; SHA1withDSA signature))
+provider: HarmonyJSSE1.0 (Harmony JSSE Provider)
+provider: AndroidKeyStore1.0 (Android KeyStore security provider)
 ```
 
 
 For some applications that support older versions of Android, bundling an up-to-date library may be the only option. SpongyCastle (a repackaged version of BouncyCastle) is a common choice in these situations. Repackaging is necessary because BouncyCastle is included in the Android SDK. The latest version of SpongyCastle <sup>[6]</sup> likely fixes issues encountered in the earlier versions of BouncyCastle <sup>[7]</sup> that were included in Android. Note that the BouncyCastle libraries packed with Android are often not as complete as their counterparts from the Legion of the BounceyCastle. Lastly: bear in mind that packing large libraries such as SpongyCastle will often lead to a multidexed Android application.
 
-Android SDK provides mechanisms for specifying secure key generation and use. Android 6.0 (Marshmallow, API 23) introduced the `KeyGenParameterSpec` class that can be used to ensure the correct key usage in the application. 
+Android SDK provides mechanisms for specifying secure key generation and use. Android 6.0 (Marshmallow, API 23) introduced the `KeyGenParameterSpec` class that can be used to ensure the correct key usage in the application.
 
 Here's an example of using AES/CBC/PKCS7Padding on API 23+:
 
@@ -267,4 +267,3 @@ public static void main (String args[]) {
 - [3] Proper seeding of SecureRandom - https://www.securecoding.cert.org/confluence/display/java/MSC63-J.+Ensure+that+SecureRandom+is+properly+seeded
 - [4] Some SecureRandom Thoughts - https://android-developers.googleblog.com/2013/08/some-securerandom-thoughts.html
 - [5] N. Elenkov, Android Security Internals, No Starch Press, 2014, Chapter 5.
-

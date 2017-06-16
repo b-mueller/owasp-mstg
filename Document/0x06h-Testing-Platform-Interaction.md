@@ -341,7 +341,7 @@ It is important to clarify that this control is only applicable on the Android P
 
 
 
-### Testing Object (De-)Serialization
+### Testing Object persistance
 
 #### Overview
 

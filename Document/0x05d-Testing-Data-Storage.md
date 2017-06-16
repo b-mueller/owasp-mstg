@@ -176,7 +176,7 @@ The level of security afforded by the Android KeyStore depends on its implementa
 In a software-only implementation, the keys are encrypted with a per-user encryption master key <sup>[16]</sup>. In that case, an attacker can access all keys on a rooted device in the folder <code>/data/misc/keystore/</code>. As the master key is generated using the user’s own lock screen pin/ password, the Android KeyStore is unavailable when the device is locked <sup>[9]</sup>.
 
 ##### Older Java-KeyStore
-Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The impelemntations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BounceyCastle KeyStore (BKS). 
+Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The impelemntations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BounceyCastle KeyStore (BKS).
 You can create one by using the `KeyStore.getInstance("BKS", "BC");`, where "BKS" is the keystore name (BounceycastleKeyStore) and "BC" is the provider (BounceyCastle). Alternatively you can use SpongeyCastle as a wrapper and initialize the keystore: `KeyStore.getInstance("BKS", "SC");`.
 
 Please be aware that not all KeyStores offer proper protection to the keys stored in the keystore files.
@@ -639,7 +639,6 @@ Once you identify a list of IPC mechanisms, review the source code in order to d
 **Vulnerable ContentProvider**
 
 An example of a vulnerable _ContentProvider_:
-(and SQL injection **-- TODO [Refer to any input validation test in the project] --**
 
 ```xml
 <provider android:name=".CredentialProvider"
@@ -1149,8 +1148,8 @@ Once sensitive functions are identified, like decryption of data, the investigat
 
 First, you need to identify which sensitive information is stored in memory. Then there are a few checks that must be executed:
 
-- Verify that no sensitive information is stored in an immutable structure. Immutable structures are not really overwritten in the heap, even after nullification or changing them. Instead, by changing the immutable structure, a copy is created on the heap. `BigInteger` and `String` are two of the most used examples when storing secrets in memory. 
-- Verify that, when mutable structures are used, such as `byte[]` and `char[]` that all copies of the structure are cleared. 
+- Verify that no sensitive information is stored in an immutable structure. Immutable structures are not really overwritten in the heap, even after nullification or changing them. Instead, by changing the immutable structure, a copy is created on the heap. `BigInteger` and `String` are two of the most used examples when storing secrets in memory.
+- Verify that, when mutable structures are used, such as `byte[]` and `char[]` that all copies of the structure are cleared.
 
 
 **NOTICE**: Destroying a key (e.g. `SecretKey secretKey = new SecretKeySpec("key".getBytes(), "AES"); secret.destroy();`) does *not* work, nor nullifying the backing byte-array from `secretKey.getEncoded()` as the SecretKeySpec based key returns a copy of the backing byte-array.
@@ -1190,7 +1189,7 @@ To quickly discover potential sensitive data in the _.hprof_ file, it is also us
 
 #### Remediation
 
-In Java, no immutable structures should be used to carry secrets (E.g. `String`, `BigInteger`). Nullifying them will not be effective: the Garbage collector might collect them, but they might remain in the JVMs heap for a longer period of time. 
+In Java, no immutable structures should be used to carry secrets (E.g. `String`, `BigInteger`). Nullifying them will not be effective: the Garbage collector might collect them, but they might remain in the JVMs heap for a longer period of time.
 Rather use byte-arrays (`byte[]`) or char-arrays (`char[]`) which are cleaned after the operations are done:
 
 
@@ -1208,7 +1207,7 @@ try{
 }
 ```
 
-Keys should be handled by the `AndroidKeyStore` or the `SecretKey` class needs to be adjusted. For a better implementation of the `SecretKey` one can use the `ErasableSecretKey` class below. This class consists of two parts: 
+Keys should be handled by the `AndroidKeyStore` or the `SecretKey` class needs to be adjusted. For a better implementation of the `SecretKey` one can use the `ErasableSecretKey` class below. This class consists of two parts:
 - A wrapperclass, called `ErasableSecretKey` which takes care of building up the internal key, adding a clean method and a static convinience method. You can call the `getKey()` on a `ErasableSecretKey` to get the actual key.
 - An internal `InternalKey` class which implements `javax.crypto.SecretKey, Destroyable`, so you can actually destroy it and it will behave as a SecretKey from JCE. The destroyable implementation first sets nullbytes to the internal key and then it will put null as a reference to the byte[] representing the actual key. As you can see the `InternalKey` does not provide a copy of its internal byte[] representation, instead it gives the actual version. This will make sure that you will no longer have copies of the key in many parts of your application memory.
 
@@ -1225,7 +1224,7 @@ public class ErasableSecretKey implements Serializable {
     protected ErasableSecretKey(final java.security.Key key) {
         this.secKey = key;
     }
-	
+
 	//Create a new `ErasableSecretKey` from a byte-array.
 	//Don't forget to clean the byte-array when you are done with the key.
     public static ErasableSecretKey fromByte(byte[] key) {

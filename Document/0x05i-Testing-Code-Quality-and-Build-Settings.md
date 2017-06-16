@@ -316,8 +316,8 @@ The DEVELOPER_MODE has to be disabled for release build in order to disable `Str
 * V7.4: "Debugging code has been removed, and the app does not log verbose errors or debugging messages."
 
 ##### CWE
--- TODO [Add relevant CWE for "Testing for Debugging Code and Verbose Error Logging"] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-215 - Information Exposure Through Debug Information
+- CWE-489 - Leftover Debug Code
 
 ##### Info
 - [1] Official Developer Guide - https://developer.android.com/reference/android/os/StrictMode.html
@@ -325,9 +325,7 @@ The DEVELOPER_MODE has to be disabled for release build in order to disable `Str
 - [3] Javabeat- http://javabeat.net/strictmode-android-1/
 
 ##### Tools
--- TODO [Add relevant tools for "Testing for Debugging Code and Verbose Error Logging"] --
-* Enjarify - https://github.com/google/enjarify
-
+- LogCat
 
 
 ### Testing Exception Handling
@@ -571,14 +569,13 @@ android {
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M7 - Client Code Quality - https://www.owasp.org/index.php/Mobile_Top_10_2016-M7-Poor_Code_Quality
+- M7 - Client Code Quality - https://www.owasp.org/index.php/Mobile_Top_10_2016-M7-Poor_Code_Quality
 
 ##### OWASP MASVS
-* V7.8: "Free security features offered by the toolchain, such as byte-code minification, stack protection, PIE support and automatic reference counting, are activated."
+- V7.8: "Free security features offered by the toolchain, such as byte-code minification, stack protection, PIE support and automatic reference counting, are activated."
 
 ##### CWE
--- TODO [Add relevant CWE for Verifying that Java Bytecode Has Been Minified] --
-- CWE-312 - Cleartext Storage of Sensitive Information
+- CWE-656 - Reliance on Security Through Obscurity
 
 ##### Info
 [1] Java Buffer Overflows - https://www.owasp.org/index.php/Reviewing_Code_for_Buffer_Overruns_and_Overflows#.NET_.26_Java
@@ -586,5 +583,4 @@ android {
 [3] Debugging with Android Studio - http://developer.android.com/tools/debugging/debugging-studio.html
 
 ##### Tools
--- TODO [Add relevant tools for Verifying that Java Bytecode Has Been Minified] --
-* Enjarify - https://github.com/google/enjarify
+- ProGuard - https://www.guardsquare.com/en/proguard

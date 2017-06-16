@@ -27,9 +27,9 @@ Here is a more detailed explanation of the steps in the diagram <sup>[1]</sup> <
 
 1. The application requests authorization to access service resources from the user.
 2. If the user authorized the request, the application receives an authorization grant. The authorization grant might have different forms (explicit, implicit, etc).
-3. The application requests an access token from the authorization server (API) by presenting authentication of its own identity, and the authorization grant. 
+3. The application requests an access token from the authorization server (API) by presenting authentication of its own identity, and the authorization grant.
 4. If the application identity is authenticated and the authorization grant is valid, the authorization server (API) issues an access token to the application. The access token might have a companion refresh token. Authorization is complete.
-5. The application requests the resource from the resource server (API) and presents the access token for authentication. The access token might be used on different ways (e.g., as a bearer token). 
+5. The application requests the resource from the resource server (API) and presents the access token for authentication. The access token might be used on different ways (e.g., as a bearer token).
 6. If the access token is valid, the resource server (API) serves the resource to the application.
 
 These are some of the common best practices for OAuth2 on native apps:
@@ -398,24 +398,24 @@ A good password policy should define the following requirements<sup>[2]</sup> in
 3. at least 1 digit (0-9)
 4. at least 1 special character (punctuation)
 
-For further details check the OWASP Authentication Cheat Sheet<sup>[2]</sup>. A common library that can be used for estimating password strength is zxcvbn<sup>[3]</sup>, which is availalbe for many programming languages. 
+For further details check the OWASP Authentication Cheat Sheet<sup>[2]</sup>. A common library that can be used for estimating password strength is zxcvbn<sup>[3]</sup>, which is available for many programming languages.
 
 
 #### References
 
 ##### OWASP Mobile Top 10 2016
-* M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
+- M4 - Insecure Authentication - https://www.owasp.org/index.php/Mobile_Top_10_2016-M4-Insecure_Authentication
 
 ##### OWASP MASVS
-* 4.5: "A password policy exists and is enforced at the remote endpoint."
+- 4.5: "A password policy exists and is enforced at the remote endpoint."
 
 ##### CWE
-* CWE-521: Weak Password Requirements
+- CWE-521: Weak Password Requirements
 
 ##### Info
-* [1] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
-* [2] OWASP Authentication Cheat Sheet - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Implement_Proper_Password_Strength_Controls
-* [3] zxcvbn - https://github.com/dropbox/zxcvbn
+- [1] OWASP Testing Guide (OTG-AUTHN-007) - https://www.owasp.org/index.php/Testing_for_Weak_password_policy_(OTG-AUTHN-007)
+- [2] OWASP Authentication Cheat Sheet - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Implement_Proper_Password_Strength_Controls
+- [3] zxcvbn - https://github.com/dropbox/zxcvbn
 
 
 ### Testing Excessive Login Attempts
@@ -492,7 +492,7 @@ The check needed here will be different depending on the technology used. Here a
 * ASP.Net - https://msdn.microsoft.com/en-GB/library/system.web.sessionstate.httpsessionstate.timeout(v=vs.110).aspx
 
 In case of stateless authentication, once a token is signed, it is valid forever unless the signing key is changed or expiration explicitly set. One could use "exp" expiration claim<sup>[3]</sup> to define the expiration time on or after which the JWT must not be accepted for processing.
-Speaking of tokens for stateless authentication, one should differentiate types of tokens, such as access tokens and refresh tokens<sup>[4]</sup>. Access tokens are used for accessing protected resources and should be short-lived. Refresh tokens are primarily used to obtain renewed access tokens. They are rather long-lived but should expire too, as otherwise their leakage would expose the system for unauthorized use. 
+Speaking of tokens for stateless authentication, one should differentiate types of tokens, such as access tokens and refresh tokens<sup>[4]</sup>. Access tokens are used for accessing protected resources and should be short-lived. Refresh tokens are primarily used to obtain renewed access tokens. They are rather long-lived but should expire too, as otherwise their leakage would expose the system for unauthorized use.
 
 The exact values for token expiration depend on the application requirements and capacity. Sample code for JWT token refreshments is presented below:
 ```
