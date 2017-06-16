@@ -31,9 +31,9 @@ Sven is an experienced penetration tester and security architect who specialized
 
 Co-authors have consistently contributed quality content, and have at least 2,000 additions logged in the GitHub repository.
 
-#### Romuald Szularek
+#### Romuald Szkudlarek
 
-Romuald is a passionate cyber security & privacy professional with a unique blend of experiences over 15+ years in the Web, Mobile, IoT and Cloud domains. During his career, he has been dedicating spare time a variery of projects with the goal of advancing the sectors of software and security. He is also a teacher at the Nice Technological Institute (France).
+Romuald is a passionate cyber security & privacy professional with over 15 years of experience in the Web, Mobile, IoT and Cloud domains. During his career, he has been dedicating spare time to a variery of projects with the goal of advancing the sectors of software and security. He is also teaching at various institutions. He holds CISSP, CSSLP and CEH credentials.
 
 #### Jeroen Willemsen
 
