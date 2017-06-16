@@ -226,7 +226,7 @@ Mobile operating systems provide a specially protected storage area for secret k
 Cryptographic algorithms -- such as symmetric encryption or MACs -- expect a secret input of a given size, e.g. 128 or 256 bit. A naive implementation might use the use-supplied password directly as an input key. There are a couple of problems with this approach:
 
 * If the password is smaller than the key, then not the full key-space is used (the rest is padded, sometimes even with spaces)
-* A user-supplied password will realistically consist mostly of displayable and pronounceable characters. So instead of the full entropy, i.e. 28 when using ASCII, only a small subset is used (approx. 26).
+* A user-supplied password will realistically consist mostly of displayable and pronounceable characters. So instead of the full entropy, i.e. 2<sup>8</sup> when using ASCII, only a small subset is used (approx. 2<sup>6</sup>).
 * If two users select the same password an attacker can match the encrypted files. This opens up the possibility of rainbow table attacks.
 
 #### Static Analysis
