@@ -21,7 +21,7 @@ OAuth2 defines 4 roles:
 
 Note: The API fulfills both the resource and authorization server roles. Therefore we will refer to both as the API.
 
-<img src="Images/Chapters/0x07a/abstract-oauth2-flow.png" width="350px"/>
+<img src="Images/Chapters/0x07a/abstract_oath2_flow.png" width="350px"/>
 
 Here is a more detailed explanation of the steps in the diagram <sup>[1]</sup> <sup>[2]</sup>:
 
@@ -65,6 +65,52 @@ For additional best practices and detailed information please refer to the sourc
 - [3] draft_ietf-oauth-native-apps-12: OAuth 2.0 for Native Apps (June 2017) - https://tools.ietf.org/html/draft-ietf-oauth-native-apps-12
 - [4] RFC6819: OAuth 2.0 Threat Model and Security Considerations (January 2013) - https://tools.ietf.org/html/rfc6819
 
+
+### Testing OAuth2 implementation
+
+#### Overview
+
+-- TODO [Provide a general description of the issue "Testing OAuth2 implementation".] --
+
+#### Static Analysis
+
+-- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+
+-- TODO [Confirm remark on "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+
+--TODO [Develop content on Testing OAuth2 implementation with source code] --
+
+
+#### Dynamic Analysis
+
+-- TODO [Describe how to test for this issue "Testing OAuth2 implementation" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
+
+#### Remediation
+
+-- TODO [Describe the best practices that developers should follow to prevent this issue "Testing OAuth2 implementation".] --
+
+#### References
+
+##### OWASP Mobile Top 10 2016
+* M6 - Insecure Authorization - https://www.owasp.org/index.php/Mobile_Top_10_2016-M6-Insecure_Authorization
+
+##### OWASP MASVS
+* --TODO [Propose adding verification of OAuth2 implementation to MASVS] --
+
+##### CWE
+
+- CWE-285: Improper Authorization
+
+##### Info
+
+- [1] Meyer's Recipe for Tomato Soup - http://www.finecooking.com/recipes/meyers-classic-tomato-soup.aspx 
+- [2] Another Informational Article - http://www.securityfans.com/informational_article.html
+- [3] Blackhat OAuth2 mobile attacks article - https://www.blackhat.com/docs/eu-16/materials/eu-16-Yang-Signing-Into-Billion-Mobile-Apps-Effortlessly-With-OAuth20-wp.pdf
+
+##### Tools
+
+-- TODO [Add relevant tools for "Testing OAuth2 implementation"] --
+* OWASP ZAP - https://github.com/zaproxy/zaproxy
 
 
 ### Verifying that Users Are Properly Authenticated
