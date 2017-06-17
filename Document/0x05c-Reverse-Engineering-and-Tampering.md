@@ -31,7 +31,7 @@ Local Android SDK installations are managed through Android Studio. Create an em
 - API 23: Android 6.0
 - API 24: Android 7.0
 - API 25: Android 7.1
-- API 26: Android O Developer Preview 
+- API 26: Android O Developer Preview
 
 <img src="Images/Chapters/0x05c/sdk_manager.jpg" width="500px"/>
 
@@ -62,7 +62,7 @@ The Android NDK contains prebuilt versions of the native compiler and toolchain.
 |X86-64-based|x86_64-&lt;gcc-version&gt;|
 |MIPS64-based|mips64el-linux-android-&lt;gcc-version&gt;|
 
-In addition to the picking the right architecture, you need to specify the correct sysroot for the native API level you want to target. The sysroot is a directory that contains the system headers and libraries for your target. Available native APIs vary by Android API level. Possible sysroots for respective Android API levels reside under <code>$NDK/platforms/</code>, each API-level directory contains subdirectories for the various CPUs and architectures. 
+In addition to the picking the right architecture, you need to specify the correct sysroot for the native API level you want to target. The sysroot is a directory that contains the system headers and libraries for your target. Available native APIs vary by Android API level. Possible sysroots for respective Android API levels reside under <code>$NDK/platforms/</code>, each API-level directory contains subdirectories for the various CPUs and architectures.
 
 One possibility to set up the build system is exporting the compiler path and necessary flags as environment variables. To make things easier however, the NDK allows you to create a so-called standalone toolchain - a "temporary" toolchain that incorporates the required settings.
 
@@ -81,7 +81,7 @@ $  export TOOLCHAIN=/tmp/android-7-toolchain
 
 ### Building a Reverse Engineering Environment For Free
 
-With a little effort you can build a reasonable GUI-powered reverse engineering environment for free. 
+With a little effort you can build a reasonable GUI-powered reverse engineering environment for free.
 
 For navigating the decompiled sources we recommend using IntelliJ <sup>[9]</sup>, a relatively light-weight IDE that works great for browsing code and allows for basic on-device debugging of the decompiled apps. However, if you prefer something that's clunky, slow and complicated to use, Eclipse <sup>[10]</sup> is the right IDE for you (note: This piece of advice is based on the author's personal bias).
 
@@ -105,7 +105,7 @@ IDA Pro <sup>[16]</sup> understands ARM, MIPS and of course Intel ELF binaries, 
 
 ### Reverse Engineering
 
-Reverse engineering is the process of taking an app apart to find out how it works. You can do this by examining the compiled app (static analysis), observing the app during runtime (dynamic analysis), or a combination of both. 
+Reverse engineering is the process of taking an app apart to find out how it works. You can do this by examining the compiled app (static analysis), observing the app during runtime (dynamic analysis), or a combination of both.
 
 #### Statically Analyzing Java Code
 
@@ -579,13 +579,13 @@ Now you can set breakpoints and attach to the Uncrackable1 app process using the
 
 <img src="Images/Chapters/0x05c/set_breakpoint_and_attach_debugger.png" width="700px" />
 
-Note that only method breakpoints work when debugging an app from decompiled sources. Once a method breakpoint is hit, you will get the chance to single step throughout the method execution. 
+Note that only method breakpoints work when debugging an app from decompiled sources. Once a method breakpoint is hit, you will get the chance to single step throughout the method execution.
 
 <img src="Images/Chapters/0x05c/Choose_Process.png" width="300px" />
 
 After you choose the Uncrackable1 application from the list, the debugger will attach to the app process and you will hit the breakpoint that was set on the <code>onCreate()</code> method. Uncrackable1 app triggers anti-debugging and anti-tampering controls within the <code>onCreate()</code> method. That's why it is a good idea to set a breakpoint on the <code>onCreate()</code> method just before the anti-tampering and anti-debugging checks performed.
 
-Next, we will single-step through the <code>onCreate()</code> method by clicking the "Force Step Into" button on the Debugger view. The "Force Step Into" option allows you to debug the Android framework functions and core Java classes that are normally ignored by debuggers. 
+Next, we will single-step through the <code>onCreate()</code> method by clicking the "Force Step Into" button on the Debugger view. The "Force Step Into" option allows you to debug the Android framework functions and core Java classes that are normally ignored by debuggers.
 
 <img src="Images/Chapters/0x05c/Force_Step_Into.png" width="700px" />
 
@@ -593,7 +593,7 @@ Once you "Force Step Into", the debugger will stop at the beginning of the next 
 
 <img src="Images/Chapters/0x05c/fucntion_a_of_class_sg_vantagepoint_a.png" width="700px" />
 
-This method searches for "su" binary within well known directories. Since we are running the app on a rooted device/emulator we need to defeat this check by manipulating variables and/or function return values. 
+This method searches for "su" binary within well known directories. Since we are running the app on a rooted device/emulator we need to defeat this check by manipulating variables and/or function return values.
 
 <img src="Images/Chapters/0x05c/variables.png" width="700px" />
 
@@ -619,13 +619,13 @@ Once you modify the binary name or the directory name, <code>File.exists</code> 
 
 <img src="Images/Chapters/0x05c/file_exists_false.png" width="700px" />
 
-This defeats the first root detection control of Uncrackable App Level 1. The remaining anti-tampering and anti-debugging controls can be defeated in similar ways to finally reach secret string verification functionality. 
+This defeats the first root detection control of Uncrackable App Level 1. The remaining anti-tampering and anti-debugging controls can be defeated in similar ways to finally reach secret string verification functionality.
 
 <img src="Images/Chapters/0x05c/anti_debug_anti_tamper_defeated.png" width="350px" />
 
 <img src="Images/Chapters/0x05c/MainActivity_verify.png" width="700px" />
 
-The secret code is verified by the method <code>a()</code> of class <code>sg.vantagepoint.uncrackable1.a</code>. Set a breakpoint on method <code>a()</code> and "Force Step Into" when you hit the breakpoint. Then, single-step until you reach the call to <code>String.equals</code>. This is where user supplied input is compared with the secret string. 
+The secret code is verified by the method <code>a()</code> of class <code>sg.vantagepoint.uncrackable1.a</code>. Set a breakpoint on method <code>a()</code> and "Force Step Into" when you hit the breakpoint. Then, single-step until you reach the call to <code>String.equals</code>. This is where user supplied input is compared with the secret string.
 
 <img src="Images/Chapters/0x05c/sg_vantagepoint_uncrackable1_a_function_a.png" width="700px" />
 
@@ -669,7 +669,7 @@ The process is now suspended, and <code>gdbserver</code> listening for debugging
 $ adb forward tcp:1234 tcp:1234
 ```
 
-We'll now use the prebuilt version of <code>gdb</code> contained in the NDK toolchain (if you haven't already, follow the instructions above to install it). 
+We'll now use the prebuilt version of <code>gdb</code> contained in the NDK toolchain (if you haven't already, follow the instructions above to install it).
 
 ```
 $ $TOOLCHAIN/bin/gdb libnative-lib.so
@@ -696,6 +696,7 @@ $ { echo "suspend"; cat; } | jdb -attach localhost:7777
 
 Next, we want to suspend the process at the point the Java runtime loads <code>libnative-lib.so</code>. In JDB, set a breakpoint on the <code>java.lang.System.loadLibrary()</code> method and resume the process. After the breakpoint has been hit, execute the <code>step up</code> command, which will resume the process until <code>loadLibrary()</code>returns. At this point, <code>libnative-lib.so</code> has been loaded.
 
+```
 > stop in java.lang.System.loadLibrary
 > resume
 All threads resumed.
@@ -951,7 +952,7 @@ public static boolean c() {
 }
 ```
 
-This method iterates through a list of directories, and returns "true" (device rooted) if the <code>su</code> binary is found in any of them. Checks like this are easy to deactivate - all you have to do is to replace the code with something that returns "false". Methok hooking using an Xposed module is one way to do this. 
+This method iterates through a list of directories, and returns "true" (device rooted) if the <code>su</code> binary is found in any of them. Checks like this are easy to deactivate - all you have to do is to replace the code with something that returns "false". Methok hooking using an Xposed module is one way to do this.
 
 This method  <code>XposedHelpers.findAndHookMethodfindAndHookMethod</code> allows you to override existing class methods. From the decompiled code, we know that the method performing the check is called <code>c()</code> and located in the class <code>com.example.a.b</code>. An Xposed module that overrides the function to always return "false" looks as follows.
 

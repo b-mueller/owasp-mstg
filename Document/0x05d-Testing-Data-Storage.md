@@ -171,16 +171,16 @@ Stored keys can be configured to operate in one of the two modes:
 
 2. User authentication authorizes a specific cryptographic operation associated with one key. In this mode, each operation involving such a key must be individually authorized by the user. Currently, the only means of such authorization is fingerprint authentication.
 
+
 The level of security afforded by the Android KeyStore depends on its implementation, which differs between devices. Most modern devices offer a hardware-backed key store implementation. In that case, keys are generated and used in a Trusted Execution Environment or a Secure Element and are not directly accessible for the operating system. This means that the encryption keys themselves cannot be easily retrieved even from a rooted device. You can check whether the keys are inside the secure hardware, based on the `isInsideSecureHardware()` which is part of the `KeyInfo` of the key. Please note that private keys are often indeed stored correctly within the secure hardware, but secret keys, hmac-keys are, on quite some devices not stored securely according to the KeyInfo.
 
 In a software-only implementation, the keys are encrypted with a per-user encryption master key <sup>[16]</sup>. In that case, an attacker can access all keys on a rooted device in the folder <code>/data/misc/keystore/</code>. As the master key is generated using the user’s own lock screen pin/ password, the Android KeyStore is unavailable when the device is locked <sup>[9]</sup>.
 
 ##### Older Java-KeyStore
-Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The impelemntations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BounceyCastle KeyStore (BKS).
-You can create one by using the `KeyStore.getInstance("BKS", "BC");`, where "BKS" is the keystore name (BounceycastleKeyStore) and "BC" is the provider (BounceyCastle). Alternatively you can use SpongeyCastle as a wrapper and initialize the keystore: `KeyStore.getInstance("BKS", "SC");`.
+Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The impelemntations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BouncyCastle KeyStore (BKS).
+You can create one by using the `KeyStore.getInstance("BKS", "BC");`, where "BKS" is the keystore name (BouncycastleKeyStore) and "BC" is the provider (BouncyCastle). Alternatively you can use SpongeyCastle as a wrapper and initialize the keystore: `KeyStore.getInstance("BKS", "SC");`.
 
 Please be aware that not all KeyStores offer proper protection to the keys stored in the keystore files.
-
 
 
 #### Static Analysis
@@ -293,7 +293,7 @@ Install and use the app as it is intended and execute all functions at least onc
 
 #### Remediation
 
-The credo for saving data can be summarized quite easily: Public data should be available for everybody, but sensitive and private data needs to be protected or even better not get stored on the devise in the first place.
+The credo for saving data can be summarized quite easily: Public data should be available for everybody, but sensitive and private data needs to be protected or even better not get stored on the device in the first place.
 
 If sensitive information (credentials, keys, PII, etc.) is needed locally on the device several best practices are offered by Android that should be used to store data securely instead of reinventing the wheel or leaving data unencrypted on the device.
 
@@ -606,95 +606,59 @@ android:longClickable="false"
 * Drozer - https://labs.mwrinfosecurity.com/tools/drozer/
 
 
-
-### Testing Whether Sensitive Data Is Exposed via IPC Mechanisms
+### Testing Whether Stored Sensitive Data Is Exposed via IPC Mechanisms
 
 #### Overview
 
-During development of a mobile application, traditional techniques for IPC might be applied like usage of shared files or network sockets. As mobile application platforms implement their own system functionality for IPC, these mechanisms should be applied as they are much more mature than traditional techniques. Using IPC mechanisms with no security in mind may cause the application to leak or expose sensitive data.
-
-The following is a list of Android IPC Mechanisms that may expose sensitive data:
-* Binders<sup>[1]</sup>
-* Services<sup>[2]</sup>
-  * Bound Services<sup>[9]</sup>
-  * AIDL<sup>[10]</sup>
-* Intents<sup>[3]</sup>
-* Content Providers<sup>[4]</sup>
+As part of the IPC mechanisms included on Android, content providers allow an app's stored data to be accessed and modified by other apps. If not properly configured, they could lead to leackage of stored sensitive data.
 
 #### Static Analysis
 
-The first step is to look into the `AndroidManifest.xml` in order to detect and identify IPC mechanisms exposed by the app. You will want to identify elements such as:
+The first step is to look into the `AndroidManifest.xml` in order to detect and identify content providers exposed by the app and identified by the  `<provider>` element.
 
-* `<intent-filter>`<sup>[5]</sup>
-* `<service>`<sup>[6]</sup>
-* `<provider>`<sup>[7]</sup>
-* `<receiver>`<sup>[8]</sup>
+Check if the provider has the export tag set to "true": `android:exported="true"`.
+Even if this is not the case, remember that if it has an `<intent-filter>` defined, the export tag will be automatically set to "true".
 
-Except for the `<intent-filter>` element, check if the previous elements contain the following attributes:
-* `android:exported`
-* `android:permission`
+Finally, check if it is being protected by any permission tag (`android:permission`) which will also limit the exposure to other apps.
 
-Once you identify a list of IPC mechanisms, review the source code in order to detect if they leak any sensitive data when used. For example, _ContentProviders_ can be used to access database information, while services can be probed to see if they return data. Also BroadcastReceiver and Broadcast intents can leak sensitive information if probed or sniffed.
+Inspect the source code to further understand how the content provider is meant to be used.
 
-**Vulnerable ContentProvider**
+> Useful strings to search for: `android.content.ContentProvider`, `android.database.Cursor`, `android.database.sqlite`, `.query(`, `.update(`.  
 
-An example of a vulnerable _ContentProvider_:
+Check if parametrized query methods <sup>[1]</sup> (query(), update(), and delete()) are being used, and if so, check if all inputs to them are properly sanitized (especially the `selection` argument).
 
+As an example of a vulnerable content provider we will use the vulnerable password manager app "Sieve" <sup>[2]</sup>.
+
+##### Inspect the AndroidManifest
+Identify all defined `<provider>` elements:
 ```xml
-<provider android:name=".CredentialProvider"
-          android:authorities="com.owaspomtg.vulnapp.provider.CredentialProvider"
-          android:exported="true">
+<provider android:authorities="com.mwr.example.sieve.DBContentProvider" android:exported="true" android:multiprocess="true" android:name=".DBContentProvider">
+    <path-permission android:path="/Keys" android:readPermission="com.mwr.example.sieve.READ_KEYS" android:writePermission="com.mwr.example.sieve.WRITE_KEYS"/>
 </provider>
+<provider android:authorities="com.mwr.example.sieve.FileBackupProvider" android:exported="true" android:multiprocess="true" android:name=".FileBackupProvider"/>
 ```
+As can be seen in the `AndroidManifest.xml` above, the application exports two content providers. Note that one path ("/Keys") is being protected by read and write permissions.
 
-As can be seen in the `AndroidManifest.xml` above, the application exports the content provider. In the `CredentialProvider.java` file the `query` function need to be inspected to detect if any sensitive information is leaked:
+##### Inspect the source code
+In the `DBContentProvider.java` file the `query` function need to be inspected to detect if any sensitive information is leaked:
 
 ```java
-public Cursor query(Uri uri, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		 SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-		 // the TABLE_NAME to query on
-		 queryBuilder.setTables(TABLE_NAME);
-	      switch (uriMatcher.match(uri)) {
-	      // maps all database column names
-	      case CREDENTIALS:
-	    	  queryBuilder.setProjectionMap(CredMap);
-	         break;
-	      case CREDENTIALS_ID:
-	    	  queryBuilder.appendWhere( ID + "=" + uri.getLastPathSegment());
-	         break;
-	      default:
-	         throw new IllegalArgumentException("Unknown URI " + uri);
-	      }
-	      if (sortOrder == null || sortOrder == ""){
-	         sortOrder = USERNAME;
-	      }
-	     Cursor cursor = queryBuilder.query(database, projection, selection,
-	    		  selectionArgs, null, null, sortOrder);
-	      cursor.setNotificationUri(getContext().getContentResolver(), uri);
-	      return cursor;
-	}
+public Cursor query(final Uri uri, final String[] array, final String s, final String[] array2, final String s2) {
+    final int match = this.sUriMatcher.match(uri);
+    final SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+    if (match >= 100 && match < 200) {
+        sqLiteQueryBuilder.setTables("Passwords");
+    }
+    else if (match >= 200) {
+        sqLiteQueryBuilder.setTables("Key");
+    }
+    return sqLiteQueryBuilder.query(this.pwdb.getReadableDatabase(), array, s, array2, (String)null, (String)null, s2);
+}
 ```
+Here we see that there are actually two paths, "/Keys" and "/Passwords", being the latter not protected in the manifest and therefore vulnerable.
 
-The query statement would return all credentials when accessing `content://com.owaspomtg.vulnapp.provider.CredentialProvider/CREDENTIALS`.
+The query statement would return all passwords when accessing an URI including this path `Passwords/`. We will address this in the dynamic analysis below and find out the exact URI required.
 
-
-* Vulnerable Broadcast
-Search in the source code for strings like `sendBroadcast`, `sendOrderedBroadcast`, `sendStickyBroadcast` and verify that the application doesn't send any sensitive data.
-
-An example of a vulnerable broadcast is the following:
-
-```java
-private void vulnerableBroadcastFunction() {
-    // ...
-    Intent VulnIntent = new Intent();
-    VulnIntent.setAction("com.owasp.omtg.receiveInfo");
-    VulnIntent.putExtra("ApplicationSession", "SESSIONID=A4EBFB8366004B3369044EE985617DF9");
-    VulnIntent.putExtra("Username", "litnsarf_omtg");
-    VulnIntent.putExtra("Group", "admin");
-  }
-  this.sendBroadcast(VulnIntent);
-```
 
 #### Dynamic Analysis
 
@@ -856,21 +820,15 @@ Row: 1 id=2, username=test, password=test
 ...
 ```
 
-##### Vulnerable Broadcasts
-
-To sniff intents install and run the application on a device (actual device or emulated device) and use tools like Drozer or Intent Sniffer to capture intents and broadcast messages.
-
 #### Remediation
 
-For an _activity_, _broadcast_ and _service_ the permission of the caller can be checked either by code or in the manifest.
+Set `android:exported` to "false" if the content is only meant to be accessed by the app itself. If not, set it to "true" and define proper read and write permissions.
 
-If not strictly required, be sure that your IPC does not have the `android:exported="true"` value in the `AndroidManifest.xml` file, as otherwise this allows all other apps on Android to communicate and invoke it.
+Protect the content provider with the `android:protectionLevel` attribute set to `signature` protection, if it is only intended to be accessed by your own apps (signed with the same key). On the other hand, you may also want to offer access to other apps, for that you can apply a security policy by using the `<permission>` element and set a proper `android:protectionLevel`. When using `android:permission`, other applications will need to declare a corresponding `<uses-permission>` element in their own manifest to be able to interact with your content provider.
 
-If the _intent_ is only broadcast/received in the same application, `LocalBroadcastManager` can be used so that, by design, other apps cannot receive the broadcast message. This reduces the risk of leaking sensitive information. `LocalBroadcastManager.sendBroadcast().
-BroadcastReceivers` should make use of the `android:permission` attribute, as otherwise any other application can invoke them. `Context.sendBroadcast(intent, receiverPermission);` can be used to specify permissions a receiver needs to be able to read the broadcast<sup>[11]</sup>.
-You can also set an explicit application package name that limits the components this Intent will resolve to. If left to the default value of null, all components in all applications will considered. If non-null, the Intent can only match the components in the given application package.
+In order to avoid SQL injection attacks, use parameterized query methods such as `query()`, `update()`, and `delete()`. Be sure to properly sanitize all inputs to these methods because if, for instance, the `selection` argument is built out of user input concatenation, it could also lead to SQL injection.
 
-If your IPC is intended to be accessible to other applications, you can apply a security policy by using the `<permission>` element and set a proper `android:protectionLevel`. When using `android:permission` in a service declaration, other applications will need to declare a corresponding `<uses-permission>` element in their own manifest to be able to start, stop, or bind to the service.
+You may also want to provide more granular access to other apps by using the android:grantUriPermissions attribute in the manifest and limit the scope with the <grant-uri-permission> element.
 
 #### References
 
@@ -885,17 +843,8 @@ If your IPC is intended to be accessible to other applications, you can apply a 
 - CWE-634 - Weaknesses that Affect System Processes
 
 ##### Info
-[1] IPCBinder - https://developer.android.com/reference/android/os/Binder.html
-[2] IPCServices - https://developer.android.com/guide/components/services.html
-[3] IPCIntent - https://developer.android.com/reference/android/content/Intent.html
-[4] IPCContentProviders - https://developer.android.com/reference/android/content/ContentProvider.html
-[5] IntentFilterElement - https://developer.android.com/guide/topics/manifest/intent-filter-element.html
-[6] ServiceElement - https://developer.android.com/guide/topics/manifest/service-element.html
-[7] ProviderElement - https://developer.android.com/guide/topics/manifest/provider-element.html
-[8] ReceiverElement - https://developer.android.com/guide/topics/manifest/receiver-element.html
-[9] BoundServices - https://developer.android.com/guide/components/bound-services.html
-[10] AIDL - https://developer.android.com/guide/components/aidl.html
-[11] SendBroadcast - https://developer.android.com/reference/android/content/Context.html#sendBroadcast(android.content.Intent)
+- [1] ContentProvider query() - https://developer.android.com/reference/android/content/ContentProvider.html#query%28android.net.Uri,%20java.lang.String[],%20android.os.Bundle,%20android.os.CancellationSignal%29
+- [2] Sieve: Vulnerable Password Manager - https://github.com/mwrlabs/drozer/releases/download/2.3.4/sieve.apk
 
 ##### Tools
 * Drozer - https://labs.mwrinfosecurity.com/tools/drozer/
@@ -1155,7 +1104,7 @@ First, you need to identify which sensitive information is stored in memory. The
 **NOTICE**: Destroying a key (e.g. `SecretKey secretKey = new SecretKeySpec("key".getBytes(), "AES"); secret.destroy();`) does *not* work, nor nullifying the backing byte-array from `secretKey.getEncoded()` as the SecretKeySpec based key returns a copy of the backing byte-array.
 Therefore the developer should, in case of not using the `AndroidKeyStore` make sure that the key is wrapped and properly protected (see remediation for more details).
 Understand that an RSA keypair is based on `BigInteger` as well and therefore reside in memory after first use outside of the `AndroidKeyStore`.
-Lastly, some of the ciphers do not properly clean up their byte-arrays, for instance: the AES `Cipher` in `BounceyCastle` does not always clean up its latest working key.
+Lastly, some of the ciphers do not properly clean up their byte-arrays, for instance: the AES `Cipher` in `BouncyCastle` does not always clean up its latest working key.
 
 #### Dynamic Analysis
 

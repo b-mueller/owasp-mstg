@@ -376,15 +376,146 @@ N/A
 
 #### Overview
 
--- TODO [Provide a general description of the issue.] --
+During development of a mobile application, traditional techniques for IPC might be applied like usage of shared files or network sockets. As mobile application platforms implement their own system functionality for IPC, these mechanisms should be applied as they are much more mature than traditional techniques. Using IPC mechanisms with no security in mind may cause the application to leak or expose sensitive data.
+
+The following is a list of Android IPC Mechanisms that may expose sensitive data:
+* Binders<sup>[1]</sup>
+* Services<sup>[2]</sup>
+  * Bound Services<sup>[9]</sup>
+  * AIDL<sup>[10]</sup>
+* Intents<sup>[3]</sup>
+* Content Providers<sup>[4]</sup>
 
 #### Static Analysis
 
--- TODO [Describe how to assess this given either the source code or installer package (APK/IPA/etc.), but without running the app. Tailor this to the general situation (e.g., in some situations, having the decompiled classes is just as good as having the original source, in others it might make a bigger difference). If required, include a subsection about how to test with or without the original sources.] --
+We start by looking at the AndroidManifest, where all activities, services and content providers included in the source code must be declared (otherwise the system will not recognize them and they will not run). However, broadcast receivers can be either declared in the manifest or created dynamically. You will want to identify elements such as:
 
--- TODO [Clarify purpose of "Use the &lt;sup&gt; tag to reference external sources, e.g. Meyer's recipe for tomato soup<sup>[1]</sup>."] --
+* `<intent-filter>`<sup>[5]</sup>
+* `<service>`<sup>[6]</sup>
+* `<provider>`<sup>[7]</sup>
+* `<receiver>`<sup>[8]</sup>
 
--- TODO [Add content for "Testing For Sensitive Functionality Exposure Through IPC" with source code] --
+Making an activity, service or content provided as "exported" means that it can be accessed by other apps. There are two common ways to set a component as exported. The obvious one is to set the export tag to true `android:exported="true"`.
+The second way is to define an `<intent-filter>` within the component element (`<activity>`, `<service>`, `<receiver>`). When doing this, the export tag is automatically set to "true".
+
+Apart from that, remember that using the permission tag (`android:permission`) will also limit the exposure of a component to other applications.
+
+For more information about the content providers, please refer to the test case "Testing Whether Stored Sensitive Data Is Exposed via IPC Mechanisms" in chapter "Testing Data Storage".
+
+Once you identify a list of IPC mechanisms, review the source code in order to detect if they leak any sensitive data when used. For example, content providers can be used to access database information, while services can be probed to see if they return data. Also broadcast receivers can leak sensitive information if probed or sniffed.
+
+In the following we will use two example apps and give examples on how to identify vulnerable IPC components:
+- "Sieve" <sup>[12]</sup>
+- "Android Insecure Bank" <sup>[13]</sup>
+
+##### Activities
+
+##### Inspect the AndroidManifest
+In the "Sieve" app we can find three exported activities idendified by `<activity>`:
+```xml
+<activity android:excludeFromRecents="true" android:label="@string/app_name" android:launchMode="singleTask" android:name=".MainLoginActivity" android:windowSoftInputMode="adjustResize|stateVisible">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+    </intent-filter>
+</activity>
+<activity android:clearTaskOnLaunch="true" android:excludeFromRecents="true" android:exported="true" android:finishOnTaskLaunch="true" android:label="@string/title_activity_file_select" android:name=".FileSelectActivity"/>
+<activity android:clearTaskOnLaunch="true" android:excludeFromRecents="true" android:exported="true" android:finishOnTaskLaunch="true" android:label="@string/title_activity_pwlist" android:name=".PWList"/>
+
+```
+
+##### Inspect the source code
+By inspecting the `PWList.java` activity we see that it offers options to list all keys, add, delete, etc. If we invoke it directly we will be able to bypass the LoginActivity. More on this can be found below in the dynamic analysis.
+
+##### Services
+
+##### Inspect the AndroidManifest
+In the "Sieve" app we can find two exported services identified by `<service>`:
+```xml
+<service android:exported="true" android:name=".AuthService" android:process=":remote"/>
+<service android:exported="true" android:name=".CryptoService" android:process=":remote"/>
+```
+
+##### Inspect the source code
+Check the source code for the class `android.app.Service`:
+
+By reversing the target application, we can see the service `AuthService` provides functionality to change the password and PIN protecting the target app.
+
+```
+   public void handleMessage(Message msg) {
+            AuthService.this.responseHandler = msg.replyTo;
+            Bundle returnBundle = msg.obj;
+            int responseCode;
+            int returnVal;
+            switch (msg.what) {
+                ...
+                case AuthService.MSG_SET /*6345*/:
+                    if (msg.arg1 == AuthService.TYPE_KEY) /*7452*/ {
+                        responseCode = 42;
+                        if (AuthService.this.setKey(returnBundle.getString("com.mwr.example.sieve.PASSWORD"))) {
+                            returnVal = 0;
+                        } else {
+                            returnVal = 1;
+                        }
+                    } else if (msg.arg1 == AuthService.TYPE_PIN) {
+                        responseCode = 41;
+                        if (AuthService.this.setPin(returnBundle.getString("com.mwr.example.sieve.PIN"))) {
+                            returnVal = 0;
+                        } else {
+                            returnVal = 1;
+                        }
+                    } else {
+                        sendUnrecognisedMessage();
+                        return;
+                    }
+```
+
+##### Broadcast Receivers
+
+##### Inspect the AndroidManifest
+In "Android Insecure Bank" app we can find a broadcast receiver in the manifest identified by `<receiver>`:
+```xml
+<receiver android:exported="true" android:name="com.android.insecurebankv2.MyBroadCastReceiver">
+    <intent-filter>
+        <action android:name="theBroadcast"/>
+    </intent-filter>
+</receiver>
+```
+
+##### Inspect the source code
+Search in the source code for strings like `sendBroadcast`, `sendOrderedBroadcast`, `sendStickyBroadcast` and verify that the application doesn't send any sensitive data.
+
+In order to know more about what the receiver is intended to do we have to go deeper in our static analysis and search for usages of the class `android.content.BroadcastReceiver` and the `Context.registerReceiver()` method used to dynamically create receivers.
+
+In the extract below taken from the source code of the target application, we can see that the broadcast receiver triggers a SMS message to be sent containing the decrypted password of the user.
+
+```
+public class MyBroadCastReceiver extends BroadcastReceiver {
+  String usernameBase64ByteString;
+  public static final String MYPREFS = "mySharedPreferences";
+
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    // TODO Auto-generated method stub
+
+        String phn = intent.getStringExtra("phonenumber");
+        String newpass = intent.getStringExtra("newpass");
+
+    if (phn != null) {
+      try {
+                SharedPreferences settings = context.getSharedPreferences(MYPREFS, Context.MODE_WORLD_READABLE);
+                final String username = settings.getString("EncryptedUsername", null);
+                byte[] usernameBase64Byte = Base64.decode(username, Base64.DEFAULT);
+                usernameBase64ByteString = new String(usernameBase64Byte, "UTF-8");
+                final String password = settings.getString("superSecurePassword", null);
+                CryptoClass crypt = new CryptoClass();
+                String decryptedPassword = crypt.aesDeccryptedString(password);
+                String textPhoneno = phn.toString();
+                String textMessage = "Updated Password from: "+decryptedPassword+" to: "+newpass;
+                SmsManager smsManager = SmsManager.getDefault();
+                System.out.println("For the changepassword - phonenumber: "+textPhoneno+" password is: "+textMessage);
+smsManager.sendTextMessage(textPhoneno, null, textMessage, null, null);
+```
 
 #### Dynamic Analysis
 
@@ -436,36 +567,7 @@ Package: com.mwr.example.sieve
     Permission: null
 ```
 
-To communicate with a service, static analysis must first be used to identify the required inputs. By reversing the target application we can see the service `AuthService` provides functionality to change the password and PIN protecting the target app.
-
-```
-   public void handleMessage(Message msg) {
-            AuthService.this.responseHandler = msg.replyTo;
-            Bundle returnBundle = msg.obj;
-            int responseCode;
-            int returnVal;
-            switch (msg.what) {
-                ...
-                case AuthService.MSG_SET /*6345*/:
-                    if (msg.arg1 == AuthService.TYPE_KEY) /*7452*/ {
-                        responseCode = 42;
-                        if (AuthService.this.setKey(returnBundle.getString("com.mwr.example.sieve.PASSWORD"))) {
-                            returnVal = 0;
-                        } else {
-                            returnVal = 1;
-                        }
-                    } else if (msg.arg1 == AuthService.TYPE_PIN) {
-                        responseCode = 41;
-                        if (AuthService.this.setPin(returnBundle.getString("com.mwr.example.sieve.PIN"))) {
-                            returnVal = 0;
-                        } else {
-                            returnVal = 1;
-                        }
-                    } else {
-                        sendUnrecognisedMessage();
-                        return;
-                    }
-```
+To communicate with a service, static analysis must first be used to identify the required inputs.
 
 Since this service is exported, it is possible to use the module `app.service.send` to communicate with the service and change the password stored in the target application:
 
@@ -478,7 +580,7 @@ Got a reply from com.mwr.example.sieve/com.mwr.example.sieve.AuthService:
   Empty
 ```
 
-##### Broadcasts
+##### Broadcast Receivers
 
 Broadcasts can be enumerated using the Drozer module `app.broadcast.info`, the target package should be specified using the `-a` parameter:
 
@@ -489,37 +591,7 @@ Package: com.android.insecurebankv2
     Permission: null
 ```
 
-In the example app "Android Insecure Bank"<sup>2</sup>, we can see that one broadcast receiver is exported, not requiring any permissions, indicating that we can formulate an intent to trigger the broadcast receiver. When testing broadcast receivers, static analysis must also be used to understand the functionality of the broadcast receiver.
-
-In the extract below taken from the source code of the target application, we can see that the broadcast receiver triggers a SMS message to be sent containing the decrypted password of the user.
-
-```
-public class MyBroadCastReceiver extends BroadcastReceiver {
-  String usernameBase64ByteString;
-  public static final String MYPREFS = "mySharedPreferences";
-
-  @Override
-  public void onReceive(Context context, Intent intent) {
-    // TODO Auto-generated method stub
-
-        String phn = intent.getStringExtra("phonenumber");
-        String newpass = intent.getStringExtra("newpass");
-
-    if (phn != null) {
-      try {
-                SharedPreferences settings = context.getSharedPreferences(MYPREFS, Context.MODE_WORLD_READABLE);
-                final String username = settings.getString("EncryptedUsername", null);
-                byte[] usernameBase64Byte = Base64.decode(username, Base64.DEFAULT);
-                usernameBase64ByteString = new String(usernameBase64Byte, "UTF-8");
-                final String password = settings.getString("superSecurePassword", null);
-                CryptoClass crypt = new CryptoClass();
-                String decryptedPassword = crypt.aesDeccryptedString(password);
-                String textPhoneno = phn.toString();
-                String textMessage = "Updated Password from: "+decryptedPassword+" to: "+newpass;
-                SmsManager smsManager = SmsManager.getDefault();
-                System.out.println("For the changepassword - phonenumber: "+textPhoneno+" password is: "+textMessage);
-smsManager.sendTextMessage(textPhoneno, null, textMessage, null, null);
-```
+In the example app "Android Insecure Bank", we can see that one broadcast receiver is exported, not requiring any permissions, indicating that we can formulate an intent to trigger the broadcast receiver. When testing broadcast receivers, static analysis must also be used to understand the functionality of the broadcast receiver as we did before.
 
 Using the Drozer module `app.broadcast.send`, it is possible to formulate an intent to trigger the broadcast and send the password to a phone number within our control:
 
@@ -552,7 +624,13 @@ Extra: newpass=12345 (java.lang.String)
 
 #### Remediation
 
--- TODO [Describe the best practices that developers should follow to prevent this issue.] --
+If not strictly required, be sure that your IPC component element does not have the `android:exported="true"` value in the `AndroidManifest.xml` file nor an `<intent-filter>`, to prevent all other apps on Android from being able to interact with it.
+
+If an Intent is only broadcast/received in the same application, `LocalBroadcastManager` can be used so that, by design, other apps cannot receive the broadcast message. This reduces the risk of leaking sensitive information. `LocalBroadcastManager.sendBroadcast().
+BroadcastReceivers` should make use of the `android:permission` attribute, as otherwise any other application can invoke them. `Context.sendBroadcast(intent, receiverPermission);` can be used to specify permissions a receiver needs to be able to read the broadcast<sup>[11]</sup>.
+You can also set an explicit application package name that limits the components this Intent will resolve to. If left to the default value of null, all components in all applications will considered. If non-null, the Intent can only match the components in the given application package.
+
+If your IPC is intended to be accessible to other applications, you can apply a security policy by using the `<permission>` element and set a proper `android:protectionLevel`. When using `android:permission` in a service declaration, other applications will need to declare a corresponding `<uses-permission>` element in their own manifest to be able to start, stop, or bind to the service.
 
 #### References
 
@@ -566,8 +644,19 @@ Extra: newpass=12345 (java.lang.String)
 -- TODO [Add links and titles for CWE related to the "Testing For Sensitive Functionality Exposure Through IPC" topic] --
 
 ##### Info
-- [1] Sieve: Vulnerable Password Manager - https://github.com/mwrlabs/drozer/releases/download/2.3.4/sieve.apk
-- [2] Android Insecure Bank V2 - https://github.com/dineshshetty/Android-InsecureBankv2
+- [1] IPCBinder - https://developer.android.com/reference/android/os/Binder.html
+- [2] IPCServices - https://developer.android.com/guide/components/services.html
+- [3] IPCIntent - https://developer.android.com/reference/android/content/Intent.html
+- [4] IPCContentProviders - https://developer.android.com/reference/android/content/ContentProvider.html
+- [5] IntentFilterElement - https://developer.android.com/guide/topics/manifest/intent-filter-element.html
+- [6] ServiceElement - https://developer.android.com/guide/topics/manifest/service-element.html
+- [7] ProviderElement - https://developer.android.com/guide/topics/manifest/provider-element.html
+- [8] ReceiverElement - https://developer.android.com/guide/topics/manifest/receiver-element.html
+- [9] BoundServices - https://developer.android.com/guide/components/bound-services.html
+- [10] AIDL - https://developer.android.com/guide/components/aidl.html
+- [11] SendBroadcast - https://developer.android.com/reference/android/content/Context.html#sendBroadcast(android.content.Intent)
+- [12] Sieve: Vulnerable Password Manager - https://github.com/mwrlabs/drozer/releases/download/2.3.4/sieve.apk
+- [13] Android Insecure Bank V2 - https://github.com/dineshshetty/Android-InsecureBankv2
 
 ##### Tools
 * Drozer - https://github.com/mwrlabs/drozer
@@ -915,16 +1004,16 @@ An object and its data can be represented as a sequence of bytes. In Java, this 
 
 ##### Json
 
-There are various ways to serialize the contents of an object to JSON. Android comes with the `JSONObject` and `JSONArray` classes. Next there is a wide veriaty of libraries which can be used, such as: GSON<sup>[2]</sup>, Jackson<sup>[3]</sup> and others. They mostly differ in whether they use reflection to compose the object, whether they support annotations and the amount of memory they use. Note that almost all the json representations are String based and therefore immutable. This means that any secret stored in json will be harder to remove from memory. 
+There are various ways to serialize the contents of an object to JSON. Android comes with the `JSONObject` and `JSONArray` classes. Next there is a wide veriaty of libraries which can be used, such as: GSON<sup>[2]</sup>, Jackson<sup>[3]</sup> and others. They mostly differ in whether they use reflection to compose the object, whether they support annotations and the amount of memory they use. Note that almost all the json representations are String based and therefore immutable. This means that any secret stored in json will be harder to remove from memory.
 The JSON itself can be stored somewhere (E.g. (NoSQL) database or a file). You just need to make sure that any JSON that contains secrets has been appropriately protected (e.g. encrypted/HMACed). See the storage chapter for more details.
 
 ##### ORM
 
-Object-Relational Mapping (ORM) is used to store the contents of an object directly into a database. Libraries like OrmLite<sup>[4]</sup>, SugarORM<sup>[5]</sup>, GreenDAO<sup>[6]</sup> and ActiveAndroid<sup>[7]</sup> use a SQLite database to store the data in. Realm <sup>[8]</sup>, another library, uses its own database to store the contents of a class. 
+Object-Relational Mapping (ORM) is used to store the contents of an object directly into a database. Libraries like OrmLite<sup>[4]</sup>, SugarORM<sup>[5]</sup>, GreenDAO<sup>[6]</sup> and ActiveAndroid<sup>[7]</sup> use a SQLite database to store the data in. Realm <sup>[8]</sup>, another library, uses its own database to store the contents of a class.
 The amount of protection that ORM can provide mostly relies on whether the database is encrypted. See the storage chapter for more details.
 
 ##### Parcelable
-`Parcelable` is an interface for classes whose instances can be written to and restored from a `Parcel` <sup>[9][10][11]</sup>. A parcel is often used to pack a class as part of a `Bundle` content for an `Intent`. 
+`Parcelable` is an interface for classes whose instances can be written to and restored from a `Parcel` <sup>[9][10][11]</sup>. A parcel is often used to pack a class as part of a `Bundle` content for an `Intent`.
 
 #### Static Analysis
 
