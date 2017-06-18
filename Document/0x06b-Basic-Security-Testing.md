@@ -227,16 +227,25 @@ A minus sign would mean that this is an instance method. Please refer to further
 Alternatively, you can easily decompile the application with Hopper Disassembler [13]. All these steps will be performed automatically and you will be able to see disassembled binary and class information. 
 
 Your main focus while performing static analysis would be:
-* Identifying and undestanding functions responsible for jailbreak detection and certificate pinning
-  * For jailbreak detection, look for methods or classess containing words like `jailbreak`, `jailbroken`, `cracked`, etc. Please note that sometimes, the name of function performing jailbreak detection will be 'obfuscated' to slow down the analysis. Your best bet is to look for jailbreak detection mechanisms discussed in further section (cf. Dynamic Analysis - Jailbreak Detection)
+* Identifying and understanding functions responsible for jailbreak detection and certificate pinning
+  * For jailbreak detection, look for methods or classes containing words like `jailbreak`, `jailbroken`, `cracked`, etc. Please note that sometimes, the name of function performing jailbreak detection will be 'obfuscated' to slow down the analysis. Your best bet is to look for jailbreak detection mechanisms discussed in further section (cf. Dynamic Analysis - Jailbreak Detection)
   * For certificate pinning, look for keywords like `pinning`, `X509` or for native method calls like `NSURLSession`, `CFStream`, `AFNetworking`
 * Understanding application logic and possible ways to bypass it 
 * Any hardcoded credentials, certificates
 * Any methods that are used for obfuscation and in consequence may reveal sensitive information
 
-### Dynamic Analysis
 
--- TODO [Dynamic analysis - copying data files, logs, from device, etc.] --
+Other commands:
+
+Listing shared libraries:
+
+
+```bash
+$ otool -L <binary>
+```
+
+
+### Dynamic Analysis
 
 #### Monitoring Console Logs
 
@@ -253,6 +262,10 @@ window to expose the console log contents
 To save the console output to a text file, click the circle with a downward-pointing arrow at the bottom right.
 
 ![Console logs](Images/Chapters/0x06b/device_console.jpg "Monitoring console logs through XCode")
+
+##### Setting up a Web Proxy
+
+
 
 #### Dynamic Analysis On Jailbroken Devices
 
@@ -325,6 +338,7 @@ Note however that this binary is signed with a self-signed certificate with a "w
 Intospy <sup>[31]</sup> is an open-source security profiler for iOS released by iSecPartners. Built on top of substrate, it can be used to log security-sensitive API calls on a jailbroken device.  The recorded API calls sent to the console and written to a database file, which can then be converted into an HTML report using Introspy-Analyzer <code>[32]</code>.
 
 -- TODO [Write an IntroSpy howto] --
+
 
 #### Dynamic Analysis on Non-Jailbroken Devices
 
