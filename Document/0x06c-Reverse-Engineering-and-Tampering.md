@@ -45,7 +45,7 @@ Some of the benefits of jailbreaking an iOS Device includes the following:
 * Allowing important testing software tools to be installed
 * Providing access to the Objective-C Runtime
 
-iOS applications store data in the application sandbox which is not accessible to the public (but is available to root and the application itself). Without root access, it is not possible to assess the application sandbox, analyse the data that were stored in the device and how they were stored. 
+iOS applications store data in the application sandbox which is not accessible to the public (but is available to root and the application itself). Without root access, it is not possible to assess the application sandbox, analyze the data that were stored in the device and how they were stored. 
 
 #### How to Jailbreak iOS?
 
@@ -69,7 +69,7 @@ The core dilemma with this approach is that, by definition, jailbreaking causes 
 
 iOS reverse engineering is a mixed bag. On the one hand, apps programmed in Objective-C and Swift can be disassembled nicely. In Objective-C, object methods are called through dynamic function pointers called "selectors", which are resolved by name during runtime. The advantage of this is that these names need to stay intact in the final binary, making the disassembly more readable. Unfortunately, this also has the effect that no direct cross-references between methods are available in the disassembler, and constructing a flow graph is challenging. 
 
-In this guide, we'll give an introduction on static and dynamic analysis and instrumentation. Throughtout this chapter, we'll be referring to the OWASP UnCrackable Apps for iOS, so download them from MSTG repository if you're planning to follow the examples.
+In this guide, we'll give an introduction on static and dynamic analysis and instrumentation. Throughout this chapter, we'll be referring to the OWASP UnCrackable Apps for iOS, so download them from MSTG repository if you're planning to follow the examples.
 
 #### Static Analysis
 
@@ -148,7 +148,7 @@ Attaching to process 2670...
 
 Cydia Substrate (formerly called MobileSubstrate) is the de-facto standard framework for developing run-time patches (“Cydia Substrate extensions”) on iOS. It comes with Cynject, a tool that provides code injection support for C. Cycript is a scripting language developed by Jay Freeman (saurik). Cycript injects a JavaScriptCore VM into the running process. Users can then manipulate the process using a hybrid of Objective-C++ and JavaScript syntax through the Cycript interactive console. It is also possible to access and instantiate Objective-C classes inside a running process. Some examples for the use of Cycript are listed in the iOS chapter.
 
-Firt the SDK need to be downloaded, unpacked and installed.
+First the SDK need to be downloaded, unpacked and installed.
 ```bash
 $ wget https://cydia.saurik.com/api/latest/3 -O cycript.zip && unzip cycript.zip
 #on iphone

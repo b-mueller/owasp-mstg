@@ -101,7 +101,7 @@ The `NSUserDefaults`<sup>[11]</sup> class provides a programmatic interface for 
 
 #### Dynamic Analysis
 
-A way to identify if sensitive information like credentials and keys are stored insecurely and without leveraging the native functions from iOS is to analyse the app data directory. It is important to trigger as much app functionality as possible before the data is analysed, as the app might only store system credentials as specific functionality is triggered by the user. A static analysis can then be performed for the data dump based on generic keywords and app specific data.
+A way to identify if sensitive information like credentials and keys are stored insecurely and without leveraging the native functions from iOS is to analyze the app data directory. It is important to trigger as much app functionality as possible before the data is analyzed, as the app might only store system credentials as specific functionality is triggered by the user. A static analysis can then be performed for the data dump based on generic keywords and app specific data.
 
 The following steps can be used to identify how the application stores data locally on the iOS device.
 
@@ -324,7 +324,7 @@ Use a define to enable NSLog statements for development and debugging, and disab
 
 #### Overview
 
-Different 3rd party services are available that can be embedded into the app to implement different features. These features can vary from tracker services to monitor the user behaviour within the app, selling banner advertisements or to create a better user experience. Interacting with these services abstracts the complexity and neediness to implement the functionality on its own and to reinvent the wheel.
+Different 3rd party services are available that can be embedded into the app to implement different features. These features can vary from tracker services to monitor the user behavior within the app, selling banner advertisements or to create a better user experience. Interacting with these services abstracts the complexity and neediness to implement the functionality on its own and to reinvent the wheel.
 
 The downside is that a developer doesn’t know in detail what code is executed via 3rd party libraries and therefore giving up visibility. Consequently it should be ensured that not more information as needed is sent to the service and that no sensitive information is disclosed.
 

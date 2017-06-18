@@ -69,7 +69,7 @@ Obviously, there are other non-standard libraries that your application might be
 
 #### Overview
 
-It is fundamentally impossible to produce truly random numbers on any deterministic device. Pseudo-random number generators (RNG) compensate for this by producing a stream of pseudo-random numbers - a stream of numbers that *appear* as if they were randomly generated. The quality of the generated numbers varies with the type of algorihm used. *Cryptographically secure* RNGs generate random numbers that that pass statistical randomness tests, and are resilient against prediction attacks.
+It is fundamentally impossible to produce truly random numbers on any deterministic device. Pseudo-random number generators (RNG) compensate for this by producing a stream of pseudo-random numbers - a stream of numbers that *appear* as if they were randomly generated. The quality of the generated numbers varies with the type of algorithm used. *Cryptographically secure* RNGs generate random numbers that that pass statistical randomness tests, and are resilient against prediction attacks.
 
 Mobile SDKs offer standard implementations of RNG algorithms that produce numbers with sufficient artificial randomness.
 
@@ -100,7 +100,7 @@ int result = SecRandomCopyBytes(kSecRandomDefault, 16, randomBytes);
 
 -- TODO [Describe how to test for this issue "Testing Random Number Generation" by running and interacting with the app. This can include everything from simply monitoring network traffic or aspects of the app’s behavior to code injection, debugging, instrumentation, etc.] --
 
--- TODO [Can probably write about generating multiple values via the random number generation and compare them to analyse the entropy] --
+-- TODO [Can probably write about generating multiple values via the random number generation and compare them to analyze the entropy] --
 
 #### Remediation
 
@@ -126,5 +126,5 @@ Avoid implementing custom cryptography algorithms and standards. Also, only supp
 - [4] SecRandomCopyBytes (Objective-C) - https://developer.apple.com/reference/security/1399291-secrandomcopybytes?language=objc
 
 ##### Tools
--- TODO [Add links to relavant tools for "Testing Random Number Generation"] --
+-- TODO [Add links to relevant tools for "Testing Random Number Generation"] --
 * Enjarify - https://github.com/google/enjarify

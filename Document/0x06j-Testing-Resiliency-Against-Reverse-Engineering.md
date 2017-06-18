@@ -5,7 +5,7 @@ Testing Anti-Reversing Defenses on iOS
 
 #### Overview
 
-In the context of reverse engineering defense, jailbreak detection mechansism are added to make it a bit more difficult to run the app on a jailbroken device, which in turn impedes some tools and techniques reverse engineers like to use. As is the case with most other defenses, jailbreak detection is not a very effective defense on its own, but having some checks sprinkled throughout the app can improve the effectiveness of the overall anti-tampering scheme. Typical jailbreak detection techniques on iOS include:
+In the context of reverse engineering defense, jailbreak detection mechanisms are added to make it a bit more difficult to run the app on a jailbroken device, which in turn impedes some tools and techniques reverse engineers like to use. As is the case with most other defenses, jailbreak detection is not a very effective defense on its own, but having some checks sprinkled throughout the app can improve the effectiveness of the overall anti-tampering scheme. Typical jailbreak detection techniques on iOS include:
 
 ##### File-based Checks
 
@@ -118,7 +118,7 @@ cy# a=choose(JailbreakDetectionVC)
 []
 ```
 
-Ooops! The returned array is empty. It means that there are no instances of this class registed within the runtime. In fact, we haven't clicked second 'Jailbreak Test' button, which indeed initializes this class:
+Ooops! The returned array is empty. It means that there are no instances of this class registered within the runtime. In fact, we haven't clicked second 'Jailbreak Test' button, which indeed initializes this class:
 
 ```
 cy# a=choose(JailbreakDetectionVC)
@@ -326,7 +326,7 @@ sys.stdin.read()
 
 #### Overview
 
-Debugging is a highly effective way of analyzing the runtime behaviour of an app. It allows the reverse engineer to step through the code, stop execution of the app at arbitrary point, inspect and modify the state of variables, and a lot more.
+Debugging is a highly effective way of analyzing the runtime behavior of an app. It allows the reverse engineer to step through the code, stop execution of the app at arbitrary point, inspect and modify the state of variables, and a lot more.
 
 -- TODO [Typical debugging defenses] --
 
@@ -461,7 +461,7 @@ static int $_my_ptrace(int request, pid_t pid, caddr_t addr, int data) {
 
 Attach a debugger to the running process. This should either fail, or the app should terminate or misbehave when the debugger has been detected. For example, if ptrace(PT_DENY_ATTACH) has been called, gdb will crash with a segmentation fault:
 
-Note that some anti-debugging implementations respond in a stealthy way so that changes in behaviour are not immediately apparent. For example, a soft token app might not visibly respond when a debugger is detected, but instead secretly alter the state of an internal variable so that an incorrect OTP is generated at a later point. Make sure to run through the complete workflow to determine if attaching the debugger causes a crash or malfunction.
+Note that some anti-debugging implementations respond in a stealthy way so that changes in behavior are not immediately apparent. For example, a soft token app might not visibly respond when a debugger is detected, but instead secretly alter the state of an internal variable so that an incorrect OTP is generated at a later point. Make sure to run through the complete workflow to determine if attaching the debugger causes a crash or malfunction.
 
 #### Remediation
 
@@ -604,7 +604,7 @@ When verifying the HMAC with CC:
 
 *When trying to bypass the application-source integrity checks* 
 
-1. Patch out the anti-debugging functionality. Disable the unwanted behaviour by simply overwriting the respective code with NOP instructions.
+1. Patch out the anti-debugging functionality. Disable the unwanted behavior by simply overwriting the respective code with NOP instructions.
 2. Patch any stored hash that is used to evaluate the integrity of the code.
 3. Use Frida to hook APIs to hook file system APIs. Return a handle to the original file instead of the modified file.
 

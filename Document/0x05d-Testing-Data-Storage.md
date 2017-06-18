@@ -177,8 +177,8 @@ The level of security afforded by the Android KeyStore depends on its implementa
 In a software-only implementation, the keys are encrypted with a per-user encryption master key <sup>[16]</sup>. In that case, an attacker can access all keys on a rooted device in the folder <code>/data/misc/keystore/</code>. As the master key is generated using the user’s own lock screen pin/ password, the Android KeyStore is unavailable when the device is locked <sup>[9]</sup>.
 
 ##### Older Java-KeyStore
-Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The impelemntations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BouncyCastle KeyStore (BKS).
-You can create one by using the `KeyStore.getInstance("BKS", "BC");`, where "BKS" is the keystore name (BouncycastleKeyStore) and "BC" is the provider (BouncyCastle). Alternatively you can use SpongeyCastle as a wrapper and initialize the keystore: `KeyStore.getInstance("BKS", "SC");`.
+Older Android versions do not have a KeyStore, but do have the KeyStore interface from JCA (Java Cryptography Architecture). One can use various KeyStores that implement this interface and provide secrecy and integrity protection to the keys stored in the keystore implementation. The implementations all rely on the fact that a file is stored on the filesystem, which then protects its contents by a password. For this, we recommend to use the BouncyCastle KeyStore (BKS).
+You can create one by using the `KeyStore.getInstance("BKS", "BC");`, where "BKS" is the keystore name (BouncycastleKeyStore) and "BC" is the provider (BouncyCastle). Alternatively you can use SpongyCastle as a wrapper and initialize the keystore: `KeyStore.getInstance("BKS", "SC");`.
 
 Please be aware that not all KeyStores offer proper protection to the keys stored in the keystore files.
 
@@ -1108,10 +1108,10 @@ Lastly, some of the ciphers do not properly clean up their byte-arrays, for inst
 
 #### Dynamic Analysis
 
-To analyse the memory of an app in Android Studio, the app must be **debuggable**.
+To analyze the memory of an app in Android Studio, the app must be **debuggable**.
 See the instructions in XXX (-- TODO [Link to repackage and sign] --) on how to repackage and sign an Android app to enable debugging for an app, if not already done. Also adb integration need to be activated in Android Studio in “_Tools/Android/Enable ADB Integration_” in order to take a memory dump.
 
-For rudimentary analysis Android Studio built-in tools can be used. Android Studio includes tools in the “_Android Monitor_” tab to investigate the memory. Select the device and app you want to analyse in the "_Android Monitor_" tab and click on "_Dump Java Heap_" and a _.hprof_ file will be created.
+For rudimentary analysis Android Studio built-in tools can be used. Android Studio includes tools in the “_Android Monitor_” tab to investigate the memory. Select the device and app you want to analyze in the "_Android Monitor_" tab and click on "_Dump Java Heap_" and a _.hprof_ file will be created.
 
 ![Create Heap Dump](Images/Chapters/0x05d/Dump_Java_Heap.png)
 

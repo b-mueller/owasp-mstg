@@ -411,7 +411,7 @@ In the following we will use two example apps and give examples on how to identi
 ##### Activities
 
 ##### Inspect the AndroidManifest
-In the "Sieve" app we can find three exported activities idendified by `<activity>`:
+In the "Sieve" app we can find three exported activities identified by `<activity>`:
 ```xml
 <activity android:excludeFromRecents="true" android:label="@string/app_name" android:launchMode="singleTask" android:name=".MainLoginActivity" android:windowSoftInputMode="adjustResize|stateVisible">
     <intent-filter>

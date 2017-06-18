@@ -12,7 +12,7 @@ App Transport Security (ATS)<sup>[1]</sup> is a set of security checks that the 
 
 ATS is enforced only when making connections to public hostnames. Therefore any connection made to an IP address, unqualified domain names or TLD of .local is  not protected with ATS.
 
-The following is a summarised list of App Transport Security Requirements<sup>[1]</sup>:
+The following is a summarized list of App Transport Security Requirements<sup>[1]</sup>:
 
 - No HTTP connections are allowed
 - The X.509 Certificate has a SHA256 fingerprint and must be signed with at least 2048-bit RSA key or a 256-bit Elliptic-Curve Cryptography (ECC) key.
@@ -61,7 +61,7 @@ NSAppTransportSecurity : Dictionary {
 ```
 Source: Apple Developer Documentation<sup>[1]</sup>.
 
-The following table summarises the global ATS exceptions. For more information about these exceptions, please refer to Table 2 in reference [1].
+The following table summarizes the global ATS exceptions. For more information about these exceptions, please refer to Table 2 in reference [1].
 
 |  Key | Description |
 | -----| ------------|
@@ -71,7 +71,7 @@ The following table summarises the global ATS exceptions. For more information a
 | `NSAllowsArbitraryLoadsForMedia` | Disable all ATS restrictions for media loaded through the AV Foundations framework |
 
 
-The following table summarises the per-domain ATS exceptions. For more information about these exceptions, please refer to Table 3 in reference [1].
+The following table summarizes the per-domain ATS exceptions. For more information about these exceptions, please refer to Table 3 in reference [1].
 
 |  Key | Description |
 | -----| ------------|
@@ -120,7 +120,7 @@ The following command shows how to convert the Info.plist file into XML format.
 $ plutil -convert xml1 Info.plist
 ```
 
-Once the file is converted to a human readable format, the exceptions can analysed. The application may have ATS exceptions defined to allow it’s normal functionality. For an example, the Firefox iOS application has ATS disabled globally. This exception is acceptable because otherwise the application would not be able to connect to any HTTP web sites or website that do not have the ATS requirements.
+Once the file is converted to a human readable format, the exceptions can analyzed. The application may have ATS exceptions defined to allow it’s normal functionality. For an example, the Firefox iOS application has ATS disabled globally. This exception is acceptable because otherwise the application would not be able to connect to any HTTP web sites or website that do not have the ATS requirements.
 
 
 #### Dynamic Analysis
@@ -129,7 +129,7 @@ Once the file is converted to a human readable format, the exceptions can analys
 
 #### Remediation
 * ATS should always be activated and only be deactivated under certain circumstances.
-* If the application connects to a defined number of domains that the application owner controls, then configure the servers to support the ATS requirements and opt-in for the ATS requirements within the app. In the following example, `example.com` is owned by the applicaiton owner and ATS is enabled for that domain.
+* If the application connects to a defined number of domains that the application owner controls, then configure the servers to support the ATS requirements and opt-in for the ATS requirements within the app. In the following example, `example.com` is owned by the application owner and ATS is enabled for that domain.
 ```
 <key>NSAppTransportSecurity</key>
 <dict>
@@ -265,7 +265,7 @@ else {
 
 ##### Server certificate validation
 
-We start our analysis by testing the application's behaviour while establishing secure connection. Our test approach is to gradually relax security of SSL handshake negotiation and check which security mechanisms are enabled.
+We start our analysis by testing the application's behavior while establishing secure connection. Our test approach is to gradually relax security of SSL handshake negotiation and check which security mechanisms are enabled.
 
 1. Having burp set up as a proxy in wifi settings, make sure that there is no certificate added to trust store (Settings -> General -> Profiles) and that tools like SSL Kill Switch are deactivated. Launch your application and check if you can see the traffic in Burp. Any failures will be reported under 'Alerts' tabl. If you can see the traffic, it means that there is no certificate validation performed at all! This effectively means that an active attacker can silently do MiTM against your application. If however, you can't see any traffic and you have an information about SSL handshake failure, follow the next point.
 2. Now, install Burp certificate, as explained in [Basic Security Testing section](./0x06b-Basic-Security-Testing.md). If the handshake is successful and you can see the traffic in Burp, it means that certificate is validated against device's trust store, but the pinning is not performed. The risk is less significant than in previous scenario, as two main attack scenarios at this point are misbehaving CAs and phishing attacks, as discussed in [Basic Security Testing section](./0x06b-Basic-Security-Testing.md).

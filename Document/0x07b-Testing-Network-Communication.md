@@ -126,7 +126,7 @@ After identifying all servers communicating with your application (e.g. using Tc
 
 * testssl.sh: via following command:
 
-The Github repo of testssl.sh offers also a compiled openssl version for download that supports **all cipher suites and protocols including SSLv2**.
+The GitHub repo of testssl.sh offers also a compiled openssl version for download that supports **all cipher suites and protocols including SSLv2**.
 
 ```
 $ OPENSSL=./bin/openssl.Linux.x86_64 bash ./testssl.sh yoursite.com

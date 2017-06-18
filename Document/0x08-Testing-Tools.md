@@ -1,5 +1,5 @@
 ## Testing Tools
-To perform security testing different tools are available in order to be able to manipulate requests and responses, decompile Apps, investigate the behaviour of running Apps and other test cases and automate them.
+To perform security testing different tools are available in order to be able to manipulate requests and responses, decompile Apps, investigate the behavior of running Apps and other test cases and automate them.
 
 ### Mobile Application Security Testing Distributions
 * Appie - https://manifestsecurity.com/appie - A portable software package for Android Pentesting and an awesome alternative to existing Virtual machines.
@@ -41,7 +41,7 @@ To perform security testing different tools are available in order to be able to
 
 #### Dynamic and Runtime Analysis
 * Cydia Substrate - http://www.cydiasubstrate.com/ - Cydia Substrate for Android enables developers to make changes to existing software with Substrate extensions that are injected in to the target process's memory.
-* Xposed Framework - http://forum.xda-developers.com/xposed/xposed-installer-versions-changelog-t2714053 - Xposed framework enables you to modify the system or application aspect and behaviour at runtime, without modifying any Android application package(APKor re-flashing.
+* Xposed Framework - http://forum.xda-developers.com/xposed/xposed-installer-versions-changelog-t2714053 - Xposed framework enables you to modify the system or application aspect and behavior at runtime, without modifying any Android application package(APKor re-flashing.
 * logcat-color - https://github.com/marshall/logcat-color - A colorful and highly configurable alternative to the adb logcat command from the Android SDK.
 * Inspeckage - https://github.com/ac-pm/Inspeckage - Inspeckage is a tool developed to offer dynamic analysis of Android applications. By applying hooks to functions of the Android API, Inspeckage will help you understand what an Android application is doing at runtime.
 * Frida - http://www.frida.re/ - The toolkit works using a client-server model and lets you inject in to running processes not just on Android, but also on iOS, Windows and Mac.
