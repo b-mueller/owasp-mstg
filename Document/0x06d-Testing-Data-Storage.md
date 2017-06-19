@@ -8,7 +8,7 @@ Note that "sensitive data" needs to be identified in the context of each specifi
 
 #### Overview
 
-As already mentioned many times in this guide, as little sensitive data as possible should be saved on permanent local storage. However, in most practical scenarios, at least some type of user-related data needs to be stored. Fortunately, iOS offers secure storage APIs which allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
+As little sensitive data as possible should be saved on permanent local storage. However, in most practical scenarios, at least some type of user-related data needs to be stored. Fortunately, iOS offers secure storage APIs which allow developers to make use of the crypto hardware available in every iOS device. Provided that these APIs are used correctly, key data and files can be secured using hardware-backed 256 bit AES encryption.
 
 ##### Data Protection API
 
@@ -215,7 +215,7 @@ Here is a sample in swift with which you can create the keys as follows (notice 
 ```
 
 
---- {TODO: add key generation for RSA encryption
+-- [TODO: add key generation for RSA encryption] --
 
 #### References
 

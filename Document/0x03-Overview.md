@@ -36,7 +36,7 @@ Mobile app architectures also increasingly incorporate authorization frameworks 
 
 ### Interaction with the Mobile Platform
 
-The controls in this group ensure that the app uses platform APIs and standard components in a secure manner. Additionally, the controls cover communication between apps (IPC).
+Mobile operating system architectures differ from that of classical Desktop architectures in important ways. For example, all mobile OSes implement app permission systems that regulate access to specific APIs. They also offer more more (Android) or less (iOS) rich inter-process communication facilities that enable apps to exchange signals and data. These platform specific features come with their own set of pitfalls. For example, if IPC APIs are used incorrectly, sensitive data or functionality might be unintentionally exposed to other apps running on the device.
 
 ### Code Quality and Exploit Mitigation
 
