@@ -12,24 +12,13 @@ By using the fingerprint API in conjunction with the Android KeyGenerator class,
 
 Apart from this relatively reasonable method, fingerprint authentication can also be implemented in unsafe ways. For instance, developers might opt to assume successful authentication based solely on whether the <code>onAuthenticationSucceeded</code> callback <sup>[3]</sup> is called or when the Samsung Pass SDK is used for instance. This event however isn't proof that the user has performed biometric authentication - such a check can be easily patched or bypassed using instrumentation. Leveraging the Keystore is the only way to be reasonably sure that the user has actually entered their fingerprint.
 
-Unless, of course, the Keystore is compromised. Which has been the case as reported in [5] and mostly explained in [6]. There are a few known CVEs registered for instance: CVE-2016-2431, CVE-2016-2432, CVE-2015-6639, CVE-2015-6647. Therefore one should always check the security patch-level:
-
-```java
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", 	Locale.getDefault());
-	sdf.parse(Build.VERSION.SECURITY_PATCH).after(sdf.parse("2016-05-01"));
-```
-
-
 #### Static Analysis
-
-First make sure that the actual Android SDK is used for fingerprint evaluation and not any vendor specific SDKs, such as Samsung Pass as it is inherently flawed.
 
 Search for calls of <code>FingerprintManager.authenticate()</code>. The first parameter passed to this method should be a <code>CryptoObject</code> instance. <code>CryptoObject</code> is a wrapper class for the crypto objects supported by FingerprintManager <sup>[2]</sup>. If this parameter is set to <code>null</code>, the fingerprint auth is purely event-bound, which likely causes a security issue.
 
 Trace back the creation of the key used to initialize the cipher wrapped in the CryptoObject. Verify that the key was created using the <code>KeyGenerator</code> class, and that <code>setUserAuthenticationRequired(true)</code> was called when creating the <code>KeyGenParameterSpec</code> object (see also the code samples below).
 
 Verify the authentication logic. For the authentication to be successful, the remote endpoint **must** require the client to present the secret retrieved from the Keystore, or some value derived from the secret.
-
 
 #### Dynamic Analysis
 
